@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-neutral-100: #FAFAFA;
+    --color-neutral-200: #D9D9D9;
+    --color-neutral-300: #D6D6D6;
+    --color-neutral-400: #C2C2C2;
+    --color-neutral-500: #8C8C8C;
+    --color-neutral-600: #737373;
+    --color-neutral-700: #595959;
+    --color-neutral-800: #404040;
+    --color-neutral-900: #131313;
+
+    --color-primary-200: #e69ea6;
+    --color-primary-300: #D3858E;
+    --color-primary-400: #B96972;
+    --color-primary-500: #AF5660;
+
+    --color-secondary-100: #FFE1C9;
+    --color-secondary-200: #FFD5B4;
+    --color-secondary-300: #F4C29B;
+  }
+
+  h1 {
+    @apply font-quicksand font-bold text-4xl leading-tight;
+  }
+
+  h2 {
+    @apply font-quicksand font-bold text-3xl leading-snug;
+  }
+
+  h3 {
+    @apply font-quicksand font-bold text-2xl leading-relaxed;
+  }
+
+  h3 {
+    @apply font-quicksand font-bold text-xl leading-relaxed;
+  }
+
+  h4 {
+    @apply font-quicksand font-bold text-lg leading-normal;
+  }
+
+  p,
+  button {
+    @apply text-base;
+  }
+
+  html,
+  * {
+    @apply font-poppins;
+    /* ini ngubah di banyak font ku komen dulu */
+    /* @apply text-[13px]; */
+  }
+
+  .bg-gradient-primary {
+    @apply bg-gradient-to-r from-secondary-200 to-primary-500;
+  }
+
+  .btn {
+    @apply py-2 px-4 rounded-md border text-sm font-medium shadow-sm align-middle transition duration-300 ease-in-out cursor-pointer;
+  }
+
+  
+  .btn-primary {
+    @apply bg-primary-400 text-white flex gap-x-1 hover:bg-primary-300;
+  }
+
+  .btn-primary:disabled{
+    @apply bg-primary-400/70 cursor-not-allowed;
+  }
+
+  .btn-outline-primary {
+    @apply border-primary-400 bg-white text-primary-400 shadow-sm hover:bg-primary-400 hover:text-white;
+  }
+
+  
+  .btn-info {
+    @apply bg-blue-600 text-white hover:bg-blue-700 shadow-sm;
+  }
+
+  .btn-outline-info {
+    @apply border-blue-600 bg-white text-blue-600 shadow-sm hover:bg-blue-700 hover:text-white;
+  }
+  
+  .btn-danger {
+    @apply bg-red-500 text-white shadow-sm;
+  }
+
+  .btn-outline-danger {
+    @apply border-red-500 bg-white text-red-500 shadow-sm hover:bg-red-500 hover:text-white;
+  }
+
+  .form-control {
+    transition: border-radius 500ms ease-in-out;
+    @apply py-3 px-4 block w-full border-2 border-gray-200 rounded-lg text-sm focus:border-primary-400 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .form-switch {
+    @apply relative w-[3.25rem] h-7 p-px bg-gray-100 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-primary-400 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-primary-400 checked:border-primary-400 focus:checked:border-primary-400 before:inline-block before:w-6 before:h-6 before:bg-white checked:before:bg-primary-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200;
+  }
+
+  .badge-primary {
+    @apply inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-primary-500 text-white;
+  }
+
+  .badge-primary:hover {
+    @apply bg-primary-400;
+  }
+
+  .badge-success {
+    @apply inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-teal-500 text-white;
+  }
+
+  .badge-danger {
+    @apply inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-red-500 text-white;
+  }
+
+  .badge-warning {
+    @apply inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-yellow-500 text-white;
+  }
+}
