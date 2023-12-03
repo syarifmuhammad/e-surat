@@ -3,14 +3,43 @@ import Register from '@/views/Register.vue'
 import AskVerification from '@/views/AskVerification.vue'
 import Login from '@/views/Login.vue'
 import Dashboard from '@/views/Dashboard.vue'
+import Position from '@/views/positions/Index.vue'
+import FormPosition from '@/views/positions/Form.vue'
 import Employees from '@/views/employees/Index.vue'
 import FormEmployees from '@/views/employees/Form.vue'
 import Categories from '@/views/incoming_letters/Categories.vue'
 import ReferenceNumberSettings from '@/views/outcoming_letters/ReferenceNumberSettings.vue'
+import LetterTemplates from '@/views/outcoming_letters/LetterTemplates/Index.vue'
+
+//surat keterangan kerja
 import SuratKeteranganKerja from '@/views/outcoming_letters/SuratKeteranganKerja/Index.vue'
 import PreviewSuratKeteranganKerja from '@/views/outcoming_letters/SuratKeteranganKerja/Preview.vue'
 import FormSuratKeteranganKerja from '@/views/outcoming_letters/SuratKeteranganKerja/Form.vue'
-import SuratKeputusanRotasiKepegawaian from '@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian.vue'
+
+//surat keputusan rotasi kepegawaian
+import SuratKeputusanRotasiKepegawaian from '@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Index.vue'
+import PreviewSuratKeputusanRotasiKepegawaian from '@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Preview.vue'
+import FormSuratKeputusanRotasiKepegawaian from '@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Form.vue'
+
+//surat keputusan pemberhentian
+import SuratKeputusanPemberhentian from '@/views/outcoming_letters/SuratKeputusanPemberhentian/Index.vue'
+import PreviewSuratKeputusanPemberhentian from '@/views/outcoming_letters/SuratKeputusanPemberhentian/Preview.vue'
+import FormSuratKeputusanPemberhentian from '@/views/outcoming_letters/SuratKeputusanPemberhentian/Form.vue'
+
+//surat keputusan pengangkatan
+import SuratKeputusanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPengangkatan/Index.vue'
+import PreviewSuratKeputusanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPengangkatan/Preview.vue'
+import FormSuratKeputusanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPengangkatan/Form.vue'
+
+//surat keputusan pemberhenetian dan pengangkatan
+import SuratKeputusanPemberhentianDanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Index.vue'
+import PreviewSuratKeputusanPemberhentianDanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Preview.vue'
+import FormSuratKeputusanPemberhentianDanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Form.vue'
+
+//surat perjanjian kerja magang
+import SuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Index.vue'
+import PreviewSuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Preview.vue'
+import FormSuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Form.vue'
 
 //errors page
 import Forbidden from '@/views/errors/Forbidden.vue'
@@ -64,12 +93,32 @@ const router = createRouter({
       },
     },
     {
+      path: '/positions',
+      name: 'positions',
+      component: Position,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['superadmin', 'admin_sdm'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/positions/create',
+      name: 'create_positions',
+      component: FormPosition,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['superadmin', 'admin_sdm'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
       path: '/employees',
       name: 'employees',
       component: Employees,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin'],
+        can_accessed: ['superadmin', 'admin_sdm'],
         layout: 'AuthenticatedLayout',
       },
     },
@@ -104,12 +153,22 @@ const router = createRouter({
       },
     },
     {
-      path: '/surat-keluar/template',
-      name: 'template_outcoming_letter',
-      component: Employees,
+      path: '/surat-keluar/templates',
+      name: 'letter_templates',
+      component: LetterTemplates,
       meta: {
         is_login_required: true,
         can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/surat-keluar/templates/create',
+      name: 'create_letter_templates',
+      component: LetterTemplates,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
         layout: 'AuthenticatedLayout',
       },
     },
@@ -141,6 +200,7 @@ const router = createRouter({
         is_login_required: true,
         can_accessed: ['*'],
         layout: 'BlankLayout',
+        parentName: 'surat_keterangan_kerja',
       },
     },
     {
@@ -149,8 +209,9 @@ const router = createRouter({
       component: FormSuratKeteranganKerja,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'admin_sekretariat', 'superadmin'],
+        can_accessed: ['admin_sdm', 'superadmin'],
         layout: 'AuthenticatedLayout',
+        parentName: 'surat_keterangan_kerja',
       },
     },
     {
@@ -163,17 +224,167 @@ const router = createRouter({
         layout: 'AuthenticatedLayout',
       },
     },
+    {
+      path: '/surat-keluar/surat-keputusan-rotasi-kepegawaian/:id/preview',
+      name: 'preview_surat_keputusan_rotasi_kepegawaian',
+      component: PreviewSuratKeputusanRotasiKepegawaian,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'BlankLayout',
+        parentName: 'surat_keputusan_rotasi_kepegawaian',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-rotasi-kepegawaian/create',
+      name: 'create_surat_keputusan_rotasi_kepegawaian',
+      component: FormSuratKeputusanRotasiKepegawaian,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_rotasi_kepegawaian',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pemberhentian',
+      name: 'surat_keputusan_pemberhentian',
+      component: SuratKeputusanPemberhentian,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pemberhentian/:id/preview',
+      name: 'preview_surat_keputusan_pemberhentian',
+      component: PreviewSuratKeputusanPemberhentian,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'BlankLayout',
+        parentName: 'surat_keputusan_pemberhentian',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pemberhentian/create',
+      name: 'create_surat_keputusan_pemberhentian',
+      component: FormSuratKeputusanPemberhentian,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_pemberhentian',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pengangkatan',
+      name: 'surat_keputusan_pengangkatan',
+      component: SuratKeputusanPengangkatan,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pengangkatan/:id/preview',
+      name: 'preview_surat_keputusan_pengangkatan',
+      component: PreviewSuratKeputusanPengangkatan,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'BlankLayout',
+        parentName: 'surat_keputusan_pengangkatan',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pengangkatan/create',
+      name: 'create_surat_keputusan_pengangkatan',
+      component: FormSuratKeputusanPengangkatan,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_pengangkatan',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pemberhentian-dan-pengangkatan',
+      name: 'surat_keputusan_pemberhentian_dan_pengangkatan',
+      component: SuratKeputusanPemberhentianDanPengangkatan,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pemberhentian-dan-pengangkatan/:id/preview',
+      name: 'preview_surat_keputusan_pemberhentian_dan_pengangkatan',
+      component: PreviewSuratKeputusanPemberhentianDanPengangkatan,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'BlankLayout',
+        parentName: 'surat_keputusan_pemberhentian_dan_pengangkatan',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pemberhentian-dan-pengangkatan/create',
+      name: 'create_surat_keputusan_pemberhentian_dan_pengangkatan',
+      component: FormSuratKeputusanPemberhentianDanPengangkatan,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_pemberhentian_dan_pengangkatan',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-magang',
+      name: 'surat_perjanjian_kerja_magang',
+      component: SuratPerjanjianKerjaMagang,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-magang/:id/preview',
+      name: 'preview_surat_perjanjian_kerja_magang',
+      component: PreviewSuratPerjanjianKerjaMagang,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'BlankLayout',
+        parentName: 'surat_perjanjian_kerja_magang',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-magang/create',
+      name: 'create_surat_perjanjian_kerja_magang',
+      component: FormSuratPerjanjianKerjaMagang,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_perjanjian_kerja_magang',
+      },
+    },
   ]
 })
 
 router.beforeEach(async (to, from, next) => {
-  const token = useAuthStore().token
+  let token = useAuthStore().token
   if (token && useUserStore().is_empty()) {
     try {
       const { data } = await axios.get(`${url}/me`)
       useUserStore().setUser(data.data)
     } catch (error) {
-      console.log(error)
+      token = null
     }
   }
   // const is_verified = useUserStore().user.is_verified
@@ -188,7 +399,7 @@ router.beforeEach(async (to, from, next) => {
 
   const can_accessed = to.meta.can_accessed.some(roles => roles === '*' || roles === useUserStore().user.roles)
   if (!can_accessed) {
-    return next('forbidden');
+    return next({ name: 'forbidden' });
   }
 
   // if (!is_verified && to.name != 'verify_email') {

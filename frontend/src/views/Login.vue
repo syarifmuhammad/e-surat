@@ -50,23 +50,23 @@ function submit() {
                         <div>
                             <label for="email" class="block text-sm mb-2">Email</label>
                             <div class="relative">
-                                <input v-model="form.email" type="email" id="email" name="email" class="form-control"
+                                <input v-model="form.email" placeholder="Masukkan email" type="email" id="email" name="email" class="form-control"
                                     autocomplete="username" required>
                             </div>
                         </div>
                         <div>
                             <div class="flex justify-between items-center">
                                 <label for="password" class="block text-sm mb-2">Password</label>
-                                <a class="text-sm text-primary-500 decoration-2 hover:underline font-medium"
+                                <a tabindex="-1" class="text-sm text-primary-500 decoration-2 hover:underline font-medium"
                                     href="../examples/html/recover-account.html">Lupa password?</a>
                             </div>
                             <div class="relative">
-                                <input v-model="form.password" type="password" id="password" name="password"
+                                <input v-model="form.password" placeholder="Masukkan password" type="password" id="password" name="password"
                                     autocomplete="current-password" class="form-control" required>
                             </div>
                         </div>
                         <div class="flex items-center gap-x-2">
-                            <input id="remember-me" type="checkbox"
+                            <input tabindex="-1" id="remember-me" type="checkbox"
                                 class="border-gray-200 rounded text-primary-500 focus:ring-primary-500">
                             <label for="remember-me" class="text-sm">Remember me</label>
                         </div>

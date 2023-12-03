@@ -29,7 +29,7 @@ function check_route_can_access(name) {
     <template v-if="props.child.length < 1">
         <li>
             <RouterLink :to="{ name: props.name }" v-if="check_route_can_access(props.name)"
-                :class="route.name === props.name ? 'bg-primary-400/20 text-primary-400 font-semibold' : 'hover:text-primary-400'"
+                :class="route.name === props.name || route.meta.parentName === props.name ? 'bg-primary-400/20 text-primary-400 font-semibold' : 'hover:text-primary-400'"
                 class="hs-accordion-toggle flex items-center gap-x-3.5 py-2 px-2.5 text-base text-black rounded-md">
                 <Icon class="min-w-[24px] min-h-[24px]" :icon="props.icon" />
                 {{ props.title }}
@@ -38,9 +38,9 @@ function check_route_can_access(name) {
     </template>
     <template v-else>
         <li class="hs-accordion" v-if="props.child.some(c => check_route_can_access(c.name))" :class="{
-            'active': props.child.some(c => c.name == route.name)
+            'active': props.child.some(c => c.name == route.name) || props.child.some(c => c.name == route.meta.parentName)
         }" :id="`${props.name}-accordion`">
-            <span :class="props.child.some(c => c.name == route.name) ? 'text-primary-400' : 'hover:text-primary-400'"
+            <span :class="props.child.some(c => c.name == route.name) || props.child.some(c => c.name == route.meta.parentName) ? 'text-primary-400' : 'hover:text-primary-400'"
                 class="hs-accordion-toggle flex items-center gap-x-3.5 py-2 px-2.5 text-base text-black rounded-md cursor-pointer">
                 <Icon class="min-w-[24px] min-h-[24px]" :icon="props.icon" />
                 {{ props.title }}
@@ -49,12 +49,12 @@ function check_route_can_access(name) {
             </span>
             <div :id="`${props.accordionName}-accordion-child`"
                 class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300" :class="{
-                    'hidden': !props.child.some(c => c.name == route.name)
+                    'hidden': !props.child.some(c => c.name == route.name) && !props.child.some(c => c.name == route.meta.parentName),
                 }">
                 <ul class="hs-accordion-group pl-3 pt-2">
                     <template v-for="child in props.child">
                         <li v-if="check_route_can_access(child.name)" class="rounded-md my-2"
-                            :class="child.name == route.name ? 'bg-primary-400/20 text-primary-400 font-semibold' : 'hover:text-primary-400'">
+                            :class="child.name == route.name || child.name === route.meta.parentName ? 'bg-primary-400/20 text-primary-400 font-semibold' : 'hover:text-primary-400'">
                             <RouterLink :to="{ name: child.name }"
                                 :class="child.disabled ? 'pointer-events-none cursor-default' : ''"
                                 class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm">

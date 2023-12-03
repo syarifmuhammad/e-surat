@@ -19,7 +19,8 @@ const form_surat = reactive({
     },
     signer: {
         position: "",
-    }
+    },
+    signature_type: "manual",
 })
 
 const errors = reactive({
@@ -31,7 +32,8 @@ const errors = reactive({
     signer: {
         nip: "",
         position: "",
-    }
+    },
+    signature_type: ""
 })
 
 const letter_templates = ref([])
@@ -39,12 +41,16 @@ const selected_employee = ref(null)
 const selected_signer = ref(null)
 
 function get_letter_templates() {
-    axios.get(`${url}/outcoming-letters/letter-templates?letter_type=${NAMA_SURAT}`)
+    loading.value.open()
+    axios.get(`${url}/outcoming-letters/templates?letter_type=${NAMA_SURAT}`)
         .then(res => {
             letter_templates.value = res.data.data
+            form_surat.letter_template_id = letter_templates.value[0].id
         })
         .catch(err => {
             console.log(err)
+        }).finally(() => {
+            loading.value.close()
         })
 }
 
@@ -54,6 +60,7 @@ function reset_errors() {
     errors.employee.position = ""
     errors.signer.nip = ""
     errors.signer.position = ""
+    errors.signature_type = ""
 }
 
 function reset_employee() {
@@ -70,6 +77,23 @@ function reset_signer() {
         nip: "",
         position: "",
     }
+}
+
+function reset_form() {
+    form_surat.id = ""
+    form_surat.letter_template_id = ""
+    form_surat.employee = {
+        nip: "",
+        position: "",
+    }
+    form_surat.signer = {
+        nip: "",
+        position: "",
+    }
+    form_surat.signature_type = "manual"
+    reset_employee()
+    reset_signer()
+    reset_errors()
 }
 
 
@@ -108,6 +132,7 @@ function save_surat() {
                 nip: selected_signer.value.nip,
                 position: form_surat.signer.position
             },
+            signature_type: form_surat.signature_type,
         }
 
         axios.post(`${url}/outcoming-letters/surat-keterangan-kerja`, payload)
@@ -117,6 +142,7 @@ function save_surat() {
                     title: "Berhasil",
                     text: res.data.message,
                 });
+                reset_form()
             })
             .catch(err => {
                 if (err.response.status == 422) {
@@ -125,6 +151,7 @@ function save_surat() {
                     errors.signer.nip = err.response.data.errors.signer.nip[0]
                     errors.employee.position = err.response.data.errors.employee.position[0]
                     errors.signer.position = err.response.data.errors.signer.position[0]
+                    errors.signature_type = err.response.data.errors.signature_type[0]
                 } else {
                     console.log(err)
                 }
@@ -139,18 +166,18 @@ onMounted(async () => {
     get_letter_templates()
 })
 
-
 </script>
 
 <template>
     <Loading ref="loading"></Loading>
     <SubHeader :title="`Tambah Surat Keterangan Kerja`" />
     <div class="flex flex-col bg-white rounded-lg">
-        <div class="px-16 py-10 min-w-full inline-block align-middle">
+        <div class="px-8 py-5 min-w-full inline-block align-middle">
             <form @submit.prevent="save_surat">
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Template Surat</label>
-                    <select class="form-control" required v-model="form_surat.letter_template_id" placeholder="Template Surat">
+                    <select class="form-control" required v-model="form_surat.letter_template_id"
+                        placeholder="Template Surat">
                         <option v-for="letter_template in letter_templates" :value="letter_template.id">{{
                             letter_template.name }}</option>
                     </select>
@@ -234,6 +261,18 @@ onMounted(async () => {
                         placeholder="Jabatan penandatangan"></custom-select>
                     <p v-if="errors.signer.position" class="text-xs text-red-600 mt-2" id="signer-position-error">
                         {{ errors.signer.position }}
+                    </p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Jenis Tanda Tangan</label>
+                    <select class="form-control" required v-model="form_surat.signature_type"
+                        placeholder="Jenis Tanda Tangan">
+                        <option value="manual">Tanda Tangan Manual</option>
+                        <option value="qrcode">Tanda Tangan QR Code</option>
+                        <option value="digital">Tanda Tangan Digital</option>
+                    </select>
+                    <p v-if="errors.signature_type" class="text-xs text-red-600 mt-2" id="signatur-type-error">
+                        {{ errors.signature_type }}
                     </p>
                 </div>
                 <div class="flex justify-end">

@@ -10,8 +10,8 @@
 </script>
 
 <template>
-  <div class="grid grid-cols-2 items-center mb-9">
-      <h1 class="text-primary-400"> {{ title }}</h1>
+  <div class="flex items-center mb-9">
+      <h1 class="text-primary-400 text-lg"> {{ title }}</h1>
       <slot />
     <!-- <MonthDropdown v-if="hasDropdownMonth" /> -->
   </div>

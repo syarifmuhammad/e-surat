@@ -6,8 +6,9 @@ import CustomTable from '@/components/CustomTable.vue'
 import Modal from '@/components/Modal.vue'
 import Loading from '@/components/Loading.vue'
 import axios from 'axios'
+import { useUserStore } from '@/stores/user'
 
-
+const userStore = useUserStore()
 const url = import.meta.env.VITE_URL_API
 
 const thead = [
@@ -67,17 +68,17 @@ function save_form_edit_roles() {
 
 <template>
     <Loading ref="loading" />
-    <SubHeader :title="`Data Pegawai`">
+    <!-- <SubHeader :title="`Data Pegawai`">
         <button type="button" class="btn btn-outline-primary inline-flex gap-2 justify-center items-center">
             Pegawai
             <Icon class="text-lg" icon="fe:sync" />
         </button>
-    </SubHeader>
+    </SubHeader> -->
     <div class="flex flex-col bg-white rounded-lg">
-        <div class="px-16 py-10 min-w-full inline-block align-middle">
+        <div class="px-8 py-5 min-w-full inline-block align-middle">
             <div class="flex justify-between mb-6">
                 <h3 class="text-primary-400">List Data Pegawai</h3>
-                <router-link :to="{ name: 'create_employees' }" class="btn btn-primary">
+                <router-link v-if="userStore.user.roles === 'superadmin'" :to="{ name: 'create_employees' }" class="btn btn-primary">
                     <Icon class="text-lg" icon="fluent:add-12-filled" /> Tambah Pegawai
                 </router-link>
             </div>

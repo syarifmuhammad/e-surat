@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "31740a9b51d06ff5dc88ae077cf57606",
+    "content-hash": "7c587927069d25caf8dbda8f470901e9",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -2184,55 +2184,6 @@
                 }
             ],
             "time": "2023-06-21T08:46:11+00:00"
-        },
-        {
-            "name": "ncjoes/office-converter",
-            "version": "v1.0.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ncjoes/office-converter.git",
-                "reference": "292339ae129ce2defdd1a4bf83f399fb3f2183f7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ncjoes/office-converter/zipball/292339ae129ce2defdd1a4bf83f399fb3f2183f7",
-                "reference": "292339ae129ce2defdd1a4bf83f399fb3f2183f7",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.3|^8.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.16",
-                "phpstan/phpstan": "^0.12.11",
-                "phpunit/phpunit": "7.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "NcJoes\\OfficeConverter\\": "src/OfficeConverter"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Chukwuemeka Nwobodo",
-                    "email": "jc.nwobodo@gmail.com"
-                }
-            ],
-            "description": "PHP Wrapper for LibreOffice",
-            "keywords": [
-                "converter",
-                "office"
-            ],
-            "support": {
-                "issues": "https://github.com/ncjoes/office-converter/issues",
-                "source": "https://github.com/ncjoes/office-converter/tree/v1.0.5"
-            },
-            "time": "2023-07-03T11:38:44+00:00"
         },
         {
             "name": "nesbot/carbon",

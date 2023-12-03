@@ -15,6 +15,10 @@ return new class extends Migration
             $table->string('nip')->primary();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('tempat_lahir');
+            $table->date('tanggal_lahir');
+            $table->text('alamat');
+            $table->string('npwp');
             $table->timestamps();
         });
     }

@@ -64,7 +64,7 @@ function save_category() {
         </button>
     </SubHeader>
     <div class="flex flex-col bg-white rounded-lg">
-        <div class="px-16 py-10 min-w-full inline-block align-middle">
+        <div class="px-8 py-5 min-w-full inline-block align-middle">
             <div class="flex justify-between mb-6">
                 <h3 class="text-primary-400">List Kategori Surat Masuk</h3>
                 <button @click="open_modal_form_category()" class="btn btn-primary">

@@ -46,7 +46,7 @@ class SuratKeteranganKerjaResource extends JsonResource
             'can_signed' => $this->can_signed(),
             'can_edit' => $this->can_edit(),
             'can_upload_verified_file' => $this->can_upload_verified_file(),
-            'signed_type' => $this->signed_type,
+            'signature_type' => $this->signature_type,
             'is_signed' => $this->is_signed(),
             'status' => $status,
             'created_at' => $this->created_at,

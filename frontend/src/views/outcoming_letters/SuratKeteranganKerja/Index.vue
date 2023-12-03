@@ -2,10 +2,14 @@
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { Icon } from '@iconify/vue'
+import axios from 'axios'
 import SubHeader from '@/components/SubHeader.vue'
 import CustomTable from '@/components/CustomTable.vue';
-import axios from 'axios'
+import Modal from '@/components/Modal.vue';
+import UploadFile from '@/components/UploadFile.vue'
+import { useUserStore } from '@/stores/user'
 
+const userStore = useUserStore()
 const url = import.meta.env.VITE_URL_API
 
 const thead = [
@@ -19,6 +23,10 @@ const thead = [
 
 const loading = ref(null)
 const table = ref(null)
+const modal_upload_signed_file = ref(null)
+
+const verified_file = ref(null)
+const letter_id = ref(null)
 
 function open_sweetalert_confirm_give_reference_number(id) {
     Swal.fire({
@@ -55,23 +63,45 @@ function give_reference_number(id) {
     })
 }
 
-function download(id) {
+function open_modal_upload_signed_file(id) {
+    modal_upload_signed_file.value.open()
+    letter_id.value = id
+}
+
+function upload_signed_file() {
+    if (!letter_id.value) {
+        Swal.fire({
+            title: 'Gagal!',
+            text: 'Terjadi kesalahan!',
+            icon: 'error',
+        })
+        return
+    }
+    if (!verified_file.value.files) {
+        Swal.fire({
+            title: 'Gagal!',
+            text: 'File tidak boleh kosong!',
+            icon: 'error',
+        })
+        return
+    }
     loading.value = true
-    axios.get(`${url}/outcoming-letters/surat-keterangan-kerja/${id}/download`, {
-        responseType: 'blob',
-    }).then(res => {
+    let request = new FormData()
+    request.append('signed_file', verified_file.value.files)
+    request.append('_method', 'PUT')
+    axios.post(`${url}/outcoming-letters/surat-keterangan-kerja/${letter_id.value}/upload-signed-file`, request).then(res => {
         loading.value = false
-        const url = window.URL.createObjectURL(new Blob([res.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `Surat Keterangan Kerja ${id}.docx`);
-        document.body.appendChild(link);
-        link.click();
+        Swal.fire({
+            title: 'Berhasil!',
+            text: 'File berhasil diupload!',
+            icon: 'success',
+        })
+        table.value.getData()
     }).catch(err => {
         loading.value = false
         Swal.fire({
             title: 'Gagal!',
-            text: 'Surat gagal diunduh!',
+            text: 'File gagal diupload!',
             icon: 'error',
         })
     })
@@ -80,17 +110,17 @@ function download(id) {
 
 <template>
     <Loading ref="loading"></Loading>
-    <SubHeader :title="`Surat Keterangan Kerja`">
+    <!-- <SubHeader :title="`Surat Keterangan Kerja`">
         <button type="button" class="btn btn-outline-primary inline-flex gap-2 justify-center items-center">
             Surat Keterangan Kerja
             <Icon class="text-lg" icon="fe:sync" />
         </button>
-    </SubHeader>
+    </SubHeader> -->
     <div class="flex flex-col bg-white rounded-lg">
-        <div class="px-16 py-10 min-w-full inline-block align-middle">
+        <div class="px-8 py-5 min-w-full inline-block align-middle">
             <div class="flex justify-between mb-6">
                 <h3 class="text-primary-400">List Surat Keterangan Kerja</h3>
-                <RouterLink :to="{ name: 'create_surat_keterangan_kerja' }" class="btn btn-primary">
+                <RouterLink v-if="userStore.user.roles === 'superadmin' || userStore.user.roles === 'admin_sdm'" :to="{ name: 'create_surat_keterangan_kerja' }" class="btn btn-primary">
                     <Icon class="text-lg" icon="fluent:add-12-filled" /> Tambah Surat Keterangan Kerja
                 </RouterLink>
             </div>
@@ -103,14 +133,19 @@ function download(id) {
                 <td :class="[item.defaultClass]">{{ item.employee.name }}</td>
                 <td :class="[item.defaultClass]">
                     <template v-if="item.status == 'waiting_for_reference_number'">
-                        <span class="badge badge-warning">Pending</span>
+                        <span class="badge badge-danger text-center">Pending</span>
                         <br>
-                        <small class="text-yellow-500 ">Catatan : Menunggu nomor surat</small>
+                        <small class="text-red-500 ">Catatan : Menunggu nomor surat</small>
                     </template>
                     <template v-if="item.status == 'waiting_for_signed'">
-                        <span class="badge badge-warning">Pending</span>
+                        <span class="badge badge-warning text-center">Pending</span>
                         <br>
                         <small class="text-yellow-500 ">Catatan : Menunggu ditandatangani</small>
+                    </template>
+                    <template v-if="item.status == 'signed'">
+                        <span class="badge badge-success text-center">Sudah Ditandatangani</span>
+                        <!-- <br>
+                        <small class="text-yellow-500 ">Catatan : Menunggu ditandatangani</small> -->
                     </template>
                     <!-- <span v-if="item.status == 'approved'" class="badge badge-success">Disetujui</span>
                     <span v-if="item.status == 'rejected'" class="badge badge-danger">Ditolak</span> -->
@@ -127,10 +162,10 @@ function download(id) {
                             </svg>
                         </button>
 
-                        <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-[15rem] bg-white shadow-md rounded-lg p-2 mt-2 divide-y divide-gray-200"
+                        <div class="z-10 hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-[15rem] bg-white shadow-md rounded-lg p-2 mt-2 divide-y divide-gray-200"
                             aria-labelledby="hs-dropdown-with-icons">
                             <div class="py-2 first:pt-0 last:pb-0">
-                                <RouterLink :to="{ name: 'preview_surat_keterangan_kerja', params: { id: item.id } }"
+                                <RouterLink target="_blank" :to="{ name: 'preview_surat_keterangan_kerja', params: { id: item.id } }"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="gg:file-document"></Icon>
                                     Lihat Surat
@@ -141,13 +176,13 @@ function download(id) {
                                     <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
                                     Berikan Nomor Surat
                                 </span>
-                                <span v-if="item.can_upload_verified_file"
-                                    @click="open_sweetalert_confirm_give_reference_number(item.id)"
+                                <span v-if="item.can_upload_verified_file" @click="open_modal_upload_signed_file(item.id)"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="octicon:upload-16"></Icon>
                                     Upload Surat Bertanda Tangan
                                 </span>
-                                <span v-if="!item.can_upload_verified_file && item.can_signed" @click="open_sweetalert_confirm_give_reference_number(item.id)"
+                                <span v-if="!item.can_upload_verified_file && item.can_signed"
+                                    @click="open_sweetalert_confirm_give_reference_number(item.id)"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="fluent:signed-24-regular"></Icon>
                                     Tanda Tangani Surat
@@ -164,4 +199,24 @@ function download(id) {
             </CustomTable>
         </div>
     </div>
+    <Modal ref="modal_upload_signed_file" :customClass="'sm:max-w-[700px]'">
+        <form @submit.prevent="upload_signed_file">
+            <div class="p-4 pb-0 sm:p-10 sm:pb-0 h-full flex flex-col">
+                <div class="text-center mb-6">
+                    <h3 class="mb-2 text-xl font-bold text-gray-800">
+                        Form Upload Surat Yang Bertanda Tangan
+                    </h3>
+                </div>
+                <div class="mb-4 rounded-md overflow-hidden" style="box-shadow: 0 0.25rem 1rem #a1acb873;">
+                    <label class="block text-sm font-medium p-4">File Bertanda Tangan <span class="text-red-400">*</span></label>
+                    <UploadFile ref="verified_file"></UploadFile>
+                </div>
+            </div>
+            <div class="border-t p-4 sm:px-10 flex justify-center">
+                <button type="button" @click="modal_upload_signed_file.close()"
+                    class="btn btn-outline-primary px-14 py-3 mr-6">Batal</button>
+                <button class="btn btn-primary px-14 py-3">Simpan</button>
+            </div>
+        </form>
+    </Modal>
 </template>

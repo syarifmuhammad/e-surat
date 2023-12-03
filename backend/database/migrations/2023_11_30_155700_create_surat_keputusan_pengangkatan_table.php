@@ -1,0 +1,45 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('surat_keputusan_pengangkatan', function (Blueprint $table) {
+            $table->id();
+            $table->string('reference_number')->nullable()->unique();
+            $table->string('nomor_berita_acara');
+            $table->date('tanggal_berita_acara');
+            $table->string('employee_nip');
+            $table->string('pengangkatan_dalam_jabatan');
+            $table->date('tanggal_berlaku');
+            $table->string('signer_nip');
+            $table->string('signer_position');
+            $table->enum('signature_type', ['manual', 'qrcode', 'digital'])->default('manual');
+            $table->unsignedBigInteger('letter_template_id');
+            $table->string('tmp_file')->nullable();
+            $table->string('signed_file')->nullable();
+            $table->string('created_by');
+            $table->timestamps();
+
+            $table->foreign('employee_nip')->references('nip')->on('employees')->noActionOnDelete();
+            $table->foreign('signer_nip')->references('nip')->on('employees')->noActionOnUpdate();
+            $table->foreign('letter_template_id')->references('id')->on('letter_templates')->restrictOnDelete();
+            $table->foreign('created_by')->references('nip')->on('users')->noActionOnDelete();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('surat_keputusan_pengangkatan');
+    }
+};

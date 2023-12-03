@@ -18,8 +18,9 @@ return new class extends Migration
             $table->string('position');
             $table->string('signer_nip');
             $table->string('signer_position');
-            $table->enum('signed_type', ['digital', 'qrcode', 'basah'])->default('basah');
+            $table->enum('signature_type', ['manual', 'qrcode', 'digital'])->default('manual');
             $table->unsignedBigInteger('letter_template_id');
+            $table->string('tmp_file')->nullable();
             $table->string('signed_file')->nullable();
             $table->string('created_by');
             $table->timestamps();

@@ -21,6 +21,36 @@ class ReferenceNumberSetting extends Model
             "prefix" => "",
             "suffix" => "/SDM11/WRII/{bln}/{thn}",
         ],
+        "SURAT_KEPUTUSAN_ROTASI_KEPEGAWAIAN" => [
+            "name" => "Surat Keputusan Rotasi Kepegawaian",
+            "letter_type" => "SURAT_KEPUTUSAN_ROTASI_KEPEGAWAIAN",
+            "prefix" => "",
+            "suffix" => "/SDM6/WRII/{bln}/{thn}",
+        ],
+        "SURAT_KEPUTUSAN_PEMBERHENTIAN" => [
+            "name" => "Surat Keputusan Pemberhentian",
+            "letter_type" => "SURAT_KEPUTUSAN_PEMBERHENTIAN",
+            "prefix" => "",
+            "suffix" => "/SDM6/WRII/{bln}/{thn}",
+        ],
+        "SURAT_KEPUTUSAN_PENGANGKATAN" => [
+            "name" => "Surat Keputusan Pengangkatan",
+            "letter_type" => "SURAT_KEPUTUSAN_PENGANGKATAN",
+            "prefix" => "",
+            "suffix" => "/SDM6/WRII/{bln}/{thn}",
+        ],
+        "SURAT_KEPUTUSAN_PEMBERHENTIAN_DAN_PENGANGKATAN" => [
+            "name" => "Surat Keputusan Pemberhentian Dan Pengangkatan",
+            "letter_type" => "SURAT_KEPUTUSAN_PEMBERHENTIAN_DAN_PENGANGKATAN",
+            "prefix" => "",
+            "suffix" => "/SDM6/WRII/{bln}/{thn}",
+        ],
+        "SURAT_PERJANJIAN_KERJA_MAGANG" => [
+            "name" => "Surat Perjanjian Kerja Magang",
+            "letter_type" => "SURAT_PERJANJIAN_KERJA_MAGANG",
+            "prefix" => "",
+            "suffix" => "/SDM24/WRII/{bln}/{thn}",
+        ],
         // "DAMIU" => [
         //     "letter_type" => "DAMIU",
         //     "prefix" => "540.2/",
@@ -109,8 +139,11 @@ class ReferenceNumberSetting extends Model
 
     public static function get_and_parse_reference_number_with_date($letter_type, $order_number, $date)
     {
-        $reference_number = self::$DEFAULT[$letter_type];
-        $order_number_len = strlen((string) $order_number) > 3 ? strlen((string) $order_number) : 3 ;
+        $reference_number = ReferenceNumberSetting::where('letter_type', $letter_type)->first();
+        if (!$reference_number) {
+            $reference_number = self::$DEFAULT[$letter_type];
+        }
+        $order_number_len = strlen((string) $order_number) > 3 ? strlen((string) $order_number) : 3;
         $reference_number = $reference_number['prefix'] . str_pad($order_number, $order_number_len, '0', STR_PAD_LEFT) . $reference_number['suffix'];
         return self::parse_reference_number_with_date($reference_number, $date);
     }

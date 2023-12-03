@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Position;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class PositionController extends Controller
 {
@@ -23,19 +24,34 @@ class PositionController extends Controller
      */
     public function store(Request $request)
     {
-        // DB::beginTransaction();
-        // try {
-        //     Position::create($request->all());
-        //     DB::commit();
-        //     return response()->json([
-        //         'message' => 'Berhasil menyimpan data jabatan',
-        //     ]);
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     return response()->json([
-        //         'message' => $e->getMessage()
-        //     ]);
-        // }
+        $validate = Validator::make($request->all(), [
+            'name' => "required|string|unique:positions",
+        ]);
+
+        if ($validate->fails()) {
+            $response = [
+                'errors' => $validate->errors(),
+                'message' => "Validasi form gagal !"
+            ];
+            return response()->json($response, 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $new_position = new Position();
+            $new_position->name = $request->name;
+            $new_position->save();
+            
+            DB::commit();
+            return response()->json([
+                'message' => 'Berhasil menyimpan data jabatan',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     /**

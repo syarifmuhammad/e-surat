@@ -86,7 +86,7 @@ function save() {
         </button> -->
     </SubHeader>
     <div class="flex flex-col bg-white rounded-lg">
-        <div class="px-16 py-10 min-w-full inline-block align-middle">
+        <div class="px-8 py-5 min-w-full inline-block align-middle">
             <form @submit.prevent="save">
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">NIP <span class="text-red-400">*</span></label>

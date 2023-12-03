@@ -105,7 +105,7 @@ onMounted(() => {
         </button> -->
     </SubHeader>
     <div class="flex flex-col bg-white rounded-lg mb-4">
-        <div class="px-16 py-10 min-w-full inline-block align-middle">
+        <div class="px-8 py-5 min-w-full inline-block align-middle">
             <h5 class="text-lg mb-2">Cara penulisan Format No Surat</h5>
             <ul class="list-disc list-inside text-gray-800 mb-2">
                 <li>
@@ -117,7 +117,7 @@ onMounted(() => {
                     : <b class="text-teal-500">{{ String(new Date().getMonth()+1).padStart(2, "0") }}</b> )
                 </li> -->
                 <li>
-                    Gunakan <code class="text-red-500">{bln_romawi}</code> untuk mendapatkan <b>bulan dalam romawi</b> (
+                    Gunakan <code class="text-red-500">{bln}</code> untuk mendapatkan <b>bulan dalam romawi</b> (
                     contoh
                     : <b class="text-teal-500">{{ romanize(new Date().getMonth() + 1) }}</b> )
                 </li>
@@ -133,7 +133,7 @@ onMounted(() => {
         </div>
     </div>
     <div class="flex flex-col bg-white rounded-lg" v-if="letter_types.length > 0 && !loading">
-        <div class="px-16 py-10 min-w-full inline-block align-middle">
+        <div class="px-8 py-5 min-w-full inline-block align-middle">
             <form method="POST" @submit.prevent="save">
                 <div class="card-body">
                     <div>

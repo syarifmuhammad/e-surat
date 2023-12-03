@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use PhpOffice\PhpWord\TemplateProcessor;
+use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 
 class SuratKeteranganKerja extends Model
 {
@@ -15,8 +17,6 @@ class SuratKeteranganKerja extends Model
     {
         if ($user->roles == 'pegawai') {
             return $query->where('employee_nip', $user->nip)->orWhere('signer_nip', $user->nip);
-        } else if ($user->roles == 'admin_sdm') {
-            return $query->where('created_by', $user->nip);
         } else {
             return $query;
         }
@@ -73,7 +73,7 @@ class SuratKeteranganKerja extends Model
     }
 
     public function can_signed() {
-        return $this->have_reference_number() && auth()->id() == $this->signer_nip;
+        return $this->have_reference_number() && auth()->id() == $this->signer_nip && !(($this->signature_type == 'manual' || $this->signature_type == 'digital'));
     }
 
     public function can_edit() {
@@ -81,47 +81,31 @@ class SuratKeteranganKerja extends Model
     }
 
     public function can_upload_verified_file() {
-        return $this->signed_file == null && ($this->signed_type == 'basah' || $this->signed_type == 'digital') ;
+        return $this->signed_file == null && ($this->signature_type == 'manual' || $this->signature_type == 'digital') && (auth()->user()->roles == 'admin_sekretariat') ;
     }
 
     public function generate_docx()
     {
         $templateProcessor = new TemplateProcessor(storage_path("app/letter_templates/" . $this->letter_template->file));
 
-        // // Kebutuhan data dari table user dan instansi
-        // $templateProcessor->setValue('nama_instansi', Str::upper($letter->user->parent->name));
-        // $templateProcessor->setValue('email', $letter->user->parent->email);
-        // $templateProcessor->setValue('provinsi', $letter->user->parent->province);
-        // $templateProcessor->setValue('kabupaten_upper', Str::upper($letter->user->parent->district));
-        // $templateProcessor->setValue('kecamatan_upper', Str::upper($letter->user->parent->sub_district));
-        // $templateProcessor->setValue('kabupaten', $letter->user->parent->district);
-        // $templateProcessor->setValue('kecamatan', $letter->user->parent->sub_district);
-        // $templateProcessor->setValue('desa_kop', $letter->user->parent->kop_village());
-        // $templateProcessor->setValue('desa', $letter->user->parent->village);
-        // $templateProcessor->setValue('jalan', $letter->user->parent->street);
-        // $templateProcessor->setValue('kode_pos', $letter->user->parent->zip_code);
-
-        // // Kebutuhan data yang terkait dengan pemohon atau pembuat surat
+        // Kebutuhan data yang terkait dengan pemohon atau pembuat surat
         // $templateProcessor->setValue('nik_pemohon', $letter->resident->nik);
         // $templateProcessor->setValue('nama_pemohon', $letter->resident->name);
         // $templateProcessor->setValue('alamat_pemohon', $letter->resident->address);
 
-        // // Kebutuhan data yang terkait dengan data surat
-        // $templateProcessor->setValue('nomor_surat', $letter->get_reference_number());
-        // $templateProcessor->setValue('tanggal_surat', Carbon::parse($letter->updated_at)->translatedFormat('j F Y'));
-        // $templateProcessor->setValue('nama_perusahaan', $letter->company_name);
-        // $templateProcessor->setValue('alamat_perusahaan', $letter->company_address);
-        // $templateProcessor->setValue('jenis_usaha', htmlspecialchars($letter->business));
-        // $templateProcessor->setValue('modal_usaha', $letter->get_capital_parse());
-        // $templateProcessor->setValue('awal_berlaku', Carbon::parse($letter->updated_at)->translatedFormat('j F Y'));
-        // $templateProcessor->setValue('akhir_berlaku', Carbon::parse($letter->updated_at)->addYears($letter->validity_period)->translatedFormat('j F Y'));
-        // $templateProcessor->setValue('masa_berlaku', $letter->validity_period . " Tahun");
+        // Kebutuhan data yang terkait dengan data surat
+        $templateProcessor->setValue('nomor_surat', $this->get_reference_number());
+        $templateProcessor->setValue('tanggal_surat', Carbon::parse($this->created_at)->translatedFormat('d F Y'));
 
-        // // Kebutuhan data yang terkait dengan pejabat yang menandatangan
-        // $templateProcessor->setValue('nip_penandatangan', 'NIP. ' . $letter->official->nip);
-        // $templateProcessor->setValue('nama_penandatangan', $letter->official->name);
-        // $templateProcessor->setValue('jabatan_penandatangan', $letter->official->position);
-        // $templateProcessor->setValue('pangkat_penandatangan', $letter->official->rank);
+        // Kebutuhan data pegawai
+        $templateProcessor->setValue('nama', $this->employee->name);
+        $templateProcessor->setValue('nip', $this->employee->nip);
+        $templateProcessor->setValue('jabatan', $this->position);
+
+        // Kebutuhan data yang terkait dengan pejabat yang menandatangan
+        $templateProcessor->setValue('nama_penandatangan', $this->signer->name);
+        $templateProcessor->setValue('jabatan_penandatangan', $this->signer_position);
+        
         // $templateProcessor->setImageValue('signature', [
         //     'path' => storage_path('app/signature/' . $letter->official->signature),
         //     'ratio' => true,

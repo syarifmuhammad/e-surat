@@ -11,6 +11,8 @@ const user = computed(() => {
     return useUserStore().user
 })
 
+const sidebar_menu_is_active = ref(false)
+
 const sidebarMenu = ref([
     {
         title: 'Dashboard',
@@ -48,7 +50,7 @@ const sidebarMenu = ref([
         child: [
             {
                 title: 'Template Surat',
-                name: 'template_outcoming_letter',
+                name: 'letter_templates',
                 icon: 'eos-icons:templates-outlined',
             },
             {
@@ -68,17 +70,22 @@ const sidebarMenu = ref([
             },
             {
                 title: 'SK Pemberhentian Dalam Jabatan',
-                name: 'surat_keputusan_rotasi_kepegawaian',
+                name: 'surat_keputusan_pemberhentian',
                 icon: 'gg:file-document',
             },
             {
                 title: 'SK Pengangkatan Dalam Jabatan',
-                name: 'surat_keputusan_rotasi_kepegawaian',
+                name: 'surat_keputusan_pengangkatan',
                 icon: 'gg:file-document',
             },
             {
                 title: 'SK Pemberhentian Dan Pengangkatan Dalam Jabatan',
-                name: 'surat_keputusan_rotasi_kepegawaian',
+                name: 'surat_keputusan_pemberhentian_dan_pengangkatan',
+                icon: 'gg:file-document',
+            },
+            {
+                title: 'Surat Perjanjian Kerja Magang',
+                name: 'surat_perjanjian_kerja_magang',
                 icon: 'gg:file-document',
             },
         ]
@@ -90,7 +97,9 @@ const sidebarMenu = ref([
 <template>
     <div id="container" class="min-h-[100vh]">
         <header id="header" class="bg-white overflow-hidden sticky top-0 flex items-center">
-            <div class="px-10 w-full flex justify-end">
+            <div class="px-10 w-full flex justify-between items-center lg:justify-end">
+                <Icon icon="iconamoon:menu-burger-horizontal-bold" class="text-lg cursor-pointer lg:hidden"
+                    @click="sidebar_menu_is_active = true"></Icon>
                 <div class="hs-dropdown relative inline-flex">
                     <button id="hs-dropdown-custom-trigger" type="button"
                         class="hs-dropdown-toggle py-1 ps-1 pe-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
@@ -130,12 +139,16 @@ const sidebarMenu = ref([
                 </div> -->
             </div>
         </header>
-        <aside id="sidebar" class="bg-white pt-7 pb-10 overflow-y-auto sticky top-0">
-            <div class="px-6">
-                <h1 class="text-center">E-SURAT</h1>
-                <RouterLink :to="'/'">
-                    <!-- <img src="../../img/logo_SSC.svg" alt="Logo SSC" /> -->
-                </RouterLink>
+        <aside id="sidebar" :class="{ active: sidebar_menu_is_active }"
+            class="bg-white pt-7 pb-10 overflow-y-auto fixed left-0 top-0 h-[100vh] z-10 w-[300px] lg:sticky">
+            <div class="px-6 flex justify-center items-center">
+                <div class="flex items-center">
+                    <RouterLink :to="'/'">
+                        <h1 class="text-center">E-SURAT</h1>
+                    </RouterLink>
+                    <Icon icon="ep:close-bold" class="text-xl cursor-pointer ml-8 lg:hidden" @click="sidebar_menu_is_active = false">
+                    </Icon>
+                </div>
             </div>
 
             <nav class="hs-accordion-group p-6 w-full flex flex-col flex-wrap">
@@ -163,8 +176,8 @@ const sidebarMenu = ref([
     --footer-height: 45px;
     --footer-z-index: 1;
     display: grid;
-    grid-template-areas: "sidebar header" "sidebar main" "sidebar footer";
-    grid-template-columns: 300px auto;
+    grid-template-areas: "header" "main" "footer";
+    grid-template-columns: 1fr;
     grid-template-rows: var(--header-height) auto var(--footer-height);
 }
 
@@ -175,8 +188,12 @@ const sidebarMenu = ref([
 
 #sidebar {
     grid-area: sidebar;
-    height: 100vh;
-    padding-bottom: var(--footer-height);
+    transform: translateX(-300px);
+    transition: transform .3s ease-in-out;
+}
+
+#sidebar.active {
+    transform: translateX(0);
 }
 
 #main {
@@ -188,4 +205,16 @@ const sidebarMenu = ref([
     z-index: var(--footer-z-index);
     align-self: stretch;
 }
-</style>
+
+@media (min-width: 1024px) {
+    #container {
+        grid-template-areas: "sidebar header" "sidebar main" "sidebar footer";
+        grid-template-columns: 300px auto;
+        grid-template-rows: var(--header-height) auto var(--footer-height);
+    }
+
+
+    #sidebar {
+        transform: translateX(0px);
+    }
+}</style>
