@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('surat_perjanjian_kerja_magang', function (Blueprint $table) {
             $table->id();
             $table->string('reference_number')->nullable()->unique();
-            $table->string('employee_nip');
+            $table->unsignedBigInteger('employee_id');
             $table->date('mulai_berlaku');
             $table->date('akhir_berlaku');
             $table->json('tugas');
@@ -22,19 +22,19 @@ return new class extends Migration
             $table->integer('upah');
             $table->string('penanggung_pembayaran');
             $table->json('rekening');
-            $table->string('signer_nip');
+            $table->unsignedBigInteger('signer_id');
             $table->string('signer_position');
             $table->enum('signature_type', ['manual', 'qrcode', 'digital'])->default('manual');
             $table->unsignedBigInteger('letter_template_id');
             $table->string('tmp_file')->nullable();
             $table->string('signed_file')->nullable();
-            $table->string('created_by');
+            $table->unsignedBigInteger('created_by');
             $table->timestamps();
 
-            $table->foreign('employee_nip')->references('nip')->on('employees')->noActionOnDelete();
-            $table->foreign('signer_nip')->references('nip')->on('employees')->noActionOnUpdate();
+            $table->foreign('employee_id')->references('id')->on('employees')->noActionOnDelete();
+            $table->foreign('signer_id')->references('id')->on('employees')->noActionOnUpdate();
             $table->foreign('letter_template_id')->references('id')->on('letter_templates')->restrictOnDelete();
-            $table->foreign('created_by')->references('nip')->on('users')->noActionOnDelete();
+            $table->foreign('created_by')->references('id')->on('users')->noActionOnDelete();
         });
     }
 

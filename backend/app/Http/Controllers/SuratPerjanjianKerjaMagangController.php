@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\SuratPerjanjianKerjaMagangCollection as ThisCollection;
 use App\Models\ReferenceNumberSetting;
+use App\Models\Rekening;
 use App\Models\SuratPerjanjianKerjaMagang as Letter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -31,7 +32,7 @@ class SuratPerjanjianKerjaMagangController extends Controller
     {
         $validate = Validator::make($request->all(), [
             'letter_template_id' => 'required|exists:letter_templates,id',
-            'employee.nip' => 'required|exists:employees,nip',
+            'employee.id' => 'required|exists:employees,id',
             'rekening' => 'required|exists:rekening,id',
             'mulai_berlaku' => 'required|date',
             'akhir_berlaku' => 'required|date|after:mulai_berlaku',
@@ -39,7 +40,7 @@ class SuratPerjanjianKerjaMagangController extends Controller
             'tugas' => 'required|array',
             'upah' => 'required|numeric',
             'penanggung_pembayaran' => 'required|string',
-            'signer.nip' => 'required|exists:employees,nip',
+            'signer.id' => 'required|exists:employees,id',
             'signer.position' => 'required|string',
             'signature_type' => 'required|in:manual,qrcode,digital',
         ]);
@@ -54,17 +55,19 @@ class SuratPerjanjianKerjaMagangController extends Controller
 
         $letter = new Letter;
         $letter->letter_template_id = $request->letter_template_id;
-        $letter->employee_nip = $request->employee['nip'];
+        $letter->employee_id = $request->employee['id'];
         $letter->mulai_berlaku = $request->mulai_berlaku;
         $letter->akhir_berlaku = $request->akhir_berlaku;
         $letter->tempat_kerja = $request->tempat_kerja;
-        $letter->tugas = $request->tugas;
+        $rekening = Rekening::find($request->rekening);
+        $letter->rekening = json_encode($rekening);
+        $letter->tugas = json_encode($request->tugas);
         $letter->upah = $request->upah;
         $letter->penanggung_pembayaran = $request->penanggung_pembayaran;
-        $letter->signer_nip = $request->signer['nip'];
+        $letter->signer_id = $request->signer['id'];
         $letter->signer_position = $request->signer['position'];
         $letter->signature_type = $request->signature_type;
-        $letter->created_by = auth()->user()->nip;
+        $letter->created_by = auth()->user()->id;
         $letter->save();
 
         $response = [

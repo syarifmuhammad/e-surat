@@ -12,6 +12,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -26,10 +28,27 @@ class EmployeeController extends Controller
 
     public function rekening(Request $request)
     {
-        $rekening = Rekening::where('employee_nip', $request->nip)->get();
+        $rekening = Rekening::where('employee_id', $request->id)->get();
         return response()->json([
             'data' => $rekening
         ], 200);
+    }
+
+    public function signature() {
+        $employee = Employee::find(auth()->id());
+
+        if (!$employee) {
+            return response()->json([
+                'message' => "Data pegawai tidak ditemukan !"
+            ], 404);
+        }
+
+        $file = storage_path('app/signature/' . $employee->signature);
+        if ($employee->signature && file_exists($file)) {
+            return response()->download($file, $employee->signature);
+        } else {
+            return response()->json(null, 200);
+        }
     }
 
     /**
@@ -39,6 +58,7 @@ class EmployeeController extends Controller
     {
         $validate = Validator::make($request->all(), [
             'nip' => 'required|unique:employees,nip',
+            'nik' => 'required|unique:employees,nik',
             'email' => 'required|unique:employees,email',
             'name' => 'required',
             'positions' => 'required|array',
@@ -62,7 +82,7 @@ class EmployeeController extends Controller
 
             foreach ($request->positions as $position) {
                 $employee_position = new EmployeePosition;
-                $employee_position->nip = $employee->nip;
+                $employee_position->id = $employee->id;
                 $employee_position->position = $position;
                 $employee_position->save();
             }
@@ -79,9 +99,9 @@ class EmployeeController extends Controller
         }
     }
 
-    public function store_rekening(Request $request, $nip)
+    public function store_rekening(Request $request, $id)
     {
-        $employee = Employee::find($nip);
+        $employee = Employee::find($id);
 
         if (!$employee) {
             return response()->json([
@@ -105,7 +125,7 @@ class EmployeeController extends Controller
         DB::beginTransaction();
         try {
             $rekening = new Rekening;
-            $rekening->employee_nip = $nip;
+            $rekening->employee_id = $id;
             $rekening->nama_bank = $request->nama_bank;
             $rekening->nomor_rekening = $request->nomor_rekening;
             $rekening->atas_nama = $request->atas_nama;
@@ -140,11 +160,11 @@ class EmployeeController extends Controller
         //
     }
 
-    public function update_roles(Request $request, string $nip)
+    public function update_roles(Request $request, $id)
     {
 
         try {
-            $user = User::find($nip);
+            $user = User::find($id);
 
             if (!$user) {
                 return response()->json([
@@ -173,6 +193,79 @@ class EmployeeController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function upload_signature($employee = null, $file) {
+        if (!$employee || !$file) {
+            return false;
+        }
+        $file = $file;
+        $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $fileNameServer = 'signature/' . $fileName;
+        Storage::put($fileNameServer, file_get_contents($file));
+
+        $employee->signature = $fileName;
+        $employee->save();
+        return true;
+    }
+
+    public function update_signature_by_admin(Request $request, $id)
+    {
+        $validate = Validator::make($request->all(), [
+            'signature' => 'required|file|mimes:jpg,jpeg,png|max:10000',
+        ]);
+
+        if ($validate->fails()) {
+            $response = [
+                'errors' => $validate->errors(),
+                'message' => "Validasi form gagal !"
+            ];
+            return response()->json($response, 422);
+        }
+
+        $employee = Employee::find($id);
+
+        if (!$employee) {
+            return response()->json([
+                'message' => "Data pegawai tidak ditemukan !"
+            ], 404);
+        }
+
+        $this->upload_signature($employee, $request->file('signature'));
+
+        $response = [
+            'message' => "Berhasil mengupload tanda tangan !"
+        ];
+        return response()->json($response, 200);
+    }
+
+    public function update_signature(Request $request) {
+        $validate = Validator::make($request->all(), [
+            'signature' => 'required|file|mimes:jpg,jpeg,png|max:10000',
+        ]);
+
+        if ($validate->fails()) {
+            $response = [
+                'errors' => $validate->errors(),
+                'message' => "Validasi form gagal !"
+            ];
+            return response()->json($response, 422);
+        }
+
+        $employee = Employee::find(auth()->id());
+
+        if (!$employee) {
+            return response()->json([
+                'message' => "Data pegawai tidak ditemukan !"
+            ], 404);
+        }
+
+        $this->upload_signature($employee, $request->file('signature'));
+
+        $response = [
+            'message' => "Berhasil mengupload tanda tangan !"
+        ];
+        return response()->json($response, 200);
     }
 
     /**

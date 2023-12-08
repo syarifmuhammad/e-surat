@@ -4,17 +4,21 @@ use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LetterTemplateController;
 use App\Http\Controllers\PositionController;
+use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\ReferenceNumberSettingController;
 use App\Http\Controllers\SuratKeteranganKerjaController;
 use App\Http\Controllers\SuratKeputusanRotasiKepegawaianController;
 use App\Http\Controllers\SuratKeputusanPemberhentianController;
 use App\Http\Controllers\SuratKeputusanPemberhentianDanPengangkatanController;
 use App\Http\Controllers\SuratKeputusanPengangkatanController;
+use App\Http\Controllers\SuratPerjanjianKerjaDosenFullTimeController;
 use App\Http\Controllers\SuratPerjanjianKerjaMagangController;
+use App\Http\Controllers\SuratPerjanjianKerjaDosenLuarBiasaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use PhpOffice\PhpWord\TemplateProcessor;
+use App\Models\KeyPair;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,17 +45,25 @@ Route::get('/unique', function (Request $request) {
     ]);
 });
 
+// Route::get('/test-key-pair', function (Request $request) {
+//     KeyPair::storeKeys(1, 'password');
+// });
+
 Route::post('/login', [AuthenticationController::class, 'login']);
 Route::post('/register', [AuthenticationController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthenticationController::class, 'me']);
+    Route::get('/signature', [EmployeeController::class, 'signature']);
+    Route::put('/signature', [EmployeeController::class, 'update_signature']);
     Route::post('/logout', [AuthenticationController::class, 'logout']);
     Route::apiResource('positions', PositionController::class);
+    Route::apiResource('prodi', ProdiController::class);
     Route::prefix('employees')->group(function () {
-        Route::get('/{nip}/rekening', [EmployeeController::class, 'rekening']);
-        Route::post('/{nip}/rekening', [EmployeeController::class, 'store_rekening']);
-        Route::put('/{nip}/roles', [EmployeeController::class, 'update_roles']);
+        Route::get('/{id}/rekening', [EmployeeController::class, 'rekening']);
+        Route::post('/{id}/rekening', [EmployeeController::class, 'store_rekening']);
+        Route::put('/{id}/roles', [EmployeeController::class, 'update_roles']);
+        Route::put('/{id}/signature', [EmployeeController::class, 'update_signature_by_admin']);
         Route::apiResource('', EmployeeController::class);
     });
 
@@ -70,13 +82,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('surat-keterangan-kerja')->group(function () {
             Route::get('', [SuratKeteranganKerjaController::class, 'index']);
             Route::post('', [SuratKeteranganKerjaController::class, 'store']);
-            Route::get('/{id}/download', [SuratKeteranganKerjaController::class, 'download']);
+            Route::get('/{id}/download/docx', [SuratKeteranganKerjaController::class, 'download_docx']);
+            Route::get('/{id}/download/pdf', [SuratKeteranganKerjaController::class, 'download_pdf']);
             Route::get('/{id}', [SuratKeteranganKerjaController::class, 'show']);
             Route::put('/{id}/upload-signed-file', [SuratKeteranganKerjaController::class, 'upload_signed_file']);
             Route::put('/{id}', [SuratKeteranganKerjaController::class, 'update']);
             Route::delete('/{id}', [SuratKeteranganKerjaController::class, 'destroy']);
             Route::put('/{id}/reference-number', [SuratKeteranganKerjaController::class, 'give_reference_number']);
-            Route::post('/{id}/sign', [SuratKeteranganKerjaController::class, 'sign']);
+            Route::put('/{id}/sign', [SuratKeteranganKerjaController::class, 'sign']);
         });
         Route::prefix('surat-keputusan-rotasi-kepegawaian')->group(function () {
             Route::get('', [SuratKeputusanRotasiKepegawaianController::class, 'index']);
@@ -136,6 +149,30 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{id}', [SuratPerjanjianKerjaMagangController::class, 'destroy']);
             Route::put('/{id}/reference-number', [SuratPerjanjianKerjaMagangController::class, 'give_reference_number']);
             Route::post('/{id}/sign', [SuratPerjanjianKerjaMagangController::class, 'sign']);
+        });
+
+        Route::prefix('surat-perjanjian-kerja-dosen-luar-biasa')->group(function () {
+            Route::get('', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'index']);
+            Route::post('', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'store']);
+            Route::get('/{id}/download', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'download']);
+            Route::get('/{id}', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'show']);
+            Route::put('/{id}/upload-signed-file', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'upload_signed_file']);
+            Route::put('/{id}', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'update']);
+            Route::delete('/{id}', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'destroy']);
+            Route::put('/{id}/reference-number', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'give_reference_number']);
+            Route::post('/{id}/sign', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'sign']);
+        });
+
+        Route::prefix('surat-perjanjian-kerja-dosen-full-time')->group(function () {
+            Route::get('', [SuratPerjanjianKerjaDosenFullTimeController::class, 'index']);
+            Route::post('', [SuratPerjanjianKerjaDosenFullTimeController::class, 'store']);
+            Route::get('/{id}/download', [SuratPerjanjianKerjaDosenFullTimeController::class, 'download']);
+            Route::get('/{id}', [SuratPerjanjianKerjaDosenFullTimeController::class, 'show']);
+            Route::put('/{id}/upload-signed-file', [SuratPerjanjianKerjaDosenFullTimeController::class, 'upload_signed_file']);
+            Route::put('/{id}', [SuratPerjanjianKerjaDosenFullTimeController::class, 'update']);
+            Route::delete('/{id}', [SuratPerjanjianKerjaDosenFullTimeController::class, 'destroy']);
+            Route::put('/{id}/reference-number', [SuratPerjanjianKerjaDosenFullTimeController::class, 'give_reference_number']);
+            Route::post('/{id}/sign', [SuratPerjanjianKerjaDosenFullTimeController::class, 'sign']);
         });
     });
 });

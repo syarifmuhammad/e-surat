@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\KeyPair;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\DB;
 
 class AuthenticationController extends Controller
 {
@@ -54,12 +56,23 @@ class AuthenticationController extends Controller
         //         'password' => Hash::make($request->password),
         //     ]);
         // } else {
-        User::create([
-            'nip' => $employee->nip,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'email_verified_at' => now(),
-        ]);
+        DB::beginTransaction();
+        try {
+            $user = new User;
+            $user->email = $request->email;
+            $user->password = Hash::make($request->password);
+            $user->email_verified_at = now();
+            $user->save();
+
+            KeyPair::storeKeys($user->id, $request->password);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => "Registrasi gagal !",
+            ], 500);
+        }
+
         // }
 
         // event(new Registered($user));

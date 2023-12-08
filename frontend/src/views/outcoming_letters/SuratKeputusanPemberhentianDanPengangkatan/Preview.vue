@@ -15,7 +15,7 @@ const pdf = ref(null)
 
 function get_pdf(id) {
     loading.value.open()
-    axios.get(`${url}/outcoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${id}/download`, {
+    axios.get(`${url}/outcoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${id}/download/pdf`, {
         responseType: 'blob',
     }).then(res => {
         const url_pdf = window.URL.createObjectURL(new Blob([res.data]));

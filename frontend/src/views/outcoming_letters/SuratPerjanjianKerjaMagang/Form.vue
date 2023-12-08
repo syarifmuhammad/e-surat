@@ -18,6 +18,9 @@ const tugas = ref("")
 const form_surat = reactive({
     id: "",
     letter_template_id: "",
+    mulai_berlaku: "",
+    akhir_berlaku: "",
+    tempat_kerja: "",
     tugas: [],
     upah: 0,
     penanggung_pembayaran: "",
@@ -30,14 +33,17 @@ const form_surat = reactive({
 const errors = reactive({
     letter_template_id: "",
     employee: {
-        nip: "",
+        id: "",
     },
     rekening: "",
+    mulai_berlaku: "",
+    akhir_berlaku: "",
+    tempat_kerja: "",
     tugas: "",
     upah: "",
     penanggung_pembayaran: "",
     signer: {
-        nip: "",
+        id: "",
         position: "",
     },
     signature_type: ""
@@ -65,12 +71,15 @@ function get_letter_templates() {
 
 function reset_errors() {
     errors.letter_template_id = ""
-    errors.employee.nip = ""
+    errors.employee.id = ""
     errors.rekening = ""
+    errors.mulai_berlaku = ""
+    errors.akhir_berlaku = ""
+    errors.tempat_kerja = ""
     errors.tugas = ""
     errors.upah = ""
     errors.penanggung_pembayaran = ""
-    errors.signer.nip = ""
+    errors.signer.id = ""
     errors.signer.position = ""
     errors.signature_type = ""
 }
@@ -93,6 +102,9 @@ function reset_signer() {
 function reset_form() {
     form_surat.id = ""
     form_surat.letter_template_id = ""
+    form_surat.mulai_berlaku = ""
+    form_surat.akhir_berlaku = ""
+    form_surat.tempat_kerja = ""
     form_surat.tugas = []
     form_surat.upah = 0
     form_surat.penanggung_pembayaran = ""
@@ -140,14 +152,17 @@ function save_surat() {
         let payload = {
             letter_template_id: form_surat.letter_template_id,
             employee: {
-                nip: selected_employee.value.nip,
+                id: selected_employee.value.id,
             },
             rekening: selected_rekening.value.id,
+            mulai_berlaku: form_surat.mulai_berlaku,
+            akhir_berlaku: form_surat.akhir_berlaku,
+            tempat_kerja: form_surat.tempat_kerja,
             tugas: form_surat.tugas,
             upah: form_surat.upah,
             penanggung_pembayaran: form_surat.penanggung_pembayaran,
             signer: {
-                nip: selected_signer.value.nip,
+                id: selected_signer.value.id,
                 position: form_surat.signer.position
             },
             signature_type: form_surat.signature_type,
@@ -165,11 +180,15 @@ function save_surat() {
             .catch(err => {
                 if (err.response.status == 422) {
                     errors.letter_template_id = err.response.data.errors.letter_template_id[0]
-                    errors.employee.nip = err.response.data.errors.employee.nip[0]
+                    errors.employee.id = err.response.data.errors.employee.id[0]
+                    errors.rekening = err.response.data.errors.rekening[0]
+                    errors.mulai_berlaku = err.response.data.errors.mulai_berlaku[0]
+                    errors.akhir_berlaku = err.response.data.errors.akhir_berlaku[0]
+                    errors.tempat_kerja = err.response.data.errors.tempat_kerja[0]
                     errors.tugas = err.response.data.errors.tugas[0]
                     errors.upah = err.response.data.errors.upah[0]
                     errors.penanggung_pembayaran = err.response.data.errors.penanggung_pembayaran[0]
-                    errors.signer.nip = err.response.data.errors.signer.nip[0]
+                    errors.signer.id = err.response.data.errors.signer.id[0]
                     errors.signer.position = err.response.data.errors.signer.position[0]
                     errors.signature_type = err.response.data.errors.signature_type[0]
                 } else {
@@ -225,8 +244,8 @@ onMounted(async () => {
                             </small>
                         </template>
                     </search-input>
-                    <p v-if="errors.employee.nip" class="text-xs text-red-600 mt-2" id="employee-error">
-                        {{ errors.employee.nip }}
+                    <p v-if="errors.employee.id" class="text-xs text-red-600 mt-2" id="employee-error">
+                        {{ errors.employee.id }}
                     </p>
                     <div v-if="selected_employee"
                         class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">
@@ -243,7 +262,7 @@ onMounted(async () => {
                 <div class="mb-4" v-if="selected_employee">
                     <label class="block text-sm font-medium mb-2">Rekening</label>
                     <search-input ref="search_input_rekening" v-if="!selected_rekening" v-model="selected_rekening"
-                        :url="`${url}/employees/${selected_employee.nip}/rekening`" placeholder="Cari Rekening ...">
+                        :url="`${url}/employees/${selected_employee.id}/rekening`" placeholder="Cari Rekening ...">
                         <template v-slot="{ data }">
                             <small>{{ data.nama_bank }}</small>
                             <p class="mb-0">{{ data.atas_nama }}</p>
@@ -360,8 +379,8 @@ onMounted(async () => {
                             </small>
                         </template>
                     </search-input>
-                    <p v-if="errors.signer.nip" class="text-xs text-red-600 mt-2" id="signer-nip-error">
-                        {{ errors.signer.nip }}
+                    <p v-if="errors.signer.id" class="text-xs text-red-600 mt-2" id="signer-id-error">
+                        {{ errors.signer.id }}
                     </p>
                     <div v-if="selected_signer"
                         class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">

@@ -32,10 +32,10 @@ class SuratKeputusanPemberhentianDanPengangkatanController extends Controller
             'letter_template_id' => 'required|exists:letter_templates,id',
             'nomor_berita_acara' => "required|string",
             'tanggal_berita_acara' => "required|date",
-            'employee.nip' => 'required|exists:employees,nip',
+            'employee.id' => 'required|exists:employees,id',
             'pemberhentian_dalam_jabatan' => 'required|string',
             'pengangkatan_dalam_jabatan' => 'required|string',
-            'signer.nip' => 'required|exists:employees,nip',
+            'signer.id' => 'required|exists:employees,id',
             'signer.position' => 'required|string',
             'signature_type' => 'required|in:manual,qrcode,digital',
             'tanggal_berlaku' => 'required|date',
@@ -53,14 +53,14 @@ class SuratKeputusanPemberhentianDanPengangkatanController extends Controller
         $letter->letter_template_id = $request->letter_template_id;
         $letter->nomor_berita_acara = $request->nomor_berita_acara;
         $letter->tanggal_berita_acara = $request->tanggal_berita_acara;
-        $letter->employee_nip = $request->employee['nip'];
+        $letter->employee_id = $request->employee['id'];
         $letter->pemberhentian_dalam_jabatan = $request->pemberhentian_dalam_jabatan;
         $letter->pengangkatan_dalam_jabatan = $request->pengangkatan_dalam_jabatan;
-        $letter->signer_nip = $request->signer['nip'];
+        $letter->signer_id = $request->signer['id'];
         $letter->signer_position = $request->signer['position'];
         $letter->signature_type = $request->signature_type;
         $letter->tanggal_berlaku = $request->tanggal_berlaku;
-        $letter->created_by = auth()->user()->nip;
+        $letter->created_by = auth()->user()->id;
         $letter->save();
 
         $response = [

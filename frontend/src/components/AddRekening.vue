@@ -18,7 +18,7 @@ const loading = ref(null)
 const modal = ref(null)
 
 const form_rekening = reactive({
-    employee_nip: props.employee.nip,
+    employee_id: props.employee.id,
     nama_bank: '',
     atas_nama: '',
     nomor_rekening: ''
@@ -32,7 +32,7 @@ const errors = reactive({
 
 function save() {
     loading.value.open()
-    axios.post(`${url}/employees/${form_rekening.employee_nip}/rekening`, form_rekening).then(res => {
+    axios.post(`${url}/employees/${form_rekening.employee_id}/rekening`, form_rekening).then(res => {
         if (res.status == 201) {
             Swal.fire({
                 icon: "success",
@@ -65,11 +65,29 @@ function save() {
 
 }
 
+function reset_errors() {
+    errors.nama_bank = ''
+    errors.atas_nama = ''
+    errors.nomor_rekening = ''
+}
+
+function reset_form() {
+    form_rekening.nama_bank = ''
+    form_rekening.atas_nama = ''
+    form_rekening.nomor_rekening = ''
+    reset_errors()
+}
+
 function open() {
     modal.value.open()
 }
 function close() {
     modal.value.close()
+}
+
+function closeAndReset() {
+    reset_form()
+    close()
 }
 
 defineExpose({ open, close })
@@ -116,8 +134,8 @@ defineExpose({ open, close })
                     </div>
                 </div>
             </div>
-            <div class="border-t p-4 sm:px-10 flex justify-center">
-                <button type="button" class="btn btn-outline-primary px-14 py-3 mr-6">Batal</button>
+            <div class="border-t p-4 sm:px-10 flex justify-end">
+                <button type="button" class="btn btn-outline-primary px-14 py-3 mr-6" @click="closeAndReset">Batal</button>
                 <button class="btn btn-primary px-14 py-3">Simpan</button>
             </div>
         </form>

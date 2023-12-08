@@ -12,9 +12,6 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $primaryKey = 'nip';
-    protected $keyType = 'string';
-
     /**
      * The attributes that are mass assignable.
      *
@@ -49,7 +46,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $appends = ['is_verified'];
 
     public function employee() {
-        return $this->hasOne(Employee::class, 'nip', 'nip');
+        return $this->hasOne(Employee::class, 'id', 'id');
     }
 
     public function is_verified() {

@@ -26,11 +26,11 @@ const form_surat = reactive({
 const errors = reactive({
     letter_template_id: "",
     employee: {
-        nip: "",
+        id: "",
         position: "",
     },
     signer: {
-        nip: "",
+        id: "",
         position: "",
     },
     signature_type: ""
@@ -56,9 +56,9 @@ function get_letter_templates() {
 
 function reset_errors() {
     errors.letter_template_id = ""
-    errors.employee.nip = ""
+    errors.employee.id = ""
     errors.employee.position = ""
-    errors.signer.nip = ""
+    errors.signer.id = ""
     errors.signer.position = ""
     errors.signature_type = ""
 }
@@ -66,7 +66,7 @@ function reset_errors() {
 function reset_employee() {
     selected_employee.value = null
     form_surat.employee = {
-        nip: "",
+        id: "",
         position: "",
     }
 }
@@ -74,7 +74,7 @@ function reset_employee() {
 function reset_signer() {
     selected_signer.value = null
     form_surat.signer = {
-        nip: "",
+        id: "",
         position: "",
     }
 }
@@ -83,11 +83,11 @@ function reset_form() {
     form_surat.id = ""
     form_surat.letter_template_id = ""
     form_surat.employee = {
-        nip: "",
+        id: "",
         position: "",
     }
     form_surat.signer = {
-        nip: "",
+        id: "",
         position: "",
     }
     form_surat.signature_type = "manual"
@@ -125,11 +125,11 @@ function save_surat() {
         let payload = {
             letter_template_id: form_surat.letter_template_id,
             employee: {
-                nip: selected_employee.value.nip,
+                id: selected_employee.value.id,
                 position: form_surat.employee.position
             },
             signer: {
-                nip: selected_signer.value.nip,
+                id: selected_signer.value.id,
                 position: form_surat.signer.position
             },
             signature_type: form_surat.signature_type,
@@ -147,8 +147,8 @@ function save_surat() {
             .catch(err => {
                 if (err.response.status == 422) {
                     errors.letter_template_id = err.response.data.errors.letter_template_id[0]
-                    errors.employee.nip = err.response.data.errors.employee.nip[0]
-                    errors.signer.nip = err.response.data.errors.signer.nip[0]
+                    errors.employee.id = err.response.data.errors.employee.id[0]
+                    errors.signer.id = err.response.data.errors.signer.id[0]
                     errors.employee.position = err.response.data.errors.employee.position[0]
                     errors.signer.position = err.response.data.errors.signer.position[0]
                     errors.signature_type = err.response.data.errors.signature_type[0]
@@ -201,8 +201,8 @@ onMounted(async () => {
                             </small>
                         </template>
                     </search-input>
-                    <p v-if="errors.employee.nip" class="text-xs text-red-600 mt-2" id="employee-error">
-                        {{ errors.employee.nip }}
+                    <p v-if="errors.employee.id" class="text-xs text-red-600 mt-2" id="employee-error">
+                        {{ errors.employee.id }}
                     </p>
                     <div v-if="selected_employee"
                         class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">
@@ -240,8 +240,8 @@ onMounted(async () => {
                             </small>
                         </template>
                     </search-input>
-                    <p v-if="errors.signer.nip" class="text-xs text-red-600 mt-2" id="signer-nip-error">
-                        {{ errors.signer.nip }}
+                    <p v-if="errors.signer.id" class="text-xs text-red-600 mt-2" id="signer-id-error">
+                        {{ errors.signer.id }}
                     </p>
                     <div v-if="selected_signer"
                         class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">
@@ -270,6 +270,7 @@ onMounted(async () => {
                         <option value="manual">Tanda Tangan Manual</option>
                         <option value="qrcode">Tanda Tangan QR Code</option>
                         <option value="digital">Tanda Tangan Digital</option>
+                        <option value="gambar tanda tangan">Tanda Tangan Berupa Gambar</option>
                     </select>
                     <p v-if="errors.signature_type" class="text-xs text-red-600 mt-2" id="signatur-type-error">
                         {{ errors.signature_type }}

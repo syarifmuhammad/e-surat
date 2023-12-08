@@ -41,6 +41,16 @@ import SuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjia
 import PreviewSuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Preview.vue'
 import FormSuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Form.vue'
 
+//surat perjanjian kerja dosen luar biasa
+import SuratPerjanjianKerjaDosenLuarBiasa from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Index.vue'
+import PreviewSuratPerjanjianKerjaDosenLuarBiasa from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Preview.vue'
+import FormSuratPerjanjianKerjaDosenLuarBiasa from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Form.vue'
+
+//surat perjanjian kerja dosen full time
+import SuratPerjanjianKerjaDosenFullTime from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Index.vue'
+import PreviewSuratPerjanjianKerjaDosenFullTime from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Preview.vue'
+import FormSuratPerjanjianKerjaDosenFullTime from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Form.vue'
+
 //errors page
 import Forbidden from '@/views/errors/Forbidden.vue'
 import { useAuthStore } from '../stores/auth'
@@ -372,6 +382,70 @@ const router = createRouter({
         can_accessed: ['admin_sdm', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_perjanjian_kerja_magang',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-dosen-luar-biasa',
+      name: 'surat_perjanjian_kerja_dosen_luar_biasa',
+      component: SuratPerjanjianKerjaDosenLuarBiasa,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-dosen-luar-biasa/:id/preview',
+      name: 'preview_surat_perjanjian_kerja_dosen_luar_biasa',
+      component: PreviewSuratPerjanjianKerjaDosenLuarBiasa,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'BlankLayout',
+        parentName: 'surat_perjanjian_kerja_dosen_luar_biasa',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-dosen-luar-biasa/create',
+      name: 'create_surat_perjanjian_kerja_dosen_luar_biasa',
+      component: FormSuratPerjanjianKerjaDosenLuarBiasa,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_perjanjian_kerja_dosen_luar_biasa',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-dosen-full-time',
+      name: 'surat_perjanjian_kerja_dosen_full_time',
+      component: SuratPerjanjianKerjaDosenFullTime,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-dosen-full-time/:id/preview',
+      name: 'preview_surat_perjanjian_kerja_dosen_full_time',
+      component: PreviewSuratPerjanjianKerjaDosenFullTime,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'BlankLayout',
+        parentName: 'surat_perjanjian_kerja_dosen_full_time',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-dosen-full-time/create',
+      name: 'create_surat_perjanjian_kerja_dosen_full_time',
+      component: FormSuratPerjanjianKerjaDosenFullTime,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_perjanjian_kerja_dosen_full_time',
       },
     },
   ]

@@ -51,6 +51,18 @@ class ReferenceNumberSetting extends Model
             "prefix" => "",
             "suffix" => "/SDM24/WRII/{bln}/{thn}",
         ],
+        "SURAT_PERJANJIAN_KERJA_DOSEN_LUAR_BIASA" => [
+            "name" => "Surat Perjanjian Kerja Dosen Luar Biasa",
+            "letter_type" => "SURAT_PERJANJIAN_KERJA_DOSEN_LUAR_BIASA",
+            "prefix" => "",
+            "suffix" => "/SDM16/WRII/{bln}/{thn}",
+        ],
+        "SURAT_PERJANJIAN_KERJA_DOSEN_FULL_TIME" => [
+            "name" => "Surat Perjanjian Kerja Dosen Full Time",
+            "letter_type" => "SURAT_PERJANJIAN_KERJA_DOSEN_FULL_TIME",
+            "prefix" => "",
+            "suffix" => "/SDM16/WRII/{bln}/{thn}",
+        ],
         // "DAMIU" => [
         //     "letter_type" => "DAMIU",
         //     "prefix" => "540.2/",

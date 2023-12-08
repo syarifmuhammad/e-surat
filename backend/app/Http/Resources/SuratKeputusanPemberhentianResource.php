@@ -32,11 +32,13 @@ class SuratKeputusanPemberhentianResource extends JsonResource
             'id' => $this->id,
             'reference_number' => $reference_number,
             'employee' => [
+                'id' => $this->employee->id,
                 'nip' => $this->employee->nip,
                 'name' => $this->employee->name,
             ],
             'pemberhentian_dalam_jabatan' => $this->pemberhentian_dalam_jabatan,
             'signer' => [
+                'id' => $this->signer->id,
                 'nip' => $this->signer->nip,
                 'name' => $this->signer->name,
                 'position' => $this->signer_position,

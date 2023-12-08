@@ -15,7 +15,7 @@ class SuratKeputusanRotasiKepegawaian extends Model
     public function scopeWhereUser($query, $user)
     {
         if ($user->roles == 'pegawai') {
-            return $query->where('employee_nip', $user->nip)->orWhere('signer_nip', $user->nip);
+            return $query->where('employee_id', $user->id)->orWhere('signer_id', $user->id);
         } else {
             return $query;
         }
@@ -24,8 +24,12 @@ class SuratKeputusanRotasiKepegawaian extends Model
     public function scopeSearch($query, $search)
     {
         $query->where('reference_number', 'like', '%' . $search . '%')
-            ->orWhere('employee_nip', 'like', '%' . $search . '%')
-            ->orWhere('signer_nip', 'like', '%' . $search . '%')
+            ->orWhereHas('employee', function ($query) use ($search) {
+                return $query->where('nip', 'like', '%' . $search . '%');
+            })
+            ->orWhereHas('signer', function ($query) use ($search) {
+                return $query->where('nip', 'like', '%' . $search . '%');
+            })
             ->orWhereHas('employee', function ($query) use ($search) {
                 return $query->where('name', 'like', '%' . $search . '%');
             })
@@ -36,12 +40,12 @@ class SuratKeputusanRotasiKepegawaian extends Model
 
     public function employee()
     {
-        return $this->belongsTo(Employee::class, 'employee_nip', 'nip');
+        return $this->belongsTo(Employee::class, 'employee_id', 'id');
     }
 
     public function signer()
     {
-        return $this->belongsTo(Employee::class, 'signer_nip', 'nip');
+        return $this->belongsTo(Employee::class, 'signer_id', 'id');
     }
 
     public function letter_template()
@@ -75,12 +79,12 @@ class SuratKeputusanRotasiKepegawaian extends Model
 
     public function can_signed()
     {
-        return $this->have_reference_number() && auth()->id() == $this->signer_nip && !(($this->signature_type == 'manual' || $this->signature_type == 'digital'));
+        return $this->have_reference_number() && auth()->id() == $this->signer_id && !(($this->signature_type == 'manual' || $this->signature_type == 'digital'));
     }
 
     public function can_edit()
     {
-        return !$this->have_reference_number() && (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->nip);
+        return !$this->have_reference_number() && (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id);
     }
 
     public function can_upload_verified_file()

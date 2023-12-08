@@ -32,11 +32,14 @@ class SuratPerjanjianKerjaMagangResource extends JsonResource
             'id' => $this->id,
             'reference_number' => $reference_number,
             'employee' => [
+                'id' => $this->employee->id,
+                'nik' => $this->employee->nik,
                 'nip' => $this->employee->nip,
                 'name' => $this->employee->name,
                 'position' => $this->position,
             ],
             'signer' => [
+                'id' => $this->signer->id,
                 'nip' => $this->signer->nip,
                 'name' => $this->signer->name,
                 'position' => $this->signer_position,

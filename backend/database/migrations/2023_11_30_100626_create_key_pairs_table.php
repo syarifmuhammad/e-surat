@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('key_pairs', function (Blueprint $table) {
             $table->id();
+            $table->binary('public_key');
+            $table->unsignedBigInteger('user_id');
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

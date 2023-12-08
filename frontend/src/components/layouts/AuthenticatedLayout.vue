@@ -88,6 +88,16 @@ const sidebarMenu = ref([
                 name: 'surat_perjanjian_kerja_magang',
                 icon: 'gg:file-document',
             },
+            {
+                title: 'Surat Perjanjian Kerja Dosen Luar Biasa',
+                name: 'surat_perjanjian_kerja_dosen_luar_biasa',
+                icon: 'gg:file-document',
+            },
+            {
+                title: 'Surat Perjanjian Kerja Dosen Full Time',
+                name: 'surat_perjanjian_kerja_dosen_full_time',
+                icon: 'gg:file-document',
+            },
         ]
     },
 

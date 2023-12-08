@@ -29,11 +29,11 @@ const errors = reactive({
     nomor_berita_acara: "",
     tanggal_berita_acara: "",
     employee: {
-        nip: "",
+        id: "",
     },
     pengangkatan_dalam_jabatan: "",
     signer: {
-        nip: "",
+        id: "",
         position: "",
     },
     signature_type: "",
@@ -62,9 +62,9 @@ function reset_errors() {
     errors.letter_template_id = ""
     errors.nomor_berita_acara = ""
     errors.tanggal_berita_acara = ""
-    errors.employee.nip = ""
+    errors.employee.id = ""
     errors.pengangkatan_dalam_jabatan = ""
-    errors.signer.nip = ""
+    errors.signer.id = ""
     errors.signer.position = ""
     errors.signature_type = ""
     errors.tanggal_berlaku = ""
@@ -73,7 +73,7 @@ function reset_errors() {
 function reset_employee() {
     selected_employee.value = null
     form_surat.employee = {
-        nip: "",
+        id: "",
         position: "",
     }
 }
@@ -81,7 +81,7 @@ function reset_employee() {
 function reset_signer() {
     selected_signer.value = null
     form_surat.signer = {
-        nip: "",
+        id: "",
         position: "",
     }
 }
@@ -135,11 +135,11 @@ function save_surat() {
             nomor_berita_acara: form_surat.nomor_berita_acara,
             tanggal_berita_acara: form_surat.tanggal_berita_acara,
             employee: {
-                nip: selected_employee.value.nip,
+                id: selected_employee.value.id,
             },
             pengangkatan_dalam_jabatan: form_surat.pengangkatan_dalam_jabatan,
             signer: {
-                nip: selected_signer.value.nip,
+                id: selected_signer.value.id,
                 position: form_surat.signer.position
             },
             signature_type: form_surat.signature_type,
@@ -160,9 +160,9 @@ function save_surat() {
                     errors.letter_template_id = err.response.data.errors.letter_template_id[0]
                     errors.nomor_berita_acara = err.response.data.errors.nomor_berita_acara[0]
                     errors.tanggal_berita_acara = err.response.data.errors.tanggal_berita_acara[0]
-                    errors.employee.nip = err.response.data.errors.employee.nip[0]
+                    errors.employee.id = err.response.data.errors.employee.id[0]
                     errors.pengangkatan_dalam_jabatan = err.response.data.errors.pengangkatan_dalam_jabatan[0]
-                    errors.signer.nip = err.response.data.errors.signer.nip[0]
+                    errors.signer.id = err.response.data.errors.signer.id[0]
                     errors.signer.position = err.response.data.errors.signer.position[0]
                     errors.signature_type = err.response.data.errors.signature_type[0]
                     errors.tanggal_berlaku = err.response.data.errors.tanggal_berlaku[0]
@@ -244,8 +244,8 @@ onMounted(async () => {
                             </small>
                         </template>
                     </search-input>
-                    <p v-if="errors.employee.nip" class="text-xs text-red-600 mt-2" id="employee-error">
-                        {{ errors.employee.nip }}
+                    <p v-if="errors.employee.id" class="text-xs text-red-600 mt-2" id="employee-error">
+                        {{ errors.employee.id }}
                     </p>
                     <div v-if="selected_employee"
                         class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">
@@ -293,8 +293,8 @@ onMounted(async () => {
                             </small>
                         </template>
                     </search-input>
-                    <p v-if="errors.signer.nip" class="text-xs text-red-600 mt-2" id="signer-nip-error">
-                        {{ errors.signer.nip }}
+                    <p v-if="errors.signer.id" class="text-xs text-red-600 mt-2" id="signer-id-error">
+                        {{ errors.signer.id }}
                     </p>
                     <div v-if="selected_signer"
                         class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">

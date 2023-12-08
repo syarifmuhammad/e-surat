@@ -32,12 +32,12 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
             'letter_template_id' => 'required|exists:letter_templates,id',
             'nomor_berita_acara' => "required|string",
             'tanggal_berita_acara' => "required|date",
-            'employee.nip' => 'required|exists:employees,nip',
+            'employee.id' => 'required|exists:employees,id',
             'employee.status_awal' => 'required|string',
             'employee.jabatan_awal' => 'required|string',
             'employee.status_akhir' => 'required|string',
             'employee.jabatan_akhir' => 'required|string',
-            'signer.nip' => 'required|exists:employees,nip',
+            'signer.id' => 'required|exists:employees,id',
             'signer.position' => 'required|string',
             'signature_type' => 'required|in:manual,qrcode,digital',
             'tanggal_berlaku' => 'required|date',
@@ -55,16 +55,16 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
         $letter->letter_template_id = $request->letter_template_id;
         $letter->nomor_berita_acara = $request->nomor_berita_acara;
         $letter->tanggal_berita_acara = $request->tanggal_berita_acara;
-        $letter->employee_nip = $request->employee['nip'];
+        $letter->employee_id = $request->employee['id'];
         $letter->status_awal = $request->employee['status_awal'];
         $letter->jabatan_awal = $request->employee['jabatan_awal'];
         $letter->status_akhir = $request->employee['status_akhir'];
         $letter->jabatan_akhir = $request->employee['jabatan_akhir'];
-        $letter->signer_nip = $request->signer['nip'];
+        $letter->signer_id = $request->signer['id'];
         $letter->signer_position = $request->signer['position'];
         $letter->signature_type = $request->signature_type;
         $letter->tanggal_berlaku = $request->tanggal_berlaku;
-        $letter->created_by = auth()->user()->nip;
+        $letter->created_by = auth()->user()->id;
         $letter->save();
 
         $response = [

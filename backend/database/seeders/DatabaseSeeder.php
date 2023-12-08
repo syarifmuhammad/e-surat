@@ -7,8 +7,11 @@ use Illuminate\Database\Seeder;
 use App\Models\Position;
 use App\Models\Employee;
 use App\Models\EmployeePosition;
+use App\Models\KeyPair;
 use App\Models\LetterTemplate;
+use App\Models\Prodi;
 use App\Models\ReferenceNumberSetting;
+use App\Models\Rekening;
 use App\Models\User;
 use League\CommonMark\Reference\Reference;
 
@@ -37,6 +40,31 @@ class DatabaseSeeder extends Seeder
             Position::create($position);
         }
 
+        //seeder to make prodi
+        $prodi = [
+            [
+                'nama_prodi' => 'Rekayasa Perangkat Lunak',
+                'singkatan_prodi' => 'RPL',
+                'nama_fakultas' => "Fakultas Teknologi Informasi Dan Bisnis",
+                'singkatan_fakultas' => "FTIB",
+            ],
+            [
+                'nama_prodi' => 'Teknik Informatika',
+                'singkatan_prodi' => 'IF',
+                'nama_fakultas' => "Fakultas Teknologi Informasi Dan Bisnis",
+                'singkatan_fakultas' => "FTIB",
+            ],
+            [
+                'nama_prodi' => 'Sistem Informasi',
+                'singkatan_prodi' => 'SI',
+                'nama_fakultas' => "Fakultas Teknologi Informasi Dan Bisnis",
+                'singkatan_fakultas' => "FTIB",
+            ],
+        ];
+        foreach ($prodi as $p) {
+            Prodi::create($p);
+        }
+
         //create employee and user data superadmin
         $employees = [
             [
@@ -50,6 +78,8 @@ class DatabaseSeeder extends Seeder
                 'tanggal_lahir' => "1999-01-01",
                 'alamat' => "Jl. Jalan",
                 'npwp' => "12345678901234567890",
+                'nama_bank' => "Bank BRI",
+                'nomor_rekening' => "1234567890",
             ],
             [
                 'nip' => '12345678',
@@ -63,6 +93,8 @@ class DatabaseSeeder extends Seeder
                 'tanggal_lahir' => "1999-01-01",
                 'alamat' => "Jl. Jalan",
                 'npwp' => "12345678901234567891",
+                'nama_bank' => "Bank BNI",
+                'nomor_rekening' => "1234567891",
             ],
             [
                 'nip' => '23456789',
@@ -76,6 +108,8 @@ class DatabaseSeeder extends Seeder
                 'tanggal_lahir' => "1999-01-01",
                 'alamat' => "Jl. Jalan",
                 'npwp' => "12345678901234567892",
+                'nama_bank' => "Bank BCA",
+                'nomor_rekening' => "1234567892",
             ],
             [
                 'nip' => '34567890',
@@ -89,11 +123,13 @@ class DatabaseSeeder extends Seeder
                 'tanggal_lahir' => "1999-01-01",
                 'alamat' => "Jl. Jalan",
                 'npwp' => "12345678901234567893",
+                'nama_bank' => "Bank Mandiri",
+                'nomor_rekening' => "1234567893",
             ]
         ];
 
         foreach ($employees as $employee) {
-            Employee::create([
+            $insert_employee = Employee::create([
                 'nip' => $employee['nip'],
                 'name' => $employee['name'],
                 'email' => $employee['email'],
@@ -104,19 +140,27 @@ class DatabaseSeeder extends Seeder
             ]);
             
             User::create([
-                'nip' => $employee['nip'],
+                'id' => $insert_employee->id,
                 'email' => $employee['email'],
                 'email_verified_at' => now(),
                 'password' => $employee['password'],
                 'roles' => $employee['roles'],
             ]);
 
+            KeyPair::storeKeys($insert_employee->id, $employee['password']);
             if (isset($employee['position'])) {
                 EmployeePosition::create([
-                    'nip' => $employee['nip'],
+                    'employee_id' => $insert_employee->id,
                     'position' => $employee['position']
                 ]);
             }
+
+            Rekening::create([
+                'employee_id' => $insert_employee->id,
+                'atas_nama' => $employee['name'],
+                'nama_bank' => $employee['nama_bank'],
+                'nomor_rekening' => $employee['nomor_rekening'],
+            ]);
         }
 
         //create default letter template

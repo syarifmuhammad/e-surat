@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('nama_bank');
             $table->string('atas_nama');
             $table->string('nomor_rekening');
-            $table->string('employee_nip');
+            $table->unsignedBigInteger('employee_id');
             $table->timestamps();
 
-            $table->foreign('employee_nip')->references('nip')->on('employees')->cascadeOnDelete();
+            $table->foreign('employee_id')->references('id')->on('employees')->cascadeOnDelete();
         });
     }
 

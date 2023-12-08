@@ -212,7 +212,7 @@ function upload_signed_file() {
                     <UploadFile ref="verified_file"></UploadFile>
                 </div>
             </div>
-            <div class="border-t p-4 sm:px-10 flex justify-center">
+            <div class="border-t p-4 sm:px-10 flex justify-end">
                 <button type="button" @click="modal_upload_signed_file.close()"
                     class="btn btn-outline-primary px-14 py-3 mr-6">Batal</button>
                 <button class="btn btn-primary px-14 py-3">Simpan</button>

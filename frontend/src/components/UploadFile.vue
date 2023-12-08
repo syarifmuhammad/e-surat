@@ -1,19 +1,23 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { Icon } from '@iconify/vue'
 
 const props = defineProps({
     accepted_file_type: {
         type: Array,
         default: () => ['application/pdf'],
-    }
+    },
+    default_files: {
+        type: Object,
+        default: null,
+    },
 })
 
 const fileform = ref(null)
 const inputfile = ref(null)
 const dragAndDropCapable = ref(false)
 const dragenter = ref(false)
-const files = ref(null)
+const files = ref(props.default_files)
 const preview = ref(null)
 const uploadPercentage = ref(0)
 
@@ -82,6 +86,14 @@ onMounted(() => {
         );
     }
 })
+
+watch(() => props.default_files, (first, second) => {
+    if (first != second) {
+        files.value = props.default_files
+        preview.value = URL.createObjectURL(props.default_files)
+    }
+}, { immediate: true });
+
 defineExpose({
     files,
 })
@@ -107,7 +119,8 @@ defineExpose({
                 @click="(files = null), (preview = null)">
                 Ubah File
             </button>
-            <iframe :src="preview" class="w-full h-full"> </iframe>
+            <iframe v-if="preview.type == 'application/pdf'" :src="preview" class="w-full h-full"> </iframe>
+            <img class="max-h-[300px]" :src="preview" />
         </div>
     </div>
 </template>

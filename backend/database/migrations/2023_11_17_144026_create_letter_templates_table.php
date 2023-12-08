@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('letter_type');
             $table->string('file');
-            $table->string('created_by')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
 
-            $table->foreign('created_by')->references('nip')->on('users')->noActionOnDelete();
+            $table->foreign('created_by')->references('id')->on('users')->noActionOnDelete();
         });
     }
 

@@ -137,7 +137,7 @@ function save() {
                     <UploadFile ref="file"></UploadFile>
                 </div>
             </div>
-            <div class="border-t p-4 sm:px-10 flex justify-center">
+            <div class="border-t p-4 sm:px-10 flex justify-end">
                 <button type="button" @click="modal_form.close()"
                     class="btn btn-outline-primary px-14 py-3 mr-6">Batal</button>
                 <button class="btn btn-primary px-14 py-3">Simpan</button>

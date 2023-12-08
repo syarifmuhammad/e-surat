@@ -14,21 +14,21 @@ return new class extends Migration
         Schema::create('surat_keterangan_kerja', function (Blueprint $table) {
             $table->id();
             $table->string('reference_number')->nullable()->unique();
-            $table->string('employee_nip');
+            $table->unsignedBigInteger('employee_id');
             $table->string('position');
-            $table->string('signer_nip');
+            $table->unsignedBigInteger('signer_id');
             $table->string('signer_position');
-            $table->enum('signature_type', ['manual', 'qrcode', 'digital'])->default('manual');
+            $table->enum('signature_type', ['manual', 'qrcode', 'digital', 'gambar tanda tangan'])->default('manual');
             $table->unsignedBigInteger('letter_template_id');
-            $table->string('tmp_file')->nullable();
             $table->string('signed_file')->nullable();
-            $table->string('created_by');
+            $table->string('signed_file_docx')->nullable();
+            $table->unsignedBigInteger('created_by');
             $table->timestamps();
 
-            $table->foreign('employee_nip')->references('nip')->on('employees')->noActionOnDelete();
-            $table->foreign('signer_nip')->references('nip')->on('employees')->noActionOnUpdate();
+            $table->foreign('employee_id')->references('id')->on('employees')->noActionOnDelete();
+            $table->foreign('signer_id')->references('id')->on('employees')->noActionOnUpdate();
             $table->foreign('letter_template_id')->references('id')->on('letter_templates')->restrictOnDelete();
-            $table->foreign('created_by')->references('nip')->on('users')->noActionOnDelete();
+            $table->foreign('created_by')->references('id')->on('users')->noActionOnDelete();
         });
     }
 

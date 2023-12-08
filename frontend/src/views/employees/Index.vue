@@ -26,18 +26,18 @@ const table = ref(null)
 const edit_roles = ref(null)
 
 const form_edit_roles = reactive({
-    nip: '',
+    id: '',
     roles: ''
 })
 
-function set_form_edit_roles(nip, roles) {
-    form_edit_roles.nip = nip
+function set_form_edit_roles(id, roles) {
+    form_edit_roles.id = id
     form_edit_roles.roles = roles
 }
 
 function save_form_edit_roles() {
     loading.value.open()
-    axios.put(`${url}/employees/${form_edit_roles.nip}/roles`, {
+    axios.put(`${url}/employees/${form_edit_roles.id}/roles`, {
         roles: form_edit_roles.roles
     }).then(res => {
         if (res.status == 200) {
@@ -89,7 +89,7 @@ function save_form_edit_roles() {
                 <td :class="[item.defaultClass]">{{ item.email }}</td>
                 <td :class="[item.defaultClass]">
                     <span class="badge-primary cursor-pointer"
-                        @click="set_form_edit_roles(item.nip, item.roles), edit_roles.open()">
+                        @click="set_form_edit_roles(item.id, item.roles), edit_roles.open()">
                         {{ item.roles }}
                         <Icon icon="cil:pencil" />
                     </span>
@@ -128,7 +128,7 @@ function save_form_edit_roles() {
                     </div>
                 </div>
             </div>
-            <div class="border-t p-4 sm:px-10 flex justify-center">
+            <div class="border-t p-4 sm:px-10 flex justify-end">
                 <button type="button" @click="set_form_edit_roles('', ''), edit_roles.close()"
                     class="btn btn-outline-primary px-14 py-3 mr-6">Batal</button>
                 <button class="btn btn-primary px-14 py-3">Simpan</button>

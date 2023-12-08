@@ -9,9 +9,6 @@ class Employee extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'nip';
-    protected $keyType = 'string';
-    public $incrementing = false;
     protected $perPage = 10;
 
     public function scopeSearch($query, $search = '')
@@ -30,12 +27,12 @@ class Employee extends Model
 
     public function positions()
     {
-        return $this->hasMany(EmployeePosition::class, 'nip', 'nip');
+        return $this->hasMany(EmployeePosition::class, 'employee_id', 'id');
     }
 
     public function account()
     {
-        return $this->hasOne(User::class, 'nip', 'nip');
+        return $this->hasOne(User::class, 'id', 'id');
     }
 
     public function isRegistered()

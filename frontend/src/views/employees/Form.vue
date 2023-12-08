@@ -88,12 +88,21 @@ function save() {
     <div class="flex flex-col bg-white rounded-lg">
         <div class="px-8 py-5 min-w-full inline-block align-middle">
             <form @submit.prevent="save">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">NIP <span class="text-red-400">*</span></label>
-                    <input v-model="form.nip" type="text" class="form-control" :class="{ 'border-red-500': errors.nip }"
-                        placeholder="NIP" required>
-                    <p v-if="errors.nip" class="text-xs text-red-600 mt-2" id="nip-error">{{
-                        errors.nip }}</p>
+                <div class="grid grid-cols-2 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">NIP <span class="text-red-400">*</span></label>
+                        <input v-model="form.nip" type="text" class="form-control" :class="{ 'border-red-500': errors.nip }"
+                            placeholder="NIP" required>
+                        <p v-if="errors.nip" class="text-xs text-red-600 mt-2" id="nip-error">{{
+                            errors.nip }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">NIK <span class="text-red-400">*</span></label>
+                        <input v-model="form.nik" type="text" class="form-control" :class="{ 'border-red-500': errors.nik }"
+                            placeholder="NIK" required>
+                        <p v-if="errors.nik" class="text-xs text-red-600 mt-2" id="nik-error">{{
+                            errors.nik }}</p>
+                    </div>
                 </div>
                 <div class="mb-4 grid grid-cols-2 gap-x-8">
                     <div>
