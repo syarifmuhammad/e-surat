@@ -39,6 +39,21 @@ class SuratPerjanjianKerjaMagang extends Model
             });
     }
 
+    public function scopeByUser($query)
+    {
+        $id = auth()->id();
+        $roles = auth()->user()->roles;
+        if ($roles === 'pegawai') {
+            return $query->where('employee_id', $id)->orWhere('signer_id', $id);
+        } else {
+            return $query;
+        }
+    }
+
+    public function scopeWhereNotSigned($query) {
+        return $query->where('signed_file', null)->where('signed_file_docx', null);
+    }
+
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'employee_id', 'id');
@@ -85,7 +100,7 @@ class SuratPerjanjianKerjaMagang extends Model
 
     public function can_edit()
     {
-        return !$this->have_reference_number() && (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id);
+        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id);
     }
 
     public function can_upload_verified_file()
@@ -96,11 +111,6 @@ class SuratPerjanjianKerjaMagang extends Model
     public function generate_docx()
     {
         $templateProcessor = new TemplateProcessor(storage_path("app/letter_templates/" . $this->letter_template->file));
-
-        // Kebutuhan data yang terkait dengan pemohon atau pembuat surat
-        // $templateProcessor->setValue('nik_pemohon', $letter->resident->nik);
-        // $templateProcessor->setValue('nama_pemohon', $letter->resident->name);
-        // $templateProcessor->setValue('alamat_pemohon', $letter->resident->address);
 
         // Kebutuhan data yang terkait dengan data surat
         $templateProcessor->setValue('nomor_surat', $this->get_reference_number());

@@ -92,6 +92,7 @@ const FormSuratPerjanjianKerjaDosenFullTime = () => import('@/views/outcoming_le
 
 //errors page
 import Forbidden from '@/views/errors/Forbidden.vue'
+import Maintenance from '@/views/errors/Maintenance.vue'
 import { useAuthStore } from '../stores/auth'
 import { useUserStore } from '../stores/user'
 import axios from 'axios'
@@ -105,6 +106,16 @@ const router = createRouter({
       path: '/forbidden',
       name: 'forbidden',
       component: Forbidden,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'GuestLayout',
+      }
+    },
+    {
+      path: '/maintenance',
+      name: 'maintenance',
+      component: Maintenance,
       meta: {
         is_login_required: true,
         can_accessed: ['*'],

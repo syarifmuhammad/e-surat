@@ -410,7 +410,7 @@ onMounted(async () => {
                     <select class="form-control" required v-model="form_surat.signature_type"
                         placeholder="Jenis Tanda Tangan">
                         <option value="manual">Tanda Tangan Manual</option>
-                        <option value="qrcode">Tanda Tangan QR Code</option>
+                        <!-- <option value="qrcode">Tanda Tangan QR Code</option> -->
                         <option value="digital">Tanda Tangan Digital</option>
                         <option value="gambar tanda tangan">Tanda Tangan Berupa Gambar</option>
                     </select>

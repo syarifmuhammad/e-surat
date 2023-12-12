@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\CategoryIncomingLetterController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\IncomingLetterController;
 use App\Http\Controllers\LetterTemplateController;
 use App\Http\Controllers\PositionController;
@@ -77,6 +78,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('', [ReferenceNumberSettingController::class, 'update']);
         Route::get('/letter-types', [ReferenceNumberSettingController::class, 'get_letter_types']);
     });
+
+    Route::get('analytics', [AnalyticsController::class, 'index']);
 
     Route::prefix('incoming-letters')->group(function () {
         Route::prefix('categories')->group(function () {

@@ -41,6 +41,11 @@ const sidebarMenu = ref([
                 name: 'archive_incoming_letter',
                 icon: 'iconoir:archive',
             },
+            {
+                title: 'Report',
+                name: 'maintenance',
+                icon: 'carbon:report',
+            },
         ]
     },
     {
@@ -57,6 +62,11 @@ const sidebarMenu = ref([
                 title: 'Nomor Surat',
                 name: 'reference_outcoming_letter',
                 icon: 'fluent:document-page-number-24-regular',
+            },
+            {
+                title: 'Report',
+                name: 'maintenance',
+                icon: 'carbon:report',
             },
             {
                 title: 'Surat Keterangan Kerja',

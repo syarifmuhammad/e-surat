@@ -43,10 +43,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
-    protected $appends = ['is_verified'];
+    protected $appends = ['is_verified', 'name'];
 
     public function employee() {
-        return $this->hasOne(Employee::class, 'id', 'id');
+        return $this->belongsTo(Employee::class, 'id', 'id');
     }
 
     public function is_verified() {
@@ -55,5 +55,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getIsVerifiedAttribute() {
         return $this->is_verified();
+    }
+
+    public function getNameAttribute() {
+        return $this->employee->name;
     }
 }
