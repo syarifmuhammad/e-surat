@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\SuratKeteranganKerjaCollection as ThisCollection;
+use App\Http\Resources\SuratKeteranganKerjaResource as ThisResource;
 use App\Models\KeyPair;
 use App\Models\ReferenceNumberSetting;
 use App\Models\SuratKeteranganKerja as Letter;
@@ -75,7 +76,7 @@ class SuratKeteranganKerjaController extends Controller
         }
 
         return response()->json([
-            'data' => $letter
+            'data' => new ThisResource($letter)
         ], 200);
     }
 
@@ -138,8 +139,9 @@ class SuratKeteranganKerjaController extends Controller
             }
         }
 
-        if (file_exists(storage_path($fileNameServerPdf))) {
-            return response()->download(storage_path($fileNameServerPdf), $filename);
+        $tmpFileNameServerPdf = 'app/tmp/surat_keterangan_kerja/' . $filename;
+        if (file_exists(storage_path($tmpFileNameServerPdf))) {
+            return response()->download(storage_path($tmpFileNameServerPdf), $filename);
         }
 
         $fileNameServerDocx = "app\\tmp\\surat_keterangan_kerja\\" . $letter->id . '.docx';
@@ -154,9 +156,10 @@ class SuratKeteranganKerjaController extends Controller
             ], 500);
         }
 
-        if ($response->successful() && file_exists(storage_path($fileNameServerPdf))) {
+        $tmpFileNameServerPdf = 'app/tmp/surat_keterangan_kerja/' . $filename;
+        if ($response->successful() && file_exists(storage_path($tmpFileNameServerPdf))) {
             unlink(storage_path($fileNameServerDocx));
-            return response()->download(storage_path($fileNameServerPdf), $filename);
+            return response()->download(storage_path($tmpFileNameServerPdf), $filename);
         }
     }
 
@@ -165,7 +168,46 @@ class SuratKeteranganKerjaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $letter = Letter::find($id);
+        if (!$letter) {
+            return response()->json([
+                'message' => "Surat keterangan kerja tidak ditemukan !"
+            ], 404);
+        }
+        if (!$letter->can_edit()) {
+            return response()->json([
+                'message' => "Surat keterangan kerja tidak dapat di edit !"
+            ], 403);
+        }
+    
+        $validate = Validator::make($request->all(), [
+            'letter_template_id' => 'required|exists:letter_templates,id',
+            'employee.id' => 'required|exists:employees,id',
+            'employee.position' => 'required|string',
+            'signer.id' => 'required|exists:employees,id',
+            'signer.position' => 'required|string',
+            'signature_type' => 'required|in:manual,qrcode,digital,gambar tanda tangan',
+        ]);
+        if ($validate->fails()) {
+            $response = [
+                'errors' => $validate->errors(),
+                'message' => "Validasi form gagal !"
+            ];
+            return response()->json($response, 422);
+        }
+
+        $letter->letter_template_id = $request->letter_template_id;
+        $letter->employee_id = $request->employee['id'];
+        $letter->position = $request->employee['position'];
+        $letter->signer_id = $request->signer['id'];
+        $letter->signer_position = $request->signer['position'];
+        $letter->signature_type = $request->signature_type;
+        $letter->save();
+
+        $response = [
+            'message' => "Berhasil mengubah surat keterangan kerja !"
+        ];
+        return response()->json($response, 200);
     }
 
     public function upload_signed_file(Request $request)
@@ -191,7 +233,7 @@ class SuratKeteranganKerjaController extends Controller
 
         if (!$letter->can_upload_verified_file()) {
             return response()->json([
-                'message' => "Surat dengan jenis tanda tangan selain manual dan digital tidak dapat ditandatangani dengan !"
+                'message' => "Surat dengan jenis tanda tangan selain manual dan digital tidak dapat ditandatangani dengan upload file!"
             ], 403);
         }
 
@@ -229,6 +271,15 @@ class SuratKeteranganKerjaController extends Controller
         //get the latest reference_number
         $latest_number = Letter::where('reference_number', '!=', 'NULL')->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year)->count();
         $letter->reference_number = ReferenceNumberSetting::get_and_parse_reference_number_with_date(Letter::NAME, $latest_number + 1, $letter->created_at);
+        $filename = $letter->id;
+        $fileNameServerPdf = 'app/signed_files/surat_keterangan_kerja/' . $filename . '.pdf';
+        $fileNameServerDocx = 'app/signed_files/surat_keterangan_kerja/' . $filename . '.docx';
+        if (file_exists(storage_path($fileNameServerPdf))) {
+            unlink(storage_path($fileNameServerPdf));
+        }
+        if (file_exists(storage_path($fileNameServerDocx))) {
+            unlink(storage_path($fileNameServerDocx));
+        }
         $letter->save();
 
         $response = [

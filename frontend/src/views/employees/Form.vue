@@ -1,35 +1,64 @@
 <script setup>
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import SubHeader from '@/components/SubHeader.vue'
 import SearchInput from '@/components/SearchInput.vue'
 import Loading from '@/components/Loading.vue'
 import axios from 'axios'
+import AddRekening from '@/components/AddRekening.vue'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const url = import.meta.env.VITE_URL_API
+const modal_add_rekening = ref(null)
 
 const form = reactive({
+    id: "",
     nip: "",
+    nik: "",
     name: "",
     email: "",
+    rekening: [],
     positions: [],
 })
 
 const errors = reactive({
     nip: "",
+    nik: "",
     name: "",
     email: "",
+    rekening: "",
     positions: "",
 })
 
 const loading = ref(null)
 
-function reset_errors() {
-    errors.nip = ""
-    errors.name = ""
-    errors.email = ""
-    errors.positions = ""
+async function get_letter(id) {
+    await axios.get(`${url}/employees/${id}`)
+        .then(res => {
+            let data = res.data.data
+            form.id = data.id
+            form.nip = data.nip
+            form.nik = data.nik
+            form.name = data.name
+            form.email = data.email
+            form.rekening = data.rekening
+            form.positions = data.positions
+        })
+        .catch(err => {
+            console.log(err)
+        })
 
+}
+
+function open_modal_add_rekening() {
+    modal_add_rekening.value.open()
+}
+
+function reset_errors() {
+    Object.keys(errors).forEach(key => {
+        errors[key] = ""
+    })
 }
 
 function reset() {
@@ -38,6 +67,14 @@ function reset() {
     form.email = ""
     form.positions = []
     reset_errors()
+}
+
+function add_rekening(rekening) {
+    form.rekening.push({
+        nama_bank: rekening.nama_bank,
+        atas_nama: rekening.atas_nama,
+        nomor_rekening: rekening.nomor_rekening,
+    })
 }
 
 function save() {
@@ -51,35 +88,107 @@ function save() {
         return
     }
 
+    if (form.rekening.length < 1) {
+        Swal.fire({
+            icon: "error",
+            title: "Gagal",
+            text: "Rekening tidak boleh kosong",
+        });
+        return
+    }
+
+    const checkSet = new Set(form.positions);
+    if (checkSet.size !== form.positions.length) {
+        Swal.fire({
+            icon: "error",
+            title: "Gagal",
+            text: "Jabatan tidak boleh sama",
+        });
+        return
+    } 
+
+    reset_errors()
+
     loading.value.open()
-    axios.post(`${url}/employees`, form).then((res) => {
-        if (res.status == 201) {
-            Swal.fire({
-                icon: "success",
-                title: "Berhasil",
-                text: res.data.message,
-            });
-            reset()
-        }
-    }).catch(e => {
-        if (e.response.status == 422) {
-            errors.nip = e.response.data.errors.nip[0]
-            errors.name = e.response.data.errors.name[0]
-            errors.email = e.response.data.errors.email[0]
-            errors.positions = e.response.data.errors.positions[0]
-        } else {
-            console.log(e)
-        }
-    }).finally(() => {
-        loading.value.close()
-    })
+
+    if (route.name == 'update_employees') {
+        axios.put(`${url}/employees/${form.id}`, form).then((res) => {
+            if (res.status == 200) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil",
+                    text: res.data.message,
+                });
+            }
+        }).catch(e => {
+            if (e.response.status == 422) {
+                Object.entries(e.response.data.errors).forEach(([key, value]) => {
+                    errors[key] = value[0]
+                })
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal",
+                    text: "Silahkan periksa kembali form anda"
+                });
+            } else {
+                console.log(e)
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal",
+                    text: "Terjadi kesalahan",
+                });
+            }
+        }).finally(() => {
+            loading.value.close()
+        })
+        return
+    } else {
+        axios.post(`${url}/employees`, form).then((res) => {
+            if (res.status == 201) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil",
+                    text: res.data.message,
+                });
+                reset()
+            }
+        }).catch(e => {
+            if (e.response.status == 422) {
+                Object.entries(e.response.data.errors).forEach(([key, value]) => {
+                    errors[key] = value[0]
+                })
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal",
+                    text: "Silahkan periksa kembali form anda"
+                });
+            } else {
+                console.log(e)
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal",
+                    text: "Terjadi kesalahan",
+                });
+            }
+        }).finally(() => {
+            loading.value.close()
+        })
+    }
 }
+
+onMounted(async () => {
+    if (route.name == 'update_employees') {
+        loading.value.open()
+        await get_letter(route.params.id)
+        loading.value.close()
+    }
+})
 
 </script>
 
 <template>
     <loading ref="loading"></loading>
-    <SubHeader :title="`Tambah Pegawai`">
+    <SubHeader :title="`Tambah Pegawai`" :back_url="{ name: 'employees' }">
         <!-- <button type="button" class="btn btn-outline-primary inline-flex gap-2 justify-center items-center">
             Pegawai
             <Icon class="text-lg" icon="fe:sync" />
@@ -88,7 +197,7 @@ function save() {
     <div class="flex flex-col bg-white rounded-lg">
         <div class="px-8 py-5 min-w-full inline-block align-middle">
             <form @submit.prevent="save">
-                <div class="grid grid-cols-2 mb-4">
+                <div class="grid grid-cols-2 mb-4 gap-x-8">
                     <div>
                         <label class="block text-sm font-medium mb-2">NIP <span class="text-red-400">*</span></label>
                         <input v-model="form.nip" type="text" class="form-control" :class="{ 'border-red-500': errors.nip }"
@@ -119,6 +228,28 @@ function save() {
                         <p v-if="errors.email" class="text-xs text-red-600 mt-2" id="email-error">{{
                             errors.email }}</p>
                     </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Rekening <span class="text-red-400">*</span></label>
+                    <p class="text-center text-primary cursor-pointer w-full form-control" @click="open_modal_add_rekening">
+                        + Tambah Data Rekening
+                    </p>
+                    <p v-if="errors.rekening" class="text-xs text-red-600 mt-2" id="positions-error">{{
+                        errors.rekening }}</p>
+                    <template v-if="form.rekening.length > 0">
+                        <div v-for="(rekening, index) in form.rekening" :key="index"
+                            class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">
+                            <div class="w-full">
+                                <small>{{ rekening.nama_bank }}</small>
+                                <p class="mb-0">{{ rekening.atas_nama }}</p>
+                                <p class="mb-0">{{ rekening.nomor_rekening }}</p>
+                            </div>
+                            <span @click="form.rekening.splice(index, 1)"
+                                class="p-3 hover:bg-red-200 rounded-full cursor-pointer transition ease-in-out duration-500">
+                                <Icon icon="jam:trash" class="text-red-600 text-2xl" />
+                            </span>
+                        </div>
+                    </template>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Jabatan <span class="text-red-400">*</span></label>
@@ -160,7 +291,7 @@ function save() {
             </form>
         </div>
     </div>
-
+    <AddRekening ref="modal_add_rekening" :save_to_api="false" @inserted="add_rekening" />
     <!-- <modal ref="modal_form_add_positions"></modal> -->
 </template>
 

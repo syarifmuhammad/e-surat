@@ -7,7 +7,9 @@ import Modal from '@/components/Modal.vue'
 import Loading from '@/components/Loading.vue'
 import axios from 'axios'
 import { useUserStore } from '@/stores/user'
+import { RouterLink, useRouter } from 'vue-router'
 
+const router = useRouter()
 const userStore = useUserStore()
 const url = import.meta.env.VITE_URL_API
 
@@ -64,6 +66,18 @@ function save_form_edit_roles() {
     })
 }
 
+function check_routes(name, roles) {
+    if (!router.hasRoute(name)) {
+        return false
+    }
+    const theroute = router.resolve({ name: name })
+    const can_accessed = theroute.meta.can_accessed.some(role => role === '*' || role === roles)
+    if (!can_accessed) {
+        return false
+    }
+    return true
+}
+
 </script>
 
 <template>
@@ -78,9 +92,9 @@ function save_form_edit_roles() {
         <div class="px-8 py-5 min-w-full inline-block align-middle">
             <div class="flex justify-between mb-6">
                 <h3 class="text-primary-400">List Data Pegawai</h3>
-                <router-link v-if="userStore.user.roles === 'superadmin'" :to="{ name: 'create_employees' }" class="btn btn-primary">
+                <RouterLink v-if="check_routes('create_employees', userStore.user.roles)" :to="{ name: 'create_employees' }" class="btn btn-primary">
                     <Icon class="text-lg" icon="fluent:add-12-filled" /> Tambah Pegawai
-                </router-link>
+                </RouterLink>
             </div>
             <CustomTable ref="table" :thead="thead" :url="`${url}/employees`" v-slot="item">
                 <td :class="[item.defaultClass]" class="w-2">{{ item.key }}</td>
@@ -99,9 +113,9 @@ function save_form_edit_roles() {
                     <span v-else class="badge-danger">Belum</span>
                 </td>
                 <td :class="[item.defaultClass]">
-                    <button class="btn btn-info">
+                    <RouterLink :to="{ name: 'update_employees', params: { id: item.id } }" class="btn btn-info">
                         <Icon class="text-lg" icon="cil:pencil" />
-                    </button>
+                    </RouterLink>
                     <button class="btn btn-danger" v-if="item.quantity < 1">
                         <Icon class="text-lg" icon="jam:trash" />
                     </button>

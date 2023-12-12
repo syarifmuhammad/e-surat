@@ -6,6 +6,7 @@ use App\Models\ReferenceNumberSetting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\SuratPerjanjianKerjaDosenFullTime as Letter;
+use Carbon\Carbon;
 
 class SuratPerjanjianKerjaDosenFullTimeResource extends JsonResource
 {
@@ -30,18 +31,29 @@ class SuratPerjanjianKerjaDosenFullTimeResource extends JsonResource
         }
         return [
             'id' => $this->id,
+            'letter_template_id' => $this->letter_template_id,
+            'nomor_surat_sebelumnya' => $this->nomor_surat_sebelumnya,
             'reference_number' => $reference_number,
             'employee' => [
                 'id' => $this->employee->id,
                 'nik' => $this->employee->nik,
                 'nip' => $this->employee->nip,
                 'name' => $this->employee->name,
+                'positions' => $this->employee->positions->pluck('position'),
             ],
+            'profesi' => $this->profesi,
+            'jabatan_fungsional' => $this->jabatan_fungsional,
+            'prodi' => json_decode($this->prodi),
+            'mulai_berlaku' => $this->mulai_berlaku,
+            'akhir_berlaku' => $this->akhir_berlaku,
+            'rekening' => json_decode($this->rekening),
+            'pertelaan_perjanjian_kerja' => new PertelaanPerjanjianKerjaResource($this->pertelaan_perjanjian_kerja),
             'signer' => [
                 'id' => $this->signer->id,
                 'nip' => $this->signer->nip,
                 'name' => $this->signer->name,
                 'position' => $this->signer_position,
+                'positions' => $this->signer->positions->pluck('position'),
             ],
             'have_reference_number' => $this->have_reference_number(),
             'can_give_reference_number' => $this->can_give_reference_number(),
@@ -51,7 +63,7 @@ class SuratPerjanjianKerjaDosenFullTimeResource extends JsonResource
             'signature_type' => $this->signature_type,
             'is_signed' => $this->is_signed(),
             'status' => $status,
-            'created_at' => $this->created_at,
+            'created_at' => Carbon::parse($this->created_at)->translatedFormat('l, d F Y'),
         ];
     }
 }

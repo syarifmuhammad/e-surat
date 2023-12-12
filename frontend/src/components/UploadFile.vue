@@ -1,6 +1,7 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 import { Icon } from '@iconify/vue'
+import 'docx-preview/dist/docx-preview.js'
 
 const props = defineProps({
     accepted_file_type: {
@@ -13,6 +14,8 @@ const props = defineProps({
     },
 })
 
+const emit = defineEmits(['updated_files'])
+
 const fileform = ref(null)
 const inputfile = ref(null)
 const dragAndDropCapable = ref(false)
@@ -20,6 +23,7 @@ const dragenter = ref(false)
 const files = ref(props.default_files)
 const preview = ref(null)
 const uploadPercentage = ref(0)
+const docx_preview = ref(null)
 
 function determineDragAndDropCapable() {
     var div = document.createElement("div");
@@ -36,6 +40,11 @@ function handleFileUploaded(file) {
     if (props.accepted_file_type.length < 1 || props.accepted_file_type.some((t) => t == file.type)) {
         files.value = file;
         preview.value = URL.createObjectURL(files.value);
+        if (file.type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+            nextTick(() => {
+                docx.renderAsync(files.value, docx_preview.value) 
+            })
+        }
     } else {
         Swal.fire({
             icon: "error",
@@ -50,7 +59,14 @@ function handleFileUploaded(file) {
 function uploadFile(event) {
     if (event.target.files.length > 0) {
         handleFileUploaded(event.target.files[0]);
+        emit('updated_files')
     }
+}
+
+function reset() {
+    files.value = null;
+    preview.value = null;
+    inputfile.value.value = null;
 }
 
 onMounted(() => {
@@ -89,17 +105,23 @@ onMounted(() => {
 
 watch(() => props.default_files, (first, second) => {
     if (first != second) {
-        files.value = props.default_files
-        preview.value = URL.createObjectURL(props.default_files)
+        handleFileUploaded(props.default_files)
+        // files.value = props.default_files
+        // preview.value = URL.createObjectURL(props.default_files)
     }
 }, { immediate: true });
 
+onMounted(() => {
+    // console.log(docx)
+})
+
+
 defineExpose({
-    files,
+    files, reset,
 })
 </script>
 <template>
-    <div class="w-full h-full flex justify-center min-h-[300px] bg-slate-100 text-gray-500" ref="fileform"
+    <div class="w-full h-full flex flex-col items-center justify-center min-h-[300px] bg-slate-100 text-gray-500" ref="fileform"
         @dragenter="dragenter = true" @dragleave="dragenter = false">
         <input type="file" @change="uploadFile" ref="inputfile" class="hidden"
             :accept="props.accepted_file_type.join(',')" />
@@ -116,11 +138,20 @@ defineExpose({
         <div class="flex flex-col items-center w-full min-h-[300px]" v-else-if="files != null">
             <button type="button"
                 class="btn cursor-pointer rounded-3xl btn-warning flex items-center mt-3 mb-2 w-25 justify-center"
-                @click="(files = null), (preview = null)">
+                @click="reset()">
                 Ubah File
             </button>
-            <iframe v-if="preview.type == 'application/pdf'" :src="preview" class="w-full h-full"> </iframe>
-            <img class="max-h-[300px]" :src="preview" />
+            <iframe v-if="files.type == 'application/pdf'" :src="preview" class="w-full h-full"> </iframe>
+            <div ref="docx_preview" id="docx_preview" v-else-if="files.type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"></div>
+            <img v-else class="max-h-[300px]" :src="preview" />
         </div>
     </div>
 </template>
+
+<style scoped>
+#docx_preview {
+    width: 100%;
+    max-height: 500px;
+    overflow-y: auto;
+}
+</style>

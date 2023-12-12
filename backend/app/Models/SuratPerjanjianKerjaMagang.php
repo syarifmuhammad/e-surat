@@ -70,7 +70,7 @@ class SuratPerjanjianKerjaMagang extends Model
 
     public function is_signed()
     {
-        return $this->signed_file != null;
+        return $this->signed_file != null || $this->signed_file_docx != null;
     }
 
     public function can_give_reference_number()
@@ -80,7 +80,7 @@ class SuratPerjanjianKerjaMagang extends Model
 
     public function can_signed()
     {
-        return $this->have_reference_number() && auth()->id() == $this->signer_id && !(($this->signature_type == 'manual' || $this->signature_type == 'digital'));
+        return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && !(($this->signature_type == 'manual' || $this->signature_type == 'digital'));
     }
 
     public function can_edit()
@@ -90,7 +90,7 @@ class SuratPerjanjianKerjaMagang extends Model
 
     public function can_upload_verified_file()
     {
-        return $this->signed_file == null && ($this->signature_type == 'manual' || $this->signature_type == 'digital') && (auth()->user()->roles == 'admin_sekretariat');
+        return !$this->is_signed() && ($this->signature_type == 'manual' || $this->signature_type == 'digital') && (auth()->user()->roles == 'admin_sekretariat');
     }
 
     public function generate_docx()
@@ -106,9 +106,10 @@ class SuratPerjanjianKerjaMagang extends Model
         $templateProcessor->setValue('nomor_surat', $this->get_reference_number());
         $templateProcessor->setValue('tanggal_surat', Carbon::parse($this->created_at)->translatedFormat('d F Y'));
         $templateProcessor->setValue('hari', Carbon::parse($this->created_at)->translatedFormat('l'));
-        $templateProcessor->setValue('tanggal', Carbon::parse($this->created_at)->translatedFormat('d'));
+        $templateProcessor->setValue('tanggal_terbilang', ucwords(terbilang(Carbon::parse($this->created_at)->translatedFormat('d'))));
         $templateProcessor->setValue('bulan', Carbon::parse($this->created_at)->translatedFormat('F'));
-        $templateProcessor->setValue('tahun', Carbon::parse($this->created_at)->translatedFormat('Y'));
+        $templateProcessor->setValue('tahun_terbilang', ucwords(terbilang(Carbon::parse($this->created_at)->translatedFormat('Y'))));
+        $templateProcessor->setValue('tanggal_format_tgl_bln_thn', Carbon::parse($this->created_at)->format('d - m - Y'));
 
         // Kebutuhan data pegawai
         $templateProcessor->setValue('nama', $this->employee->name);

@@ -1,15 +1,18 @@
 <script setup>
-import { reactive } from 'vue'
+import { ref, reactive } from 'vue'
 import { Icon } from '@iconify/vue'
 import SubHeader from '@/components/SubHeader.vue'
 import CustomTable from '@/components/CustomTable.vue';
 import Modal from '@/components/Modal.vue';
+import Loading from '@/components/Loading.vue';
 import axios from 'axios'
 
-const url = 'https://9056e12e-0ee3-4a34-aa6e-778790fa873f.mock.pstmn.io/api'
+const url = import.meta.env.VITE_URL_API
+const loading = ref(null)
+const table = ref(null)
+const modal_form_category = ref(null)
 
 const thead = [
-    "",
     "#",
     "Nama",
     "Jumlah Surat",
@@ -18,51 +21,156 @@ const thead = [
 
 const form_category = reactive({
     id: "",
-    name: '',
-    show: true,
+    name: "",
 })
+
+const errors = reactive({
+    name: '',
+})
+
+function reset_form_category() {
+    form_category.id = ""
+    form_category.name = ""
+}
+
+function reset_errors() {
+    errors.name = ""
+}
 
 function open_modal_form_category(form_category_args = null) {
     if (form_category_args) {
         form_category.id = form_category_args.id
         form_category.name = form_category_args.name
-        form_category.show = form_category_args.show
     }
 
-    const modal = document.getElementById('form_category')
-    HSOverlay.open(modal)
+    modal_form_category.value.open()
+}
+
+function close_modal_form_category() {
+    modal_form_category.value.close()
+    reset_form_category()
+    reset_errors()
 }
 
 function save_category() {
-    if (form_category.id.trim()) {
+    reset_errors()
+    loading.value.open()
+    if (form_category.id != "") {
         // update
+        let payload = {
+            name: form_category.name,
+        }
+
+        axios.put(`${url}/incoming-letters/categories/${form_category.id}`, payload)
+            .then(res => {
+                loading.value.close()
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Kategori berhasil diubah!',
+                })
+                table.value.getData()
+                close_modal_form_category()
+            })
+            .catch(err => {
+                loading.value.close()
+                if (err.response.status == 422) {
+                    modal_form_category.value.open()
+                    errors.name = err.response.data.errors.name[0]
+                } else {
+                    console.log(err.response)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Terjadi kesalahan, silahkan coba lagi!',
+                    })
+                    close_modal_form_category()
+                }
+
+            })
     } else {
         // create
         let payload = {
             name: form_category.name,
-            show: form_category.show,
         }
 
-        axios.post(`${url}/incoming-letter/categories`, payload)
+        axios.post(`${url}/incoming-letters/categories`, payload)
             .then(res => {
-                console.log(res)
+                loading.value.close()
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Kategori berhasil ditambahkan!',
+                })
+                table.value.getData()
+                close_modal_form_category()
             })
             .catch(err => {
-                console.log(err)
+                loading.value.close()
+                if (err.response.status == 422) {
+                    modal_form_category.value.open()
+                    errors.name = err.response.data.errors.name[0]
+                } else {
+                    console.log(err.response)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Terjadi kesalahan, silahkan coba lagi!',
+                    })
+                    close_modal_form_category()
+                }
+
             })
     }
 }
 
-
+function delete_category(id) {
+    Swal.fire({
+        title: 'Apakah anda yakin?',
+        text: "Kategori akan dihapus secara permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            loading.value.open()
+            axios.delete(`${url}/incoming-letters/categories/${id}`)
+                .then(res => {
+                    loading.value.close()
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'Kategori berhasil dihapus!',
+                    })
+                    table.value.getData()
+                })
+                .catch(err => {
+                    loading.value.close()
+                    if (err.response.status == 422) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: err.response.data.message,
+                        })
+                    } else {
+                        console.log(err.response)
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Terjadi kesalahan, silahkan coba lagi!',
+                        })
+                    }
+                })
+        }
+    })
+}
 </script>
-
 <template>
-    <SubHeader :title="`Kategori Surat Masuk`">
-        <button type="button" class="btn btn-outline-primary inline-flex gap-2 justify-center items-center">
-            Kategori Surat Masuk
-            <Icon class="text-lg" icon="fe:sync" />
-        </button>
-    </SubHeader>
+    <Loading ref="loading" />
+    <!-- <SubHeader :title="``"></SubHeader> -->
     <div class="flex flex-col bg-white rounded-lg">
         <div class="px-8 py-5 min-w-full inline-block align-middle">
             <div class="flex justify-between mb-6">
@@ -71,29 +179,42 @@ function save_category() {
                     <Icon class="text-lg" icon="fluent:add-12-filled" /> Tambah Kategori
                 </button>
             </div>
-            <CustomTable :thead="thead" :url="`${url}/incoming-letter/categories`" v-slot="item">
-                <td :class="[item.defaultClass]">
-                    <button v-if="item.show" class="btn btn-outline-danger" title="Jangan tampilkan kategori berikut">
-                        <Icon class="text-lg" icon="tabler:eye-off" />
-                    </button>
-                    <button v-else class="btn btn-outline-info" title="Tampilkan kategori berikut">
-                        <Icon class="text-lg" icon="tabler:eye" />
-                    </button>
-                </td>
+            <CustomTable ref="table" :thead="thead" :url="`${url}/incoming-letters/categories`" v-slot="item">
                 <td :class="[item.defaultClass, { disabled: item.show }]">{{ item.key }}</td>
                 <td :class="[item.defaultClass, { disabled: item.show }]">{{ item.name }}</td>
-                <td :class="[item.defaultClass, { disabled: item.show }]">{{ item.quantity }}</td>
+                <td :class="[item.defaultClass, { disabled: item.show }]">{{ item.count }}</td>
                 <td :class="[item.defaultClass]">
-                    <button class="btn btn-info">
-                        <Icon class="text-lg" icon="cil:pencil" />
-                    </button>
-                    <button class="btn btn-danger" v-if="item.quantity < 1">
-                        <Icon class="text-lg" icon="jam:trash" />
-                    </button>
+                    <div class="hs-dropdown relative inline-flex">
+                        <button id="hs-dropdown-with-icons" type="button"
+                            class="hs-dropdown-toggle py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                            Aksi
+                            <svg class="hs-dropdown-open:rotate-180 w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24"
+                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
+                        </button>
+                        <div class="z-10 hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-[15rem] bg-white shadow-md rounded-lg p-2 mt-2 divide-y divide-gray-200"
+                            aria-labelledby="hs-dropdown-with-icons">
+                            <div class="py-2 first:pt-0 last:pb-0">
+                                <span
+                                    @click="open_modal_form_category({ id: item.id, name: item.name })"
+                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+                                    <Icon class="text-lg" icon="cil:pencil"></Icon>
+                                    Edit
+                                </span>
+                                <span v-if="item.count < 1" @click="delete_category(item.id)"
+                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+                                    <Icon class="text-lg" icon="cil:trash"></Icon>
+                                    Hapus
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </td>
             </CustomTable>
         </div>
-        <Modal id="form_category">
+        <Modal ref="modal_form_category">
             <form @submit.prevent="save_category">
                 <div class="p-4 sm:p-10 overflow-y-auto">
                     <div class="text-center mb-6">
@@ -106,13 +227,11 @@ function save_category() {
                     </div>
                     <div class="mb-4">
                         <label for="input-label" class="block text-sm font-medium mb-2">Kategori</label>
-                        <input v-model="form_category.name" type="text" id="input-label" class="form-control" placeholder="Cth: Surat Undangan">
-                    </div>
-                    <div class="mb-4">
-                        <label for="input-label" class="block text-sm font-medium mb-2">Tampilkan Kategori ?</label>
-                        <div class="flex items-center">
-                            <input v-model="form_category.show" type="checkbox" id="hs-basic-with-description" class="form-switch">
-                        </div>
+                        <input v-model="form_category.name" type="text" id="input-label" class="form-control"
+                            placeholder="Cth: Surat Undangan">
+                        <p v-if="errors.name" class="text-xs text-red-600 mt-2" id="name-error">
+                            {{ errors.name }}
+                        </p>
                     </div>
                 </div>
                 <div class="border-t p-4 sm:px-10 flex justify-end">
@@ -123,12 +242,4 @@ function save_category() {
     </div>
 </template>
 
-<style scoped>
-td.disabled {
-    opacity: .5;
-}
-
-td.disabled:hover {
-    background-color: initial !important;
-}
-</style>
+<style scoped></style>

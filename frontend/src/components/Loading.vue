@@ -3,11 +3,16 @@ import { ref } from 'vue'
 import Modal from "@/components/Modal.vue"
 
 const modal = ref(null)
+const is_active = ref(false)
 
 function open() {
+    if (is_active.value) return
+    is_active.value = true
     modal.value.open()
 }
 function close() {
+    if (!is_active.value) return
+    is_active.value = false
     modal.value.close()
 }
 

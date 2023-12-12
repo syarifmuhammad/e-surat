@@ -70,7 +70,7 @@ class SuratKeputusanPemberhentian extends Model
 
     public function is_signed()
     {
-        return $this->signed_file != null;
+        return $this->signed_file != null || $this->signed_file_docx != null;
     }
 
     public function can_give_reference_number()
@@ -80,7 +80,7 @@ class SuratKeputusanPemberhentian extends Model
 
     public function can_signed()
     {
-        return $this->have_reference_number() && auth()->id() == $this->signer_id && !(($this->signature_type == 'manual' || $this->signature_type == 'digital'));
+        return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && !(($this->signature_type == 'manual' || $this->signature_type == 'digital'));
     }
 
     public function can_edit()
@@ -90,7 +90,7 @@ class SuratKeputusanPemberhentian extends Model
 
     public function can_upload_verified_file()
     {
-        return $this->signed_file == null && ($this->signature_type == 'manual' || $this->signature_type == 'digital') && (auth()->user()->roles == 'admin_sekretariat');
+        return !$this->is_signed && ($this->signature_type == 'manual' || $this->signature_type == 'digital') && (auth()->user()->roles == 'admin_sekretariat');
     }
 
     public function generate_docx()

@@ -5,7 +5,9 @@ import axios from 'axios'
 import SubHeader from '@/components/SubHeader.vue'
 import SearchInput from '@/components/SearchInput.vue';
 import CustomSelect from '@/components/CustomSelect.vue';
+import { useRoute } from 'vue-router';
 
+const route = useRoute()
 const url = import.meta.env.VITE_URL_API
 const NAMA_SURAT = "SURAT_KEPUTUSAN_PEMBERHENTIAN"
 
@@ -30,16 +32,12 @@ const errors = reactive({
     letter_template_id: "",
     nomor_berita_acara: "",
     tanggal_berita_acara: "",
-    employee: {
-        id: "",
-    },
+    "employee.id": "",
     pemberhentian_dalam_jabatan: "",
     dikembalikan_ke_jabatan: "",
     keterangan_tambahan: "",
-    signer: {
-        id: "",
-        position: "",
-    },
+    "signer.id": "",
+    "signer.position": "",
     signature_type: "",
     tanggal_berlaku: "",
 })
@@ -48,32 +46,52 @@ const letter_templates = ref([])
 const selected_employee = ref(null)
 const selected_signer = ref(null)
 
-function get_letter_templates() {
-    loading.value.open()
-    axios.get(`${url}/outcoming-letters/templates?letter_type=${NAMA_SURAT}`)
+async function get_letter_templates() {
+    await axios.get(`${url}/outcoming-letters/templates?letter_type=${NAMA_SURAT}`)
         .then(res => {
             letter_templates.value = res.data.data
             form_surat.letter_template_id = letter_templates.value[0].id
         })
         .catch(err => {
             console.log(err)
-        }).finally(() => {
-            loading.value.close()
         })
 }
 
+async function get_letter(id) {
+    await axios.get(`${url}/outcoming-letters/surat-keputusan-pemberhentian/${id}`)
+        .then(res => {
+            let data = res.data.data
+            form_surat.id = data.id
+            form_surat.letter_template_id = data.letter_template_id
+            form_surat.nomor_berita_acara = data.nomor_berita_acara
+            form_surat.tanggal_berita_acara = data.tanggal_berita_acara
+            form_surat.employee = {
+                id: data.employee.id,
+                position: data.employee.position,
+            }
+            form_surat.pemberhentian_dalam_jabatan = data.pemberhentian_dalam_jabatan
+            form_surat.dikembalikan_ke_jabatan = data.dikembalikan_ke_jabatan
+            form_surat.keterangan_tambahan = data.keterangan_tambahan
+            form_surat.signer = {
+                id: data.signer.id,
+                position: data.signer.position,
+            }
+            form_surat.signature_type = data.signature_type
+            form_surat.tanggal_berlaku = data.tanggal_berlaku
+
+            selected_employee.value = data.employee
+            selected_signer.value = data.signer
+        })
+        .catch(err => {
+            console.log(err)
+        })
+
+}
+
 function reset_errors() {
-    errors.letter_template_id = ""
-    errors.nomor_berita_acara = ""
-    errors.tanggal_berita_acara = ""
-    errors.employee.id = ""
-    errors.pemberhentian_dalam_jabatan = ""
-    errors.dikembalikan_ke_jabatan = ""
-    errors.keterangan_tambahan = ""
-    errors.signer.id = ""
-    errors.signer.position = ""
-    errors.signature_type = ""
-    errors.tanggal_berlaku = ""
+    Object.keys(errors).forEach(key => {
+        errors[key] = ""
+    })
 }
 
 function reset_employee() {
@@ -132,10 +150,59 @@ function save_surat() {
         return
     }
     //end of check if form is valid
+    reset_errors()
 
     loading.value.open()
-    if (form_surat.id.trim()) {
+    if (form_surat.id != "") {
         // update
+        let payload = {
+            letter_template_id: form_surat.letter_template_id,
+            nomor_berita_acara: form_surat.nomor_berita_acara,
+            tanggal_berita_acara: form_surat.tanggal_berita_acara,
+            employee: {
+                id: selected_employee.value.id,
+            },
+            pemberhentian_dalam_jabatan: form_surat.pemberhentian_dalam_jabatan,
+            dikembalikan_ke_jabatan: form_surat.dikembalikan_ke_jabatan,
+            keterangan_tambahan: form_surat.keterangan_tambahan,
+            signer: {
+                id: selected_signer.value.id,
+                position: form_surat.signer.position
+            },
+            signature_type: form_surat.signature_type,
+            tanggal_berlaku: form_surat.tanggal_berlaku,
+        }
+
+        axios.put(`${url}/outcoming-letters/surat-keputusan-pemberhentian/${form_surat.id}`, payload)
+            .then(res => {
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil",
+                    text: res.data.message,
+                });
+            })
+            .catch(err => {
+                if (err.response.status == 422) {
+                    Object.entries(err.response.data.errors).forEach(entry => {
+                        const [key, value] = entry;
+                        errors[key] = value[0]
+                    });
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal",
+                        text: "Silahkan periksa kembali form anda",
+                    });
+                } else {
+                    console.log(err)
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal",
+                        text: "Terjadi kesalahan",
+                    });
+                }
+            }).finally(() => {
+                loading.value.close()
+            })
     } else {
         // create
         let payload = {
@@ -167,19 +234,22 @@ function save_surat() {
             })
             .catch(err => {
                 if (err.response.status == 422) {
-                    errors.letter_template_id = err.response.data.errors.letter_template_id[0]
-                    errors.nomor_berita_acara = err.response.data.errors.nomor_berita_acara[0]
-                    errors.tanggal_berita_acara = err.response.data.errors.tanggal_berita_acara[0]
-                    errors.employee.id = err.response.data.errors.employee.id[0]
-                    errors.pemberhentian_dalam_jabatan = err.response.data.errors.pemberhentian_dalam_jabatan[0]
-                    errors.dikembalikan_ke_jabatan = err.response.data.errors.dikembalikan_ke_jabatan[0]
-                    errors.keterangan_tambahan = err.response.data.errors.keterangan_tambahan[0]
-                    errors.signer.id = err.response.data.errors.signer.id[0]
-                    errors.signer.position = err.response.data.errors.signer.position[0]
-                    errors.signature_type = err.response.data.errors.signature_type[0]
-                    errors.tanggal_berlaku = err.response.data.errors.tanggal_berlaku[0]
+                    Object.entries(err.response.data.errors).forEach(entry => {
+                        const [key, value] = entry;
+                        errors[key] = value[0]
+                    });
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal",
+                        text: "Silahkan periksa kembali form anda",
+                    });
                 } else {
                     console.log(err)
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal",
+                        text: "Terjadi kesalahan",
+                    });
                 }
             }).finally(() => {
                 loading.value.close()
@@ -189,14 +259,21 @@ function save_surat() {
 }
 
 onMounted(async () => {
-    get_letter_templates()
+    loading.value.open()
+    if (route.name == 'update_surat_keputusan_pemberhentian') {
+        await get_letter(route.params.id)
+    }
+    await get_letter_templates()
+    loading.value.close()
 })
 
 </script>
 
 <template>
     <Loading ref="loading"></Loading>
-    <SubHeader :title="`Tambah Surat Keputusan Pemberhentian`" />
+    <SubHeader
+        :title="route.name == 'update_surat_keputusan_pemberhentian' ? `Edit Surat Keputusan Pemberhentian` : `Tambah Surat Keputusan Pemberhentian`"
+        :back_url="{ name: 'surat_keputusan_pemberhentian' }" />
     <div class="flex flex-col bg-white rounded-lg">
         <div class="px-8 py-5 min-w-full inline-block align-middle">
             <form @submit.prevent="save_surat">
@@ -256,8 +333,8 @@ onMounted(async () => {
                             </small>
                         </template>
                     </search-input>
-                    <p v-if="errors.employee.id" class="text-xs text-red-600 mt-2" id="employee-error">
-                        {{ errors.employee.id }}
+                    <p v-if="errors['employee.id']" class="text-xs text-red-600 mt-2" id="employee-error">
+                        {{ errors['employee.id'] }}
                     </p>
                     <div v-if="selected_employee"
                         class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">
@@ -283,8 +360,16 @@ onMounted(async () => {
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-medium mb-2">Dikembalikan fungsinya sebagai</label>
-                        <custom-select :required="true" v-model="form_surat.dikembalikan_ke_jabatan"
-                            :data="selected_employee.positions" placeholder="Dikembalikan ke jabatan"></custom-select>
+                        <search-input @inputValue="(data) => { form_surat.dikembalikan_ke_jabatan = data }"
+                            @selected="(data) => { form_surat.dikembalikan_ke_jabatan = data.name }"
+                            :defaultValue="form_surat.dikembalikan_ke_jabatan" :url="`${url}/positions`"
+                            id="search_input_jabatan" placeholder="Cari Jabatan ...">
+                            <template v-slot="{ data }">
+                                <p class="mb-0">{{ data.name }}</p>
+                            </template>
+                        </search-input>
+                        <!-- <custom-select :required="true" v-model="form_surat.dikembalikan_ke_jabatan"
+                            :data="selected_employee.positions" placeholder="Dikembalikan ke jabatan"></custom-select> -->
                         <p v-if="errors.dikembalikan_ke_jabatan" class="text-xs text-red-600 mt-2"
                             id="employee-jabatan_awal-error">
                             {{ errors.dikembalikan_ke_jabatan }}
@@ -317,8 +402,8 @@ onMounted(async () => {
                             </small>
                         </template>
                     </search-input>
-                    <p v-if="errors.signer.id" class="text-xs text-red-600 mt-2" id="signer-id-error">
-                        {{ errors.signer.id }}
+                    <p v-if="errors['signer.id']" class="text-xs text-red-600 mt-2" id="signer-id-error">
+                        {{ errors['signer.id'] }}
                     </p>
                     <div v-if="selected_signer"
                         class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">
@@ -336,8 +421,8 @@ onMounted(async () => {
                     <label class="block text-sm font-medium mb-2">Pilih Jabatan Penandatangan</label>
                     <custom-select :required="true" v-model="form_surat.signer.position" :data="selected_signer.positions"
                         placeholder="Jabatan penandatangan"></custom-select>
-                    <p v-if="errors.signer.position" class="text-xs text-red-600 mt-2" id="signer-position-error">
-                        {{ errors.signer.position }}
+                    <p v-if="errors['signer.position']" class="text-xs text-red-600 mt-2" id="signer-position-error">
+                        {{ errors['signer.position'] }}
                     </p>
                 </div>
                 <div class="mb-4">
@@ -347,6 +432,7 @@ onMounted(async () => {
                         <option value="manual">Tanda Tangan Manual</option>
                         <option value="qrcode">Tanda Tangan QR Code</option>
                         <option value="digital">Tanda Tangan Digital</option>
+                        <option value="gambar tanda tangan">Tanda Tangan Berupa Gambar</option>
                     </select>
                     <p v-if="errors.signature_type" class="text-xs text-red-600 mt-2" id="signatur-type-error">
                         {{ errors.signature_type }}

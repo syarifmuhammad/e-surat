@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('pertelaan_perjanjian_kerja', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('surat_dosen_full_time_id');
             $table->string('pendidikan');
             $table->string('jangka_waktu');
             $table->string('tahun_satu');
@@ -31,7 +30,7 @@ return new class extends Migration
             $table->json('fasilitas_lainnya');
             $table->timestamps();
 
-            $table->foreign('surat_dosen_full_time_id')->references('id')->on('surat_perjanjian_kerja_dosen_full_time')->onDelete('cascade');
+            $table->foreign('id', 'pertelaan_perjanjian_kerja_id')->references('id')->on('surat_perjanjian_kerja_dosen_full_time')->cascadeOnDelete();
         });
     }
 

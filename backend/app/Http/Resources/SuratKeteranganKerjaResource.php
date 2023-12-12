@@ -6,6 +6,7 @@ use App\Models\ReferenceNumberSetting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\SuratKeteranganKerja as Letter;
+use Carbon\Carbon;
 
 class SuratKeteranganKerjaResource extends JsonResource
 {
@@ -30,18 +31,21 @@ class SuratKeteranganKerjaResource extends JsonResource
         }
         return [
             'id' => $this->id,
+            'letter_template_id' => $this->letter_template_id,
             'reference_number' => $reference_number,
             'employee' => [
                 'id' => $this->employee->id,
                 'nip' => $this->employee->nip,
                 'name' => $this->employee->name,
                 'position' => $this->position,
+                'positions' => $this->employee->positions->pluck('position'),
             ],
             'signer' => [
                 'id' => $this->signer->id,
                 'nip' => $this->signer->nip,
                 'name' => $this->signer->name,
                 'position' => $this->signer_position,
+                'positions' => $this->signer->positions->pluck('position'),
             ],
             'have_reference_number' => $this->have_reference_number(),
             'can_give_reference_number' => $this->can_give_reference_number(),
@@ -51,7 +55,7 @@ class SuratKeteranganKerjaResource extends JsonResource
             'signature_type' => $this->signature_type,
             'is_signed' => $this->is_signed(),
             'status' => $status,
-            'created_at' => $this->created_at,
+            'created_at' => Carbon::parse($this->created_at)->translatedFormat('l, d F Y'),
         ];
     }
 }

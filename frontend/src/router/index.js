@@ -1,55 +1,94 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Register from '@/views/Register.vue'
-import AskVerification from '@/views/AskVerification.vue'
-import Login from '@/views/Login.vue'
-import Dashboard from '@/views/Dashboard.vue'
-import Position from '@/views/positions/Index.vue'
-import FormPosition from '@/views/positions/Form.vue'
-import Employees from '@/views/employees/Index.vue'
-import FormEmployees from '@/views/employees/Form.vue'
-import Categories from '@/views/incoming_letters/Categories.vue'
-import ReferenceNumberSettings from '@/views/outcoming_letters/ReferenceNumberSettings.vue'
-import LetterTemplates from '@/views/outcoming_letters/LetterTemplates/Index.vue'
+const Register = () => import('@/views/Register.vue')
+const AskVerification = () => import('@/views/AskVerification.vue')
+const Login = () => import('@/views/Login.vue')
+const Dashboard = () => import('@/views/Dashboard.vue')
+const Position = () => import('@/views/positions/Index.vue')
+const FormPosition = () => import('@/views/positions/Form.vue')
+const Employees = () => import('@/views/employees/Index.vue')
+const FormEmployees = () => import('@/views/employees/Form.vue')
+const Categories = () => import('@/views/incoming_letters/Categories.vue')
+const Archive = () => import('@/views/incoming_letters/Archive.vue')
+const PreviewIncomingLetter = () => import('@/views/incoming_letters/Preview.vue')
+const ReferenceNumberSettings = () => import('@/views/outcoming_letters/ReferenceNumberSettings.vue')
+const LetterTemplates = () => import('@/views/outcoming_letters/LetterTemplates/Index.vue')
+const FormLetterTemplates = () => import('@/views/outcoming_letters/LetterTemplates/Form.vue')
+
+// import Login from '@/views/Login.vue'
+
+// import Dashboard from '@/views/Dashboard.vue'
+// import Position from '@/views/positions/Index.vue'
+// import FormPosition from '@/views/positions/Form.vue'
+// import Employees from '@/views/employees/Index.vue'
+// import FormEmployees from '@/views/employees/Form.vue'
+// import Categories from '@/views/incoming_letters/Categories.vue'
+// import Archive from '@/views/incoming_letters/Archive.vue'
+// import ReferenceNumberSettings from '@/views/outcoming_letters/ReferenceNumberSettings.vue'
+// import LetterTemplates from '@/views/outcoming_letters/LetterTemplates/Index.vue'
 
 //surat keterangan kerja
-import SuratKeteranganKerja from '@/views/outcoming_letters/SuratKeteranganKerja/Index.vue'
-import PreviewSuratKeteranganKerja from '@/views/outcoming_letters/SuratKeteranganKerja/Preview.vue'
-import FormSuratKeteranganKerja from '@/views/outcoming_letters/SuratKeteranganKerja/Form.vue'
+const SuratKeteranganKerja = () => import('@/views/outcoming_letters/SuratKeteranganKerja/Index.vue')
+const PreviewSuratKeteranganKerja = () => import('@/views/outcoming_letters/SuratKeteranganKerja/Preview.vue')
+const FormSuratKeteranganKerja = () => import('@/views/outcoming_letters/SuratKeteranganKerja/Form.vue')
+// import SuratKeteranganKerja from '@/views/outcoming_letters/SuratKeteranganKerja/Index.vue'
+// import PreviewSuratKeteranganKerja from '@/views/outcoming_letters/SuratKeteranganKerja/Preview.vue'
+// import FormSuratKeteranganKerja from '@/views/outcoming_letters/SuratKeteranganKerja/Form.vue'
 
 //surat keputusan rotasi kepegawaian
-import SuratKeputusanRotasiKepegawaian from '@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Index.vue'
-import PreviewSuratKeputusanRotasiKepegawaian from '@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Preview.vue'
-import FormSuratKeputusanRotasiKepegawaian from '@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Form.vue'
+const SuratKeputusanRotasiKepegawaian = () => import('@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Index.vue')
+const PreviewSuratKeputusanRotasiKepegawaian = () => import('@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Preview.vue')
+const FormSuratKeputusanRotasiKepegawaian = () => import('@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Form.vue')
+// import SuratKeputusanRotasiKepegawaian from '@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Index.vue'
+// import PreviewSuratKeputusanRotasiKepegawaian from '@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Preview.vue'
+// import FormSuratKeputusanRotasiKepegawaian from '@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Form.vue'
 
 //surat keputusan pemberhentian
-import SuratKeputusanPemberhentian from '@/views/outcoming_letters/SuratKeputusanPemberhentian/Index.vue'
-import PreviewSuratKeputusanPemberhentian from '@/views/outcoming_letters/SuratKeputusanPemberhentian/Preview.vue'
-import FormSuratKeputusanPemberhentian from '@/views/outcoming_letters/SuratKeputusanPemberhentian/Form.vue'
+const SuratKeputusanPemberhentian = () => import('@/views/outcoming_letters/SuratKeputusanPemberhentian/Index.vue')
+const PreviewSuratKeputusanPemberhentian = () => import('@/views/outcoming_letters/SuratKeputusanPemberhentian/Preview.vue')
+const FormSuratKeputusanPemberhentian = () => import('@/views/outcoming_letters/SuratKeputusanPemberhentian/Form.vue')
+// import SuratKeputusanPemberhentian from '@/views/outcoming_letters/SuratKeputusanPemberhentian/Index.vue'
+// import PreviewSuratKeputusanPemberhentian from '@/views/outcoming_letters/SuratKeputusanPemberhentian/Preview.vue'
+// import FormSuratKeputusanPemberhentian from '@/views/outcoming_letters/SuratKeputusanPemberhentian/Form.vue'
 
 //surat keputusan pengangkatan
-import SuratKeputusanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPengangkatan/Index.vue'
-import PreviewSuratKeputusanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPengangkatan/Preview.vue'
-import FormSuratKeputusanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPengangkatan/Form.vue'
+const SuratKeputusanPengangkatan = () => import('@/views/outcoming_letters/SuratKeputusanPengangkatan/Index.vue')
+const PreviewSuratKeputusanPengangkatan = () => import('@/views/outcoming_letters/SuratKeputusanPengangkatan/Preview.vue')
+const FormSuratKeputusanPengangkatan = () => import('@/views/outcoming_letters/SuratKeputusanPengangkatan/Form.vue')
+// import SuratKeputusanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPengangkatan/Index.vue'
+// import PreviewSuratKeputusanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPengangkatan/Preview.vue'
+// import FormSuratKeputusanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPengangkatan/Form.vue'
 
 //surat keputusan pemberhenetian dan pengangkatan
-import SuratKeputusanPemberhentianDanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Index.vue'
-import PreviewSuratKeputusanPemberhentianDanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Preview.vue'
-import FormSuratKeputusanPemberhentianDanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Form.vue'
+const SuratKeputusanPemberhentianDanPengangkatan = () => import('@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Index.vue')
+const PreviewSuratKeputusanPemberhentianDanPengangkatan = () => import('@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Preview.vue')
+const FormSuratKeputusanPemberhentianDanPengangkatan = () => import('@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Form.vue')
+// import SuratKeputusanPemberhentianDanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Index.vue'
+// import PreviewSuratKeputusanPemberhentianDanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Preview.vue'
+// import FormSuratKeputusanPemberhentianDanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Form.vue'
 
 //surat perjanjian kerja magang
-import SuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Index.vue'
-import PreviewSuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Preview.vue'
-import FormSuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Form.vue'
+const SuratPerjanjianKerjaMagang = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Index.vue')
+const PreviewSuratPerjanjianKerjaMagang = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Preview.vue')
+const FormSuratPerjanjianKerjaMagang = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Form.vue')
+// import SuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Index.vue'
+// import PreviewSuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Preview.vue'
+// import FormSuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Form.vue'
 
 //surat perjanjian kerja dosen luar biasa
-import SuratPerjanjianKerjaDosenLuarBiasa from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Index.vue'
-import PreviewSuratPerjanjianKerjaDosenLuarBiasa from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Preview.vue'
-import FormSuratPerjanjianKerjaDosenLuarBiasa from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Form.vue'
+const SuratPerjanjianKerjaDosenLuarBiasa = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Index.vue')
+const PreviewSuratPerjanjianKerjaDosenLuarBiasa = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Preview.vue')
+const FormSuratPerjanjianKerjaDosenLuarBiasa = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Form.vue')
+// import SuratPerjanjianKerjaDosenLuarBiasa from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Index.vue'
+// import PreviewSuratPerjanjianKerjaDosenLuarBiasa from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Preview.vue'
+// import FormSuratPerjanjianKerjaDosenLuarBiasa from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Form.vue'
 
 //surat perjanjian kerja dosen full time
-import SuratPerjanjianKerjaDosenFullTime from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Index.vue'
-import PreviewSuratPerjanjianKerjaDosenFullTime from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Preview.vue'
-import FormSuratPerjanjianKerjaDosenFullTime from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Form.vue'
+const SuratPerjanjianKerjaDosenFullTime = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Index.vue')
+const PreviewSuratPerjanjianKerjaDosenFullTime = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Preview.vue')
+const FormSuratPerjanjianKerjaDosenFullTime = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Form.vue')
+// import SuratPerjanjianKerjaDosenFullTime from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Index.vue'
+// import PreviewSuratPerjanjianKerjaDosenFullTime from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Preview.vue'
+// import FormSuratPerjanjianKerjaDosenFullTime from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Form.vue'
 
 //errors page
 import Forbidden from '@/views/errors/Forbidden.vue'
@@ -138,7 +177,17 @@ const router = createRouter({
       component: FormEmployees,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin'],
+        can_accessed: ['superadmin', 'admin_sdm'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/employees/:id',
+      name: 'update_employees',
+      component: FormEmployees,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['superadmin', 'admin_sdm'],
         layout: 'AuthenticatedLayout',
       },
     },
@@ -148,18 +197,28 @@ const router = createRouter({
       component: Categories,
       meta: {
         is_login_required: true,
-        can_accessed: ['*'],
+        can_accessed: ['admin_sdm', 'admin_sekretariat'],
         layout: 'AuthenticatedLayout',
       },
     },
     {
       path: '/surat-masuk/arsip',
       name: 'archive_incoming_letter',
-      component: Employees,
+      component: Archive,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'admin_sekretariat'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/surat-masuk/arsip/:id/file',
+      name: 'file_archive_incoming_letter',
+      component: PreviewIncomingLetter,
       meta: {
         is_login_required: true,
         can_accessed: ['*'],
-        layout: 'AuthenticatedLayout',
+        layout: 'BlankLayout',
       },
     },
     {
@@ -175,7 +234,17 @@ const router = createRouter({
     {
       path: '/surat-keluar/templates/create',
       name: 'create_letter_templates',
-      component: LetterTemplates,
+      component: FormLetterTemplates,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/surat-keluar/templates/:id',
+      name: 'update_letter_templates',
+      component: FormLetterTemplates,
       meta: {
         is_login_required: true,
         can_accessed: ['admin_sdm', 'superadmin'],
@@ -225,6 +294,17 @@ const router = createRouter({
       },
     },
     {
+      path: '/surat-keluar/surat-keterangan-kerja/:id',
+      name: 'update_surat_keterangan_kerja',
+      component: FormSuratKeteranganKerja,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keterangan_kerja',
+      },
+    },
+    {
       path: '/surat-keluar/surat-keputusan-rotasi-kepegawaian',
       name: 'surat_keputusan_rotasi_kepegawaian',
       component: SuratKeputusanRotasiKepegawaian,
@@ -248,6 +328,17 @@ const router = createRouter({
     {
       path: '/surat-keluar/surat-keputusan-rotasi-kepegawaian/create',
       name: 'create_surat_keputusan_rotasi_kepegawaian',
+      component: FormSuratKeputusanRotasiKepegawaian,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_rotasi_kepegawaian',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-rotasi-kepegawaian/:id',
+      name: 'update_surat_keputusan_rotasi_kepegawaian',
       component: FormSuratKeputusanRotasiKepegawaian,
       meta: {
         is_login_required: true,
@@ -289,6 +380,17 @@ const router = createRouter({
       },
     },
     {
+      path: '/surat-keluar/surat-keputusan-pemberhentian/:id',
+      name: 'update_surat_keputusan_pemberhentian',
+      component: FormSuratKeputusanPemberhentian,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_pemberhentian',
+      },
+    },
+    {
       path: '/surat-keluar/surat-keputusan-pengangkatan',
       name: 'surat_keputusan_pengangkatan',
       component: SuratKeputusanPengangkatan,
@@ -312,6 +414,17 @@ const router = createRouter({
     {
       path: '/surat-keluar/surat-keputusan-pengangkatan/create',
       name: 'create_surat_keputusan_pengangkatan',
+      component: FormSuratKeputusanPengangkatan,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_pengangkatan',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pengangkatan/:id',
+      name: 'update_surat_keputusan_pengangkatan',
       component: FormSuratKeputusanPengangkatan,
       meta: {
         is_login_required: true,
@@ -353,6 +466,17 @@ const router = createRouter({
       },
     },
     {
+      path: '/surat-keluar/surat-keputusan-pemberhentian-dan-pengangkatan/:id',
+      name: 'update_surat_keputusan_pemberhentian_dan_pengangkatan',
+      component: FormSuratKeputusanPemberhentianDanPengangkatan,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_pemberhentian_dan_pengangkatan',
+      },
+    },
+    {
       path: '/surat-keluar/surat-perjanjian-kerja-magang',
       name: 'surat_perjanjian_kerja_magang',
       component: SuratPerjanjianKerjaMagang,
@@ -376,6 +500,17 @@ const router = createRouter({
     {
       path: '/surat-keluar/surat-perjanjian-kerja-magang/create',
       name: 'create_surat_perjanjian_kerja_magang',
+      component: FormSuratPerjanjianKerjaMagang,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_perjanjian_kerja_magang',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-magang/:id',
+      name: 'update_surat_perjanjian_kerja_magang',
       component: FormSuratPerjanjianKerjaMagang,
       meta: {
         is_login_required: true,
@@ -417,6 +552,17 @@ const router = createRouter({
       },
     },
     {
+      path: '/surat-keluar/surat-perjanjian-kerja-dosen-luar-biasa/:id',
+      name: 'update_surat_perjanjian_kerja_dosen_luar_biasa',
+      component: FormSuratPerjanjianKerjaDosenLuarBiasa,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_perjanjian_kerja_dosen_luar_biasa',
+      },
+    },
+    {
       path: '/surat-keluar/surat-perjanjian-kerja-dosen-full-time',
       name: 'surat_perjanjian_kerja_dosen_full_time',
       component: SuratPerjanjianKerjaDosenFullTime,
@@ -440,6 +586,17 @@ const router = createRouter({
     {
       path: '/surat-keluar/surat-perjanjian-kerja-dosen-full-time/create',
       name: 'create_surat_perjanjian_kerja_dosen_full_time',
+      component: FormSuratPerjanjianKerjaDosenFullTime,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['admin_sdm', 'superadmin'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_perjanjian_kerja_dosen_full_time',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-dosen-full-time/:id',
+      name: 'update_surat_perjanjian_kerja_dosen_full_time',
       component: FormSuratPerjanjianKerjaDosenFullTime,
       meta: {
         is_login_required: true,

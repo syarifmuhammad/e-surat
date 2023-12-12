@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\CategoryIncomingLetter;
 use Illuminate\Database\Seeder;
 use App\Models\Position;
 use App\Models\Employee;
@@ -69,6 +71,7 @@ class DatabaseSeeder extends Seeder
         $employees = [
             [
                 'nip' => '000000000000000000',
+                'nik' => '000000000000000000',
                 'name' => 'Super Admin',
                 'email' => 'admin@example.com',
                 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
@@ -83,6 +86,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'nip' => '12345678',
+                'nik' => '12345678',
                 'name' => 'Admin SDM Dummy',
                 'email' => 'admin_sdm@example.com',
                 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
@@ -98,6 +102,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'nip' => '23456789',
+                'nik' => '23456789',
                 'name' => 'Admin Sekretariat Dummy',
                 'email' => 'admin_sekretariat@example.com',
                 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
@@ -113,6 +118,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'nip' => '34567890',
+                'nik' => '34567890',
                 'name' => 'Dosen Dummy',
                 'email' => 'dosen1@example.com',
                 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
@@ -131,6 +137,7 @@ class DatabaseSeeder extends Seeder
         foreach ($employees as $employee) {
             $insert_employee = Employee::create([
                 'nip' => $employee['nip'],
+                'nik' => $employee['nik'],
                 'name' => $employee['name'],
                 'email' => $employee['email'],
                 'tempat_lahir' => $employee['tempat_lahir'],
@@ -147,7 +154,7 @@ class DatabaseSeeder extends Seeder
                 'roles' => $employee['roles'],
             ]);
 
-            KeyPair::storeKeys($insert_employee->id, $employee['password']);
+            // KeyPair::storeKeys($insert_employee->id, $employee['password']);
             if (isset($employee['position'])) {
                 EmployeePosition::create([
                     'employee_id' => $insert_employee->id,
@@ -204,6 +211,19 @@ class DatabaseSeeder extends Seeder
             'letter_type' => 'SURAT_PERJANJIAN_KERJA_MAGANG',
             'file' => '3aed34a1-8e66-4d59-990e-a4b13a918e00.docx',
         ]);
+
+
+        // create fake categories for incoming letters
+
+        $categories = [
+            ['name' => 'Surat Undangan'],
+            ['name' => 'Surat Pemberitahuan'],
+            ['name' => 'Surat Pernyataan'],
+        ];
+
+        foreach ($categories as $category) {
+            CategoryIncomingLetter::create($category);
+        }
 
 
         // create fake ReferenceNumberSetting

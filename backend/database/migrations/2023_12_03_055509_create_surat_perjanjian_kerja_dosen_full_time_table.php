@@ -18,18 +18,16 @@ return new class extends Migration
             $table->unsignedBigInteger('employee_id');
             $table->string('profesi');
             $table->string('jabatan_fungsional');
-            $table->string('fakultas');
-            $table->string('singkatan_fakultas');
-            $table->string('jurusan');
+            $table->json('prodi');
             $table->date('mulai_berlaku');
             $table->date('akhir_berlaku');
             $table->json('rekening');
             $table->unsignedBigInteger('signer_id');
             $table->string('signer_position');
-            $table->enum('signature_type', ['manual', 'qrcode', 'digital'])->default('manual');
+            $table->enum('signature_type', ['manual', 'qrcode', 'digital', 'gambar tanda tangan'])->default('manual');
             $table->unsignedBigInteger('letter_template_id');
-            $table->string('tmp_file')->nullable();
             $table->string('signed_file')->nullable();
+            $table->string('signed_file_docx')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
 

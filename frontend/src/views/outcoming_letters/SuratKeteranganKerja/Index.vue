@@ -19,6 +19,8 @@ const thead = [
     "Nomor Surat",
     "NIP",
     "Nama Pegawai",
+    "Nama Penandatangan",
+    "Tanggal Surat",
     "Status",
     "",
 ]
@@ -34,7 +36,7 @@ const letter_signature_type = ref("")
 const signature = ref(null)
 const password = ref("")
 
-function download_docx(id) {
+function download_docx(id, nama) {
     loading.value.open()
     axios.get(`${url}/outcoming-letters/surat-keterangan-kerja/${id}/download/docx`, {
         responseType: 'blob',
@@ -42,7 +44,7 @@ function download_docx(id) {
         const url = window.URL.createObjectURL(new Blob([res.data]))
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', `${id}.docx`)
+        link.setAttribute('download', `Surat Keterangan Kerja Atas Nama ${nama}.docx`)
         document.body.appendChild(link)
         link.click()
     }).catch(err => {
@@ -232,6 +234,8 @@ function sign() {
                 </td>
                 <td :class="[item.defaultClass]">{{ item.employee.nip }}</td>
                 <td :class="[item.defaultClass]">{{ item.employee.name }}</td>
+                <td :class="[item.defaultClass]">{{ item.signer.name }}</td>
+                <td :class="[item.defaultClass]">{{ item.created_at }}</td>
                 <td :class="[item.defaultClass]">
                     <template v-if="item.status == 'waiting_for_reference_number'">
                         <span class="badge badge-danger text-center">Pending</span>
@@ -272,7 +276,7 @@ function sign() {
                                     <Icon class="text-lg" icon="gg:file-document"></Icon>
                                     Lihat Surat (.PDF)
                                 </RouterLink>
-                                <span @click="download_docx(item.id)"
+                                <span @click="download_docx(item.id, item.employee.name)"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
                                     Lihat Surat (.DOCX)
@@ -283,7 +287,7 @@ function sign() {
                                     <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
                                     Berikan Nomor Surat
                                 </span>
-                                <span v-if="item.can_signed && item.can_upload_verified_file"
+                                <span v-if="item.can_upload_verified_file"
                                     @click="open_modal_upload_signed_file(item.id)"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="octicon:upload-16"></Icon>
@@ -295,11 +299,12 @@ function sign() {
                                     <Icon class="text-lg" icon="fluent:signed-24-regular"></Icon>
                                     Tanda Tangani Surat
                                 </span>
-                                <span v-if="item.can_edit" @click="open_sweetalert_confirm_give_reference_number(item.id)"
+                                <RouterLink v-if="item.can_edit"
+                                    :to="{ name: 'update_surat_keterangan_kerja', params: { id: item.id } }"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="cil:pencil"></Icon>
                                     Edit Surat
-                                </span>
+                                </RouterLink>
                             </div>
                         </div>
                     </div>
@@ -345,7 +350,7 @@ function sign() {
                     <img v-if="signature" :src="signature" class="w-1/2 mx-auto">
                     <div v-else class="mb-4 flex flex-col items-center">
                         <p class="text-center mb-4">Tanda tangan tidak ditemukan!</p>
-                        <button @click="modal_update_signature.open()" class="btn bg-blue-500 text-white ">Upload Tanda
+                        <button type="button" @click="modal_update_signature.open()" class="btn bg-blue-500 text-white ">Upload Tanda
                             Tangan</button>
                     </div>
                 </template>

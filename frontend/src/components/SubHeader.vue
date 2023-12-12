@@ -1,18 +1,27 @@
 <script setup>
-//   import { Icon } from '@iconify/vue';
+import { RouterLink } from 'vue-router';
+
+  import { Icon } from '@iconify/vue';
 //   import MonthDropdown from './MonthDropdown.vue';
-  defineProps({
-    title: {
-      type: String,
-      default: 'Title',
-    },
-  });
+defineProps({
+  title: {
+    type: String,
+    default: 'Title',
+  },
+  back_url: {
+    type: Object,
+    default: null,
+  },
+});
 </script>
 
 <template>
   <div class="flex items-center mb-9">
-      <h1 class="text-primary-400 text-lg"> {{ title }}</h1>
-      <slot />
+    <RouterLink v-if="back_url" :to="back_url" class="mr-4">
+      <Icon icon="eva:arrow-back-outline" class="text-primary-400" />
+    </RouterLink>
+    <h1 class="text-primary-400 text-lg"> {{ title }}</h1>
+    <slot />
     <!-- <MonthDropdown v-if="hasDropdownMonth" /> -->
   </div>
 </template>

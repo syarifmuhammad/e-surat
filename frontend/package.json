@@ -13,6 +13,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "docx-preview": "^0.1.20",
     "pinia": "^2.1.7",
     "preline": "^1.9.0",
     "sweetalert2": "^11.10.0",

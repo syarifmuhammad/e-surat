@@ -69,7 +69,7 @@ class SuratPerjanjianKerjaDosenLuarBiasa extends Model
 
     public function is_signed()
     {
-        return $this->signed_file != null;
+        return $this->signed_file != null || $this->signed_file_docx != null;
     }
 
     public function can_give_reference_number() {
@@ -77,7 +77,7 @@ class SuratPerjanjianKerjaDosenLuarBiasa extends Model
     }
 
     public function can_signed() {
-        return $this->have_reference_number() && auth()->id() == $this->signer_id && !(($this->signature_type == 'manual' || $this->signature_type == 'digital'));
+        return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && !(($this->signature_type == 'manual' || $this->signature_type == 'digital'));
     }
 
     public function can_edit() {
@@ -85,7 +85,7 @@ class SuratPerjanjianKerjaDosenLuarBiasa extends Model
     }
 
     public function can_upload_verified_file() {
-        return $this->signed_file == null && ($this->signature_type == 'manual' || $this->signature_type == 'digital') && (auth()->user()->roles == 'admin_sekretariat') ;
+        return !$this->is_signed() && ($this->signature_type == 'manual' || $this->signature_type == 'digital') && (auth()->user()->roles == 'admin_sekretariat') ;
     }
 
     public function generate_docx()
@@ -100,11 +100,30 @@ class SuratPerjanjianKerjaDosenLuarBiasa extends Model
         // Kebutuhan data yang terkait dengan data surat
         $templateProcessor->setValue('nomor_surat', $this->get_reference_number());
         $templateProcessor->setValue('tanggal_surat', Carbon::parse($this->created_at)->translatedFormat('d F Y'));
+        $templateProcessor->setValue('hari', Carbon::parse($this->created_at)->translatedFormat('l'));
+        $templateProcessor->setValue('tanggal_terbilang', ucwords(terbilang(Carbon::parse($this->created_at)->translatedFormat('d'))));
+        $templateProcessor->setValue('bulan', Carbon::parse($this->created_at)->translatedFormat('F'));
+        $templateProcessor->setValue('tahun_terbilang', ucwords(terbilang(Carbon::parse($this->created_at)->translatedFormat('Y'))));
 
         // Kebutuhan data pegawai
         $templateProcessor->setValue('nama', $this->employee->name);
         $templateProcessor->setValue('nip', $this->employee->nip);
-        $templateProcessor->setValue('jabatan', $this->position);
+        $templateProcessor->setValue('nik', $this->employee->nik);
+        $templateProcessor->setValue('alamat', $this->employee->alamat);
+        $templateProcessor->setValue('tempat_lahir', $this->employee->tempat_lahir);
+        $templateProcessor->setValue('tanggal_lahir', Carbon::parse($this->employee->tanggal_lahir)->translatedFormat('d F Y'));
+        $templateProcessor->setValue('jabatan_fungsional', $this->jabatan_fungsional);
+        $templateProcessor->setValue('nidn', $this->nidn);
+        $templateProcessor->setValue('mata_kuliah', $this->mata_kuliah);
+        $templateProcessor->setValue('tahun_ajaran', $this->tahun_ajaran);
+        $templateProcessor->setValue('semester', $this->semester);
+        $templateProcessor->setValue('upah', $this->upah);
+        $templateProcessor->setValue('transportasi', $this->transportasi);
+        $rekening = json_decode($this->rekening);
+        $templateProcessor->setValue('nama_bank', $rekening->nama_bank);
+        $templateProcessor->setValue('atas_nama', $rekening->atas_nama);
+        $templateProcessor->setValue('nomor_rekening', $rekening->nomor_rekening);
+        $templateProcessor->setValue('npwp', $this->employee->npwp);
 
         // Kebutuhan data yang terkait dengan pejabat yang menandatangan
         $templateProcessor->setValue('nama_penandatangan', $this->signer->name);

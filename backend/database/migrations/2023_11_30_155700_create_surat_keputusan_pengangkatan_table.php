@@ -21,10 +21,10 @@ return new class extends Migration
             $table->date('tanggal_berlaku');
             $table->unsignedBigInteger('signer_id');
             $table->string('signer_position');
-            $table->enum('signature_type', ['manual', 'qrcode', 'digital'])->default('manual');
+            $table->enum('signature_type', ['manual', 'qrcode', 'digital', 'gambar tanda tangan'])->default('manual');
             $table->unsignedBigInteger('letter_template_id');
-            $table->string('tmp_file')->nullable();
             $table->string('signed_file')->nullable();
+            $table->string('signed_file_docx')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
 

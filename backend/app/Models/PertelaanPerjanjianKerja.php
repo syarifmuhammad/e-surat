@@ -11,6 +11,8 @@ class PertelaanPerjanjianKerja extends Model
 
     protected $table = 'pertelaan_perjanjian_kerja';
 
+    public $incrementing = false;
+
     public function surat_dosen_full_time()
     {
         return $this->belongsTo(SuratPerjanjianKerjaDosenFullTime::class, 'surat_dosen_full_time_id', 'id');

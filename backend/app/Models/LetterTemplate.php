@@ -31,4 +31,11 @@ class LetterTemplate extends Model
     //     return $format;
     // }
 
+    public function scopeSearch($query, $search)
+    {
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
+    }
+
 }

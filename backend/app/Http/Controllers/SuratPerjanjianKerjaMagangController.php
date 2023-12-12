@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\SuratPerjanjianKerjaMagangCollection as ThisCollection;
+use App\Http\Resources\SuratPerjanjianKerjaMagangResource as ThisResource;
+use App\Models\KeyPair;
 use App\Models\ReferenceNumberSetting;
 use App\Models\Rekening;
 use App\Models\SuratPerjanjianKerjaMagang as Letter;
@@ -12,7 +14,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use NcJoes\OfficeConverter\OfficeConverter;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class SuratPerjanjianKerjaMagangController extends Controller
 {
@@ -42,7 +44,7 @@ class SuratPerjanjianKerjaMagangController extends Controller
             'penanggung_pembayaran' => 'required|string',
             'signer.id' => 'required|exists:employees,id',
             'signer.position' => 'required|string',
-            'signature_type' => 'required|in:manual,qrcode,digital',
+            'signature_type' => 'required|in:manual,qrcode,digital,gambar tanda tangan',
         ]);
 
         if ($validate->fails()) {
@@ -71,7 +73,7 @@ class SuratPerjanjianKerjaMagangController extends Controller
         $letter->save();
 
         $response = [
-            'message' => "Berhasil membuat Surat perjanjian kerja magang !"
+            'message' => "Berhasil membuat surat perjanjian kerja magang !"
         ];
         return response()->json($response, 201);
     }
@@ -89,11 +91,39 @@ class SuratPerjanjianKerjaMagangController extends Controller
         }
 
         return response()->json([
-            'data' => $letter
+            'data' => new ThisResource($letter)
         ], 200);
     }
 
-    public function download(string $id)
+    public function download_docx(string $id)
+    {
+        $letter = Letter::find($id);
+        if (!$letter) {
+            return response()->json([
+                'message' => "Surat perjanjian kerja magang tidak ditemukan !"
+            ], 404);
+        }
+
+        if ($letter->signed_file_docx != null) {
+            $fileNameServerDocx = 'app\\signed_files\\surat_perjanjian_kerja_magang\\' . $letter->signed_file_docx;
+            return response()->download(storage_path($fileNameServerDocx), $letter->signed_file_docx);
+        }
+
+        $filename = $letter->id . '.docx';
+        $fileNameServerDocx = "app\\tmp\\surat_perjanjian_kerja_magang\\" . $filename;
+
+        if (file_exists(storage_path($fileNameServerDocx))) {
+            return response()->download(storage_path($fileNameServerDocx), $filename);
+        }
+
+        $templateProcessor = $letter->generate_docx();
+        $templateProcessor->setValue('tanda_tangan', '');
+        $templateProcessor->setValue('tanda_tangan_pihak_kedua', '');
+        $templateProcessor->saveAs(storage_path($fileNameServerDocx));
+        return response()->download(storage_path($fileNameServerDocx), $filename);
+    }
+
+    public function download_pdf(string $id)
     {
         $letter = Letter::find($id);
         if (!$letter) {
@@ -103,19 +133,36 @@ class SuratPerjanjianKerjaMagangController extends Controller
         }
 
         if ($letter->signed_file != null) {
-            $fileNameServerPdf = 'app\\signed_files\\' . $letter->signed_file;
+            $fileNameServerPdf = 'app\\signed_files\\surat_perjanjian_kerja_magang\\' . $letter->signed_file;
             return response()->download(storage_path($fileNameServerPdf), $letter->signed_file);
         }
 
         $filename = $letter->id . '.pdf';
-        $fileNameServerPdf = 'app/tmp/surat_perjanjian_kerja_magang/' . $filename;
+        $fileNameServerPdf = 'app/signed_files/surat_perjanjian_kerja_magang/' . $filename;
 
-        if ($letter->tmp_file && file_exists(storage_path($letter->tmp_file))) {
-            return response()->download(storage_path($letter->tmp_file), $filename);
+        if ($letter->signed_file_docx != null) {
+            $response = Http::post(env('APP_DOCX_CONVERTER_URL') . '/convert', ['file_path' => storage_path($letter->signed_file_docx)]);
+            if ($response->failed()) {
+                return response()->json([
+                    'errors' => "Something errors"
+                ], 500);
+            }
+
+            if ($response->successful() && file_exists(storage_path($fileNameServerPdf))) {
+                $letter->signed_file = $filename;
+                $letter->save();
+                return response()->download(storage_path($fileNameServerPdf), $filename);
+            }
         }
 
-        $templateProcessor = $letter->generate_docx();
+        $tmpFileNameServerPdf = 'app/tmp/surat_perjanjian_kerja_magang/' . $filename;
+        if (file_exists(storage_path($tmpFileNameServerPdf))) {
+            return response()->download(storage_path($tmpFileNameServerPdf), $filename);
+        }
+
         $fileNameServerDocx = "app\\tmp\\surat_perjanjian_kerja_magang\\" . $letter->id . '.docx';
+        $templateProcessor = $letter->generate_docx();
+        $templateProcessor->setValue('tanda_tangan', "");
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
 
         $response = Http::post(env('APP_DOCX_CONVERTER_URL') . '/convert', ['file_path' => storage_path($fileNameServerDocx)]);
@@ -125,11 +172,10 @@ class SuratPerjanjianKerjaMagangController extends Controller
             ], 500);
         }
 
-        if ($response->successful() && file_exists(storage_path($fileNameServerPdf))) {
+        $tmpFileNameServerPdf = 'app/tmp/surat_perjanjian_kerja_magang/' . $filename;
+        if ($response->successful() && file_exists(storage_path($tmpFileNameServerPdf))) {
             unlink(storage_path($fileNameServerDocx));
-            $letter->tmp_file = $fileNameServerPdf;
-            $letter->save();
-            return response()->download(storage_path($fileNameServerPdf), $filename);
+            return response()->download(storage_path($tmpFileNameServerPdf), $filename);
         }
     }
 
@@ -138,7 +184,63 @@ class SuratPerjanjianKerjaMagangController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $letter = Letter::find($id);
+        if (!$letter) {
+            return response()->json([
+                'message' => "Surat perjanjian kerja magang tidak ditemukan"
+            ], 404);
+        }
+
+        if (!$letter->can_edit()) {
+            return response()->json([
+                'message' => "Surat perjanjian kerja magang tidak dapat di edit !"
+            ], 403);
+        }
+
+        $validate = Validator::make($request->all(), [
+            'letter_template_id' => 'required|exists:letter_templates,id',
+            'employee.id' => 'required|exists:employees,id',
+            'rekening' => 'required|exists:rekening,id',
+            'mulai_berlaku' => 'required|date',
+            'akhir_berlaku' => 'required|date|after:mulai_berlaku',
+            'tempat_kerja' => 'required|string',
+            'tugas' => 'required|array',
+            'upah' => 'required|numeric',
+            'penanggung_pembayaran' => 'required|string',
+            'signer.id' => 'required|exists:employees,id',
+            'signer.position' => 'required|string',
+            'signature_type' => 'required|in:manual,qrcode,digital,gambar tanda tangan',
+        ]);
+
+        if ($validate->fails()) {
+            $response = [
+                'errors' => $validate->errors(),
+                'message' => "Validasi form gagal !"
+            ];
+            return response()->json($response, 422);
+        }
+
+        $letter->letter_template_id = $request->letter_template_id;
+        $letter->employee_id = $request->employee['id'];
+        $letter->mulai_berlaku = $request->mulai_berlaku;
+        $letter->akhir_berlaku = $request->akhir_berlaku;
+        $letter->tempat_kerja = $request->tempat_kerja;
+        $rekening = Rekening::find($request->rekening);
+        $letter->rekening = json_encode($rekening);
+        $letter->tugas = json_encode($request->tugas);
+        $letter->upah = $request->upah;
+        $letter->penanggung_pembayaran = $request->penanggung_pembayaran;
+        $letter->signer_id = $request->signer['id'];
+        $letter->signer_position = $request->signer['position'];
+        $letter->signature_type = $request->signature_type;
+        $letter->save();
+
+        $response = [
+            'message' => "Berhasil mengubah surat perjanjian kerja magang !"
+        ];
+
+        return response()->json($response, 200);
+        
     }
 
     public function upload_signed_file(Request $request)
@@ -164,7 +266,7 @@ class SuratPerjanjianKerjaMagangController extends Controller
 
         if (!$letter->can_upload_verified_file()) {
             return response()->json([
-                'message' => "Surat dengan jenis tanda tangan selain manual dan digital tidak dapat ditandatangani dengan !"
+                'message' => "Surat dengan jenis tanda tangan selain manual dan digital tidak dapat ditandatangani dengan upload file !"
             ], 403);
         }
 
@@ -210,5 +312,55 @@ class SuratPerjanjianKerjaMagangController extends Controller
         ];
 
         return response()->json($response, 200);
+    }
+
+    public function sign(Request $request, $id)
+    {
+        $letter = Letter::find($id);
+
+        if (!$letter && $letter->can_sign()) {
+            return response()->json([
+                'message' => "Surat perjanjian kerja magang tidak ditemukan !"
+            ], 404);
+        }
+
+        if ($letter->signature_type == 'qrcode') {
+            $validate = Validator::make($request->all(), [
+                'password' => 'required|string',
+            ]);
+
+            if ($validate->fails()) {
+                $response = [
+                    'errors' => $validate->errors(),
+                    'message' => "Wajib mengisi password untuk tanda tangan qrcode !"
+                ];
+                return response()->json($response, 422);
+            }
+        }
+
+        $templateProcessor = $letter->generate_docx();
+        if ($letter->signature_type == 'qrcode') {
+            $keypair = KeyPair::where('user_id', auth()->id())->first();
+            $data = $keypair->encrypt($request->password, $letter->id);
+            // var_dump(openssl_error_string());
+            return $data;
+            if (!$data) {
+                return response()->json([
+                    'message' => "Gagal mengenkripsi data, password atau kunci pribadi tidak valid !"
+                ], 422);
+            }
+            $qrcode = QrCode::size(300)->format('png')->generate($data);
+            $templateProcessor->setImageValue('tanda_tangan', $qrcode);
+        } else {
+            $templateProcessor->setImageValue('tanda_tangan', storage_path('app/signature/' . $letter->signer->signature));
+        }
+        $filename = $letter->id;
+        $fileNameServerDocx = "app\\signed_files\\surat_perjanjian_kerja_magang\\" . $filename . '.docx';
+        $templateProcessor->saveAs(storage_path($fileNameServerDocx));
+        $letter->signed_file_docx = $fileNameServerDocx;
+        $letter->save();
+        return response()->json([
+            'message' => "Berhasil menandatangani surat perjanjian kerja magang !"
+        ], 200);
     }
 }

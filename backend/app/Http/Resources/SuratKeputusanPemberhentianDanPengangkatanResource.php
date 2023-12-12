@@ -6,6 +6,7 @@ use App\Models\ReferenceNumberSetting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\SuratKeputusanPemberhentianDanPengangkatan as Letter;
+use Carbon\Carbon;
 
 class SuratKeputusanPemberhentianDanPengangkatanResource extends JsonResource
 {
@@ -30,11 +31,13 @@ class SuratKeputusanPemberhentianDanPengangkatanResource extends JsonResource
         }
         return [
             'id' => $this->id,
+            'letter_template_id' => $this->letter_template_id,
             'reference_number' => $reference_number,
             'employee' => [
                 'id' => $this->employee->id,
                 'nip' => $this->employee->nip,
                 'name' => $this->employee->name,
+                'positions' => $this->employee->positions->pluck('position'),
             ],
             'pemberhentian_dalam_jabatan' => $this->pemberhentian_dalam_jabatan,
             'pengangkatan_dalam_jabatan' => $this->pengangkatan_dalam_jabatan,
@@ -43,7 +46,11 @@ class SuratKeputusanPemberhentianDanPengangkatanResource extends JsonResource
                 'nip' => $this->signer->nip,
                 'name' => $this->signer->name,
                 'position' => $this->signer_position,
+                'positions' => $this->signer->positions->pluck('position'),
             ],
+            'nomor_berita_acara' => $this->nomor_berita_acara,
+            'tanggal_berita_acara' => $this->tanggal_berita_acara,
+            'tanggal_berlaku' => $this->tanggal_berlaku,
             'have_reference_number' => $this->have_reference_number(),
             'can_give_reference_number' => $this->can_give_reference_number(),
             'can_signed' => $this->can_signed(),
@@ -52,7 +59,7 @@ class SuratKeputusanPemberhentianDanPengangkatanResource extends JsonResource
             'signature_type' => $this->signature_type,
             'is_signed' => $this->is_signed(),
             'status' => $status,
-            'created_at' => $this->created_at,
+            'created_at' => Carbon::parse($this->created_at)->translatedFormat('l, d F Y'),
         ];
     }
 }

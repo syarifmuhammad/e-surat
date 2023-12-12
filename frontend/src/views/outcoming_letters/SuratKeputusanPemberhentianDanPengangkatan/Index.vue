@@ -6,10 +6,13 @@ import axios from 'axios'
 import CustomTable from '@/components/CustomTable.vue';
 import Modal from '@/components/Modal.vue';
 import UploadFile from '@/components/UploadFile.vue'
+import Loading from '@/components/Loading.vue'
+import UploadSignature from '@/components/UploadSignature.vue';
 import { useUserStore } from '@/stores/user';
 
 const userStore = useUserStore()
 const url = import.meta.env.VITE_URL_API
+const loading = ref(null)
 
 const thead = [
     "#",
@@ -18,16 +21,45 @@ const thead = [
     "Nama Pegawai",
     "Diberhentikan Dalam Jabatan",
     "Diangkat Dalam Jabatan",
+    "Nama Penandatangan",
+    "Tanggal Surat",
     "Status",
     "",
 ]
 
-const loading = ref(null)
 const table = ref(null)
 const modal_upload_signed_file = ref(null)
+const modal_sign = ref(null)
+const modal_update_signature = ref(null)
 
 const verified_file = ref(null)
 const letter_id = ref(null)
+const letter_signature_type = ref("")
+const signature = ref(null)
+const password = ref("")
+
+function download_docx(id, nama) {
+    loading.value.open()
+    axios.get(`${url}/outcoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${id}/download/docx`, {
+        responseType: 'blob',
+    }).then(res => {
+        const url = window.URL.createObjectURL(new Blob([res.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', `Surat Keputusan Pemberhentian Dan Pengangkatan Atas Nama ${nama}.docx`)
+        document.body.appendChild(link)
+        link.click()
+    }).catch(err => {
+        // loading.value.close()
+        Swal.fire({
+            title: 'Gagal!',
+            text: 'Surat gagal diunduh!',
+            icon: 'error',
+        })
+    }).finally(() => {
+        loading.value.close()
+    })
+}
 
 function open_sweetalert_confirm_give_reference_number(id) {
     Swal.fire({
@@ -43,11 +75,11 @@ function open_sweetalert_confirm_give_reference_number(id) {
 }
 
 function give_reference_number(id) {
-    loading.value = true
+    loading.value.open()
     axios.post(`${url}/outcoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${id}/reference-number`, {
         _method: 'PUT',
     }).then(res => {
-        loading.value = false
+        loading.value.close()
         Swal.fire({
             title: 'Berhasil!',
             text: 'Nomor surat berhasil diberikan!',
@@ -55,7 +87,7 @@ function give_reference_number(id) {
         })
         table.value.getData()
     }).catch(err => {
-        loading.value = false
+        loading.value.close()
         Swal.fire({
             title: 'Gagal!',
             text: 'Nomor surat gagal diberikan!',
@@ -86,12 +118,12 @@ function upload_signed_file() {
         })
         return
     }
-    loading.value = true
+    loading.value.open()
     let request = new FormData()
     request.append('signed_file', verified_file.value.files)
     request.append('_method', 'PUT')
     axios.post(`${url}/outcoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${letter_id.value}/upload-signed-file`, request).then(res => {
-        loading.value = false
+        loading.value.close()
         Swal.fire({
             title: 'Berhasil!',
             text: 'File berhasil diupload!',
@@ -99,13 +131,84 @@ function upload_signed_file() {
         })
         table.value.getData()
     }).catch(err => {
-        loading.value = false
+        loading.value.close()
         Swal.fire({
             title: 'Gagal!',
             text: 'File gagal diupload!',
             icon: 'error',
         })
     })
+}
+
+function open_modal_sign(id, signature_type) {
+    if (signature_type == 'qrcode') {
+        modal_sign.value.open()
+        letter_id.value = id
+        letter_signature_type.value = signature_type
+    } else {
+        loading.value.open()
+        axios.get(`${url}/signature`, {
+            responseType: 'blob',
+        }).then(res => {
+            if (res.data.type != 'application/json') {
+                signature.value = window.URL.createObjectURL(new Blob([res.data]));
+            } else {
+                signature.value = null
+            }
+            modal_sign.value.open()
+            letter_id.value = id
+            letter_signature_type.value = signature_type
+        }).catch(err => {
+            loading.value.close()
+            Swal.fire({
+                title: 'Gagal!',
+                text: 'File tanda tangan gagal didapatkan!',
+                icon: 'error',
+            })
+        }).finally(() => {
+            loading.value.close()
+        })
+    }
+}
+
+function sign() {
+    if (!letter_id.value) {
+        Swal.fire({
+            title: 'Gagal!',
+            text: 'Terjadi kesalahan!',
+            icon: 'error',
+        })
+        return
+    }
+    loading.value.open()
+    let payload = {}
+    if (letter_signature_type.value == 'qrcode') {
+        payload = {
+            password: password.value,
+            _method: 'PUT',
+        }
+    } else {
+        payload = {
+            _method: 'PUT',
+        }
+    }
+    axios.put(`${url}/outcoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${letter_id.value}/sign`, payload).then(res => {
+        loading.value.close()
+        Swal.fire({
+            title: 'Berhasil!',
+            text: 'Surat berhasil ditandatangani!',
+            icon: 'success',
+        })
+        table.value.getData()
+    }).catch(err => {
+        loading.value.close()
+        Swal.fire({
+            title: 'Gagal!',
+            text: 'Surat gagal ditandatangani!',
+            icon: 'error',
+        })
+    })
+
 }
 </script>
 
@@ -136,6 +239,8 @@ function upload_signed_file() {
                 <td :class="[item.defaultClass]">{{ item.employee.name }}</td>
                 <td :class="[item.defaultClass]">{{ item.pemberhentian_dalam_jabatan }}</td>
                 <td :class="[item.defaultClass]">{{ item.pengangkatan_dalam_jabatan }}</td>
+                <td :class="[item.defaultClass]">{{ item.signer.name }}</td>
+                <td :class="[item.defaultClass]">{{ item.created_at }}</td>
                 <td :class="[item.defaultClass]">
                     <template v-if="item.status == 'waiting_for_reference_number'">
                         <span class="badge badge-danger text-center">Pending</span>
@@ -174,30 +279,37 @@ function upload_signed_file() {
                                     :to="{ name: 'preview_surat_keputusan_pemberhentian_dan_pengangkatan', params: { id: item.id } }"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="gg:file-document"></Icon>
-                                    Lihat Surat
+                                    Lihat Surat (.PDF)
                                 </RouterLink>
+                                <span @click="download_docx(item.id, item.employee.name)"
+                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+                                    <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
+                                    Lihat Surat (.DOCX)
+                                </span>
                                 <span v-if="item.can_give_reference_number"
                                     @click="open_sweetalert_confirm_give_reference_number(item.id)"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
                                     Berikan Nomor Surat
                                 </span>
-                                <span v-if="item.can_upload_verified_file" @click="open_modal_upload_signed_file(item.id)"
+                                <span v-if="item.can_upload_verified_file"
+                                    @click="open_modal_upload_signed_file(item.id)"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="octicon:upload-16"></Icon>
                                     Upload Surat Bertanda Tangan
                                 </span>
                                 <span v-if="!item.can_upload_verified_file && item.can_signed"
-                                    @click="open_sweetalert_confirm_give_reference_number(item.id)"
+                                    @click="open_modal_sign(item.id, item.signature_type)"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="fluent:signed-24-regular"></Icon>
                                     Tanda Tangani Surat
                                 </span>
-                                <span v-if="item.can_edit" @click="open_sweetalert_confirm_give_reference_number(item.id)"
+                                <RouterLink v-if="item.can_edit"
+                                    :to="{ name: 'update_surat_keputusan_pemberhentian_dan_pengangkatan', params: { id: item.id } }"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="cil:pencil"></Icon>
                                     Edit Surat
-                                </span>
+                                </RouterLink>
                             </div>
                         </div>
                     </div>
@@ -226,4 +338,34 @@ function upload_signed_file() {
             </div>
         </form>
     </Modal>
+    <Modal ref="modal_sign" :customClass="'sm:max-w-[700px]'">
+        <form @submit.prevent="sign">
+            <div class="p-4 pb-0 sm:p-10 sm:pb-0 h-full flex flex-col">
+                <div class="text-center mb-6">
+                    <h3 class="mb-2 text-xl font-bold text-gray-800">
+                        Tanda Tangan Surat
+                    </h3>
+                </div>
+                <template v-if="letter_signature_type == 'qrcode'">
+                    <div class="p-4 sm:px-10">
+                        <input v-model="password" type="password" class="form-control" placeholder="Masukkan password anda">
+                    </div>
+                </template>
+                <template v-else>
+                    <img v-if="signature" :src="signature" class="w-1/2 mx-auto">
+                    <div v-else class="mb-4 flex flex-col items-center">
+                        <p class="text-center mb-4">Tanda tangan tidak ditemukan!</p>
+                        <button type="button" @click="modal_update_signature.open()" class="btn bg-blue-500 text-white ">Upload Tanda
+                            Tangan</button>
+                    </div>
+                </template>
+                <div class="border-t p-4 sm:px-10 flex justify-end">
+                    <button type="button" @click="modal_sign.close()"
+                        class="btn btn-outline-primary px-14 py-3 mr-6">Batal</button>
+                    <button class="btn btn-primary px-14 py-3" :disabled="!signature && !password">Tanda Tangan</button>
+                </div>
+            </div>
+        </form>
+    </Modal>
+    <UploadSignature ref="modal_update_signature"></UploadSignature>
 </template>

@@ -30,6 +30,10 @@ class Employee extends Model
         return $this->hasMany(EmployeePosition::class, 'employee_id', 'id');
     }
 
+    public function rekening() {
+        return $this->hasMany(Rekening::class, 'employee_id', 'id');
+    }
+
     public function account()
     {
         return $this->hasOne(User::class, 'id', 'id');

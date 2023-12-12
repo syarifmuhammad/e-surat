@@ -5,9 +5,12 @@ import Loading from "@/components/Loading.vue"
 import axios from "axios"
 
 const props = defineProps({
+    save_to_api: {
+        type: Boolean,
+        default: true
+    },
     employee: {
         type: Object,
-        required: true
     }
 })
 
@@ -18,7 +21,7 @@ const loading = ref(null)
 const modal = ref(null)
 
 const form_rekening = reactive({
-    employee_id: props.employee.id,
+    employee_id: props.employee?.id,
     nama_bank: '',
     atas_nama: '',
     nomor_rekening: ''
@@ -31,44 +34,51 @@ const errors = reactive({
 })
 
 function save() {
-    loading.value.open()
-    axios.post(`${url}/employees/${form_rekening.employee_id}/rekening`, form_rekening).then(res => {
-        if (res.status == 201) {
-            Swal.fire({
-                icon: "success",
-                title: "Berhasil",
-                text: res.data.message,
-            });
-            loading.value.close()
-            modal.value.close()
-            emit('inserted', res.data.data)
-        }
-    }).catch(e => {
-        if (e.response.status == 422) {
-            Swal.fire({
-                icon: "error",
-                title: "Gagal",
-                text: e.response.data.message,
-            });
-            loading.value.close()
-            modal.value.open()
-        } else {
-            Swal.fire({
-                icon: "error",
-                title: "Gagal",
-                text: "Kegagal pada server, silahkan coba lagi nanti",
-            });
-            loading.value.close()
-            modal.value.close()
-        }
-    })
+    reset_errors()
+
+    if (props.save_to_api) {
+        loading.value.open()
+        axios.post(`${url}/employees/${form_rekening.employee_id}/rekening`, form_rekening).then(res => {
+            if (res.status == 201) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil",
+                    text: res.data.message,
+                });
+                loading.value.close()
+                modal.value.close()
+                emit('inserted', res.data.data)
+            }
+        }).catch(e => {
+            if (e.response.status == 422) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal",
+                    text: e.response.data.message,
+                });
+                loading.value.close()
+                modal.value.open()
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal",
+                    text: "Kegagal pada server, silahkan coba lagi nanti",
+                });
+                loading.value.close()
+                modal.value.close()
+            }
+        })
+    } else {
+        emit('inserted', form_rekening)
+        closeAndReset()
+    }
 
 }
 
 function reset_errors() {
-    errors.nama_bank = ''
-    errors.atas_nama = ''
-    errors.nomor_rekening = ''
+    Object.keys(errors).forEach(key => {
+        errors[key] = ""
+    })
 }
 
 function reset_form() {
@@ -104,7 +114,7 @@ defineExpose({ open, close })
                     </h3>
                 </div>
                 <div class="overflow-auto max-h-[400px]">
-                    <div class="mb-4">
+                    <div class="mb-4" v-if="employee">
                         <label class="block text-sm font-medium mb-2">Nama Pegawai <span
                                 class="text-red-400">*</span></label>
                         <input disabled class="form-control" required :value="props.employee.name">

@@ -61,6 +61,7 @@ class EmployeeController extends Controller
             'nik' => 'required|unique:employees,nik',
             'email' => 'required|unique:employees,email',
             'name' => 'required',
+            'rekening' => 'required|array',
             'positions' => 'required|array',
         ]);
 
@@ -80,9 +81,18 @@ class EmployeeController extends Controller
             $employee->name = $request->name;
             $employee->save();
 
+            foreach ($request->rekening as $rekening) {
+                $employee_rekening = new Rekening();
+                $employee_rekening->employee_id = $employee->id;
+                $employee_rekening->nama_bank = $rekening['nama_bank'];
+                $employee_rekening->atas_nama = $rekening['atas_nama'];
+                $employee_rekening->nomor_rekening = $rekening['nomor_rekening'];
+                $employee_rekening->save();
+            }
+
             foreach ($request->positions as $position) {
                 $employee_position = new EmployeePosition;
-                $employee_position->id = $employee->id;
+                $employee_position->employee_id = $employee->id;
                 $employee_position->position = $position;
                 $employee_position->save();
             }
@@ -149,7 +159,15 @@ class EmployeeController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $employee = Employee::find($id);
+
+        if (!$employee) {
+            return response()->json([
+                'message' => "Data pegawai tidak ditemukan !"
+            ], 404);
+        }
+
+        return new EmployeeResource($employee);
     }
 
     /**
@@ -157,7 +175,66 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $employee = Employee::find($id);
+
+        if (!$employee) {
+            return response()->json([
+                'message' => "Data pegawai tidak ditemukan !"
+            ], 404);
+        }
+
+        $validate = Validator::make($request->all(), [
+            'nip' => 'required|unique:employees,nip,' . $id,
+            'nik' => 'required|unique:employees,nik,' . $id,
+            'email' => 'required|unique:employees,email,' . $id,
+            'name' => 'required',
+            'rekening' => 'required|array',
+            'positions' => 'required|array',
+        ]);
+
+        if ($validate->fails()) {
+            $response = [
+                'errors' => $validate->errors(),
+                'message' => "Validasi form gagal !"
+            ];
+            return response()->json($response, 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $employee->nip = $request->nip;
+            $employee->email = $request->email;
+            $employee->name = $request->name;
+            $employee->save();
+
+            $employee->rekening()->delete();
+            foreach ($request->rekening as $rekening) {
+                $employee_rekening = new Rekening();
+                $employee_rekening->employee_id = $employee->id;
+                $employee_rekening->nama_bank = $rekening['nama_bank'];
+                $employee_rekening->atas_nama = $rekening['atas_nama'];
+                $employee_rekening->nomor_rekening = $rekening['nomor_rekening'];
+                $employee_rekening->save();
+            }
+
+            $employee->positions()->delete();
+            foreach ($request->positions as $position) {
+                $employee_position = new EmployeePosition;
+                $employee_position->employee_id = $employee->id;
+                $employee_position->position = $position;
+                $employee_position->save();
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => 'Berhasil menyimpan data pegawai !',
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function update_roles(Request $request, $id)

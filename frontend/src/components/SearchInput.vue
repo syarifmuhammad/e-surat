@@ -41,7 +41,7 @@ watch([value, focus], ([newValue, newFocus]) => {
         onSearch(newValue);
         list_search.value.addEventListener("scroll", handleScroll);
     }
-}, { immediate: true })
+})
 
 watch(() => props.defaultValue, (first, second) => {
     if (first != second) {
@@ -126,6 +126,10 @@ function onFocusOut(event) {
         focus.value = false;
     }
 }
+
+onMounted(() => {
+    onSearch('');
+})
 
 defineExpose({ fetchData })
 </script>

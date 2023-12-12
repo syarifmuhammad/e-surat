@@ -16,7 +16,6 @@ window.Swal = Swal.mixin({
 })
 
 import axios from 'axios'
-
 const url = import.meta.env.VITE_URL_API
 
 axios.interceptors.request.use(function (config) {

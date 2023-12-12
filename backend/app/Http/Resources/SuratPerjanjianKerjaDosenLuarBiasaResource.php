@@ -6,6 +6,7 @@ use App\Models\ReferenceNumberSetting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\SuratPerjanjianKerjaDosenLuarBiasa as Letter;
+use Carbon\Carbon;
 
 class SuratPerjanjianKerjaDosenLuarBiasaResource extends JsonResource
 {
@@ -30,18 +31,29 @@ class SuratPerjanjianKerjaDosenLuarBiasaResource extends JsonResource
         }
         return [
             'id' => $this->id,
+            'letter_template_id' => $this->letter_template_id,
             'reference_number' => $reference_number,
             'employee' => [
                 'id' => $this->employee->id,
                 'nik' => $this->employee->nik,
                 'nip' => $this->employee->nip,
                 'name' => $this->employee->name,
+                'positions' => $this->employee->positions->pluck('position'),
             ],
+            'jabatan_fungsional' => $this->jabatan_fungsional,
+            'nidn' => $this->nidn,
+            'mata_kuliah' => $this->mata_kuliah,
+            'tahun_ajaran' => $this->tahun_ajaran,
+            'semester' => $this->semester,
+            'rekening' => json_decode($this->rekening),
+            'upah' => $this->upah,
+            'transportasi' => $this->transportasi,
             'signer' => [
                 'id' => $this->signer->id,
                 'nip' => $this->signer->nip,
                 'name' => $this->signer->name,
                 'position' => $this->signer_position,
+                'positions' => $this->signer->positions->pluck('position'),
             ],
             'have_reference_number' => $this->have_reference_number(),
             'can_give_reference_number' => $this->can_give_reference_number(),
@@ -51,7 +63,7 @@ class SuratPerjanjianKerjaDosenLuarBiasaResource extends JsonResource
             'signature_type' => $this->signature_type,
             'is_signed' => $this->is_signed(),
             'status' => $status,
-            'created_at' => $this->created_at,
+            'created_at' => Carbon::parse($this->created_at)->translatedFormat('l, d F Y'),
         ];
     }
 }

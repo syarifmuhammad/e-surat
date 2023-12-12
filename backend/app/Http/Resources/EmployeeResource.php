@@ -17,8 +17,10 @@ class EmployeeResource extends JsonResource
         return [
             'id' => $this->id,
             'nip' => $this->nip,
+            'nik' => $this->nik,
             'name' => $this->name,
             'email' => $this->email,
+            'rekening' => $this->rekening,
             'positions' => $this->positions->pluck('position'),
             'roles' => $this->account ? $this->account->roles : 'pegawai',
             'is_registered' => $this->isRegistered(),

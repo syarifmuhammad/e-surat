@@ -7,7 +7,9 @@ import SearchInput from '@/components/SearchInput.vue';
 import CustomSelect from '@/components/CustomSelect.vue';
 import AddRekening from '@/components/AddRekening.vue';
 import AddProdi from '@/components/AddProdi.vue';
+import { useRoute } from 'vue-router';
 
+const route = useRoute()
 const url = import.meta.env.VITE_URL_API
 const NAMA_SURAT = "SURAT_PERJANJIAN_KERJA_DOSEN_FULL_TIME"
 
@@ -21,10 +23,12 @@ const form_surat = reactive({
     id: "",
     nomor_surat_sebelumnya: "",
     letter_template_id: "",
+    employee: {},
     profesi: "",
     jabatan_fungsional: "",
     mulai_berlaku: "",
     akhir_berlaku: "",
+    rekening: {},
     signer: {
         position: "",
     },
@@ -54,37 +58,31 @@ const form_surat = reactive({
 const errors = reactive({
     letter_template_id: "",
     nomor_surat_sebelumnya: "",
-    employee: {
-        id: "",
-    },
+    'employee.id': "",
     profesi: "",
     jabatan_fungsional: "",
     mulai_berlaku: "",
     akhir_berlaku: "",
     rekening: "",
     prodi: "",
-    signer: {
-        id: "",
-        position: "",
-    },
+    "signer.id": "",
+    "signer.position": "",
     signature_type: "",
-    pertelaan_perjanjian_kerja: {
-        pendidikan: "",
-        jangka_waktu: "",
-        tahun_satu: "",
-        tunjangan_dasar_satu: "",
-        tunjangan_fungsional_satu: "",
-        tunjangan_struktural_satu: "",
-        tunjangan_kemahalan_satu: "",
-        pendapatan_bulanan_satu: "",
-        tahun_dua: "",
-        tunjangan_dasar_dua: "",
-        tunjangan_fungsional_dua: "",
-        tunjangan_struktural_dua: "",
-        tunjangan_kemahalan_dua: "",
-        pendapatan_bulanan_dua: "",
-        fasilitas_lainnya: "",
-    }
+    "pertelaan_perjanjian_kerja.pendidikan": "",
+    "pertelaan_perjanjian_kerja.jangka_waktu": "",
+    "pertelaan_perjanjian_kerja.tahun_satu": "",
+    "pertelaan_perjanjian_kerja.tunjangan_dasar_satu": "",
+    "pertelaan_perjanjian_kerja.tunjangan_fungsional_satu": "",
+    "pertelaan_perjanjian_kerja.tunjangan_struktural_satu": "",
+    "pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu": "",
+    "pertelaan_perjanjian_kerja.pendapatan_bulanan_satu": "",
+    "pertelaan_perjanjian_kerja.tahun_dua": "",
+    "pertelaan_perjanjian_kerja.tunjangan_dasar_dua": "",
+    "pertelaan_perjanjian_kerja.tunjangan_fungsional_dua": "",
+    "pertelaan_perjanjian_kerja.tunjangan_struktural_dua": "",
+    "pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua": "",
+    "pertelaan_perjanjian_kerja.pendapatan_bulanan_dua": "",
+    "pertelaan_perjanjian_kerja.fasilitas_lainnya": "",
 })
 
 const letter_templates = ref([])
@@ -95,48 +93,49 @@ const selected_signer = ref(null)
 const modal_add_rekening = ref(null)
 const modal_add_prodi = ref(null)
 
-function get_letter_templates() {
-    loading.value.open()
-    axios.get(`${url}/outcoming-letters/templates?letter_type=${NAMA_SURAT}`)
+async function get_letter_templates() {
+    await axios.get(`${url}/outcoming-letters/templates?letter_type=${NAMA_SURAT}`)
         .then(res => {
             letter_templates.value = res.data.data
             form_surat.letter_template_id = letter_templates.value[0].id
         })
         .catch(err => {
             console.log(err)
-        }).finally(() => {
-            loading.value.close()
         })
 }
 
+async function get_letter(id) {
+    await axios.get(`${url}/outcoming-letters/surat-perjanjian-kerja-dosen-full-time/${id}`)
+        .then(res => {
+            let data = res.data.data
+            form_surat.id = data.id
+            form_surat.nomor_surat_sebelumnya = data.nomor_surat_sebelumnya
+            form_surat.letter_template_id = data.letter_template_id
+            form_surat.employee = data.employee
+            form_surat.profesi = data.profesi
+            form_surat.jabatan_fungsional = data.jabatan_fungsional
+            form_surat.mulai_berlaku = data.mulai_berlaku
+            form_surat.akhir_berlaku = data.akhir_berlaku
+            form_surat.rekening = data.rekening
+            form_surat.prodi = data.prodi
+            form_surat.signer = data.signer
+            form_surat.signature_type = data.signature_type
+            form_surat.pertelaan_perjanjian_kerja = data.pertelaan_perjanjian_kerja
+            selected_employee.value = data.employee
+            selected_rekening.value = data.rekening
+            selected_prodi.value = data.prodi
+            selected_signer.value = data.signer
+        })
+        .catch(err => {
+            console.log(err)
+        })
+
+}
+
 function reset_errors() {
-    errors.letter_template_id = ""
-    errors.nomor_surat_sebelumnya = ""
-    errors.employee.id = ""
-    errors.profesi = ""
-    errors.jabatan_fungsional = ""
-    errors.mulai_berlaku = ""
-    errors.akhir_berlaku = ""
-    errors.prodi = ""
-    errors.rekening = ""
-    errors.signer.id = ""
-    errors.signer.position = ""
-    errors.signature_type = ""
-    errors.pertelaan_perjanjian_kerja.pendidikan = ""
-    errors.pertelaan_perjanjian_kerja.jangka_waktu = ""
-    errors.pertelaan_perjanjian_kerja.tahun_satu = ""
-    errors.pertelaan_perjanjian_kerja.tunjangan_dasar_satu = ""
-    errors.pertelaan_perjanjian_kerja.tunjangan_fungsional_satu = ""
-    errors.pertelaan_perjanjian_kerja.tunjangan_struktural_satu = ""
-    errors.pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu = ""
-    errors.pertelaan_perjanjian_kerja.pendapatan_bulanan_satu = ""
-    errors.pertelaan_perjanjian_kerja.tahun_dua = ""
-    errors.pertelaan_perjanjian_kerja.tunjangan_dasar_dua = ""
-    errors.pertelaan_perjanjian_kerja.tunjangan_fungsional_dua = ""
-    errors.pertelaan_perjanjian_kerja.tunjangan_struktural_dua = ""
-    errors.pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua = ""
-    errors.pertelaan_perjanjian_kerja.pendapatan_bulanan_dua = ""
-    errors.pertelaan_perjanjian_kerja.fasilitas_lainnya = ""
+    Object.keys(errors).forEach(key => {
+        errors[key] = ""
+    })
 }
 
 function reset_employee() {
@@ -194,7 +193,6 @@ function reset_form() {
     reset_errors()
 }
 
-
 function save_surat() {
     //check if form is valid
     if (!selected_employee.value) {
@@ -230,10 +228,51 @@ function save_surat() {
         return
     }
     //end of check if form is valid
+    reset_errors()
 
     loading.value.open()
-    if (form_surat.id.trim()) {
+    if (form_surat.id != "") {
         // update
+        let payload = {
+            letter_template_id: form_surat.letter_template_id,
+            nomor_surat_sebelumnya: form_surat.nomor_surat_sebelumnya,
+            employee: {
+                id: selected_employee.value.id,
+            },
+            profesi: form_surat.profesi,
+            jabatan_fungsional: form_surat.jabatan_fungsional,
+            mulai_berlaku: form_surat.mulai_berlaku,
+            akhir_berlaku: form_surat.akhir_berlaku,
+            prodi: selected_prodi.value.id,
+            rekening: selected_rekening.value.id,
+            signer: {
+                id: selected_signer.value.id,
+                position: form_surat.signer.position
+            },
+            signature_type: form_surat.signature_type,
+            pertelaan_perjanjian_kerja: form_surat.pertelaan_perjanjian_kerja
+        }
+
+        axios.put(`${url}/outcoming-letters/surat-perjanjian-kerja-dosen-full-time/${form_surat.id}`, payload)
+            .then(res => {
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil",
+                    text: res.data.message,
+                });
+            })
+            .catch(err => {
+                if (err.response?.status == 422) {
+                    Object.entries(err.response.data.errors).forEach(entry => {
+                        const [key, value] = entry;
+                        errors[key] = value[0]
+                    });
+                } else {
+                    console.log(err)
+                }
+            }).finally(() => {
+                loading.value.close()
+            })
     } else {
         // create
         let payload = {
@@ -246,30 +285,14 @@ function save_surat() {
             jabatan_fungsional: form_surat.jabatan_fungsional,
             mulai_berlaku: form_surat.mulai_berlaku,
             akhir_berlaku: form_surat.akhir_berlaku,
-            prodi: selected_prodi.value.id, 
+            prodi: selected_prodi.value.id,
             rekening: selected_rekening.value.id,
             signer: {
                 id: selected_signer.value.id,
                 position: form_surat.signer.position
             },
             signature_type: form_surat.signature_type,
-            pertelaan_perjanjian_kerja: {
-                pendidikan: form_surat.pertelaan_perjanjian_kerja.pendidikan,
-                jangka_waktu: form_surat.pertelaan_perjanjian_kerja.jangka_waktu,
-                tahun_satu: form_surat.pertelaan_perjanjian_kerja.tahun_satu,
-                tunjangan_dasar_satu: form_surat.pertelaan_perjanjian_kerja.tunjangan_dasar_satu,
-                tunjangan_fungsional_satu: form_surat.pertelaan_perjanjian_kerja.tunjangan_fungsional_satu,
-                tunjangan_struktural_satu: form_surat.pertelaan_perjanjian_kerja.tunjangan_struktural_satu,
-                tunjangan_kemahalan_satu: form_surat.pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu,
-                pendapatan_bulanan_satu: form_surat.pertelaan_perjanjian_kerja.pendapatan_bulanan_satu,
-                tahun_dua: form_surat.pertelaan_perjanjian_kerja.tahun_dua,
-                tunjangan_dasar_dua: form_surat.pertelaan_perjanjian_kerja.tunjangan_dasar_dua,
-                tunjangan_fungsional_dua: form_surat.pertelaan_perjanjian_kerja.tunjangan_fungsional_dua,
-                tunjangan_struktural_dua: form_surat.pertelaan_perjanjian_kerja.tunjangan_struktural_dua,
-                tunjangan_kemahalan_dua: form_surat.pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua,
-                pendapatan_bulanan_dua: form_surat.pertelaan_perjanjian_kerja.pendapatan_bulanan_dua,
-                fasilitas_lainnya: form_surat.pertelaan_perjanjian_kerja.fasilitas_lainnya,
-            }
+            pertelaan_perjanjian_kerja: form_surat.pertelaan_perjanjian_kerja
         }
 
         axios.post(`${url}/outcoming-letters/surat-perjanjian-kerja-dosen-full-time`, payload)
@@ -282,36 +305,22 @@ function save_surat() {
                 reset_form()
             })
             .catch(err => {
-                if (err.response.status == 422) {
-                    errors.letter_template_id = err.response.data.errors.letter_template_id[0]
-                    errors.nomor_surat_sebelumnya = err.response.data.errors.nomor_surat_sebelumnya[0]
-                    errors.employee.id = err.response.data.errors.employee.id[0]
-                    errors.profesi = err.response.data.errors.profesi[0]
-                    errors.jabatan_fungsional = err.response.data.errors.jabatan_fungsional[0]
-                    errors.mulai_berlaku = err.response.data.errors.mulai_berlaku[0]
-                    errors.akhir_berlaku = err.response.data.errors.akhir_berlaku[0]
-                    errors.prodi = err.response.data.errors.prodi[0]
-                    errors.rekening = err.response.data.errors.rekening[0]
-                    errors.signer.id = err.response.data.errors.signer.id[0]
-                    errors.signer.position = err.response.data.errors.signer.position[0]
-                    errors.signature_type = err.response.data.errors.signature_type[0]
-                    errors.pertelaan_perjanjian_kerja.pendidikan = err.response.data.errors.pertelaan_perjanjian_kerja.pendidikan[0]
-                    errors.pertelaan_perjanjian_kerja.jangka_waktu = err.response.data.errors.pertelaan_perjanjian_kerja.jangka_waktu[0]
-                    errors.pertelaan_perjanjian_kerja.tahun_satu = err.response.data.errors.pertelaan_perjanjian_kerja.tahun_satu[0]
-                    errors.pertelaan_perjanjian_kerja.tunjangan_dasar_satu = err.response.data.errors.pertelaan_perjanjian_kerja.tunjangan_dasar_satu[0]
-                    errors.pertelaan_perjanjian_kerja.tunjangan_fungsional_satu = err.response.data.errors.pertelaan_perjanjian_kerja.tunjangan_fungsional_satu[0]
-                    errors.pertelaan_perjanjian_kerja.tunjangan_struktural_satu = err.response.data.errors.pertelaan_perjanjian_kerja.tunjangan_struktural_satu[0]
-                    errors.pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu = err.response.data.errors.pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu[0]
-                    errors.pertelaan_perjanjian_kerja.pendapatan_bulanan_satu = err.response.data.errors.pertelaan_perjanjian_kerja.pendapatan_bulanan_satu[0]
-                    errors.pertelaan_perjanjian_kerja.tahun_dua = err.response.data.errors.pertelaan_perjanjian_kerja.tahun_dua[0]
-                    errors.pertelaan_perjanjian_kerja.tunjangan_dasar_dua = err.response.data.errors.pertelaan_perjanjian_kerja.tunjangan_dasar_dua[0]
-                    errors.pertelaan_perjanjian_kerja.tunjangan_fungsional_dua = err.response.data.errors.pertelaan_perjanjian_kerja.tunjangan_fungsional_dua[0]
-                    errors.pertelaan_perjanjian_kerja.tunjangan_struktural_dua = err.response.data.errors.pertelaan_perjanjian_kerja.tunjangan_struktural_dua[0]
-                    errors.pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua = err.response.data.errors.pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua[0]
-                    errors.pertelaan_perjanjian_kerja.pendapatan_bulanan_dua = err.response.data.errors.pertelaan_perjanjian_kerja.pendapatan_bulanan_dua[0]
-                    errors.pertelaan_perjanjian_kerja.fasilitas_lainnya = err.response.data.errors.pertelaan_perjanjian_kerja.fasilitas_lainnya[0]
+                if (err.response?.status == 422) {
+                    Object.entries(err.response.data.errors).forEach(entry => {
+                        const [key, value] = entry;
+                        errors[key] = value[0]
+                    });
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal",
+                        text: "Pastikan semua inputan sudah terisi dengan benar",
+                    });
                 } else {
-                    console.log(err)
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal",
+                        text: err.response.data.message,
+                    });
                 }
             }).finally(() => {
                 loading.value.close()
@@ -328,14 +337,21 @@ function open_modal_add_prodi() {
 }
 
 onMounted(async () => {
-    get_letter_templates()
+    loading.value.open()
+    if (route.name == 'update_surat_perjanjian_kerja_dosen_full_time') {
+        await get_letter(route.params.id)
+    }
+    await get_letter_templates()
+    loading.value.close()
 })
 
 </script>
 
 <template>
     <Loading ref="loading"></Loading>
-    <SubHeader :title="`Tambah Surat Perjanjian Kerja Dosen Full Time`" />
+    <SubHeader
+        :title="route.name == 'update_surat_perjanjian_kerja_dosen_full_time' ? `Edit Surat Perjanjian Kerja Dosen Full Time` : `Tambah Surat Perjanjian Kerja Dosen Full Time`"
+        :back_url="{ name: 'surat_perjanjian_kerja_dosen_full_time' }" />
     <div class="flex flex-col bg-white rounded-lg">
         <div class="px-8 py-5 min-w-full inline-block align-middle">
             <form @submit.prevent="save_surat">
@@ -351,8 +367,10 @@ onMounted(async () => {
                     </p>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">Nomor Surat Perjanjian Kerja Yang Diamandemen (Tidak Wajib)</label>
-                    <input type="text" class="form-control" v-model="form_surat.nomor_surat_sebelumnya" placeholder="Nomor Surat Perjanjian Kerja Yang Diamandemen">
+                    <label class="block text-sm font-medium mb-2">Nomor Surat Perjanjian Kerja Yang Diamandemen (Tidak
+                        Wajib)</label>
+                    <input type="text" class="form-control" v-model="form_surat.nomor_surat_sebelumnya"
+                        placeholder="Nomor Surat Perjanjian Kerja Yang Diamandemen">
                     <p v-if="errors.nomor_surat_sebelumnya" class="text-xs text-red-600 mt-2">
                         {{ errors.nomor_surat_sebelumnya }}
                     </p>
@@ -373,8 +391,8 @@ onMounted(async () => {
                             </small>
                         </template>
                     </search-input>
-                    <p v-if="errors.employee.id" class="text-xs text-red-600 mt-2" id="employee-error">
-                        {{ errors.employee.id }}
+                    <p v-if="errors['employee.id']" class="text-xs text-red-600 mt-2" id="employee-error">
+                        {{ errors['employee.id'] }}
                     </p>
                     <div v-if="selected_employee"
                         class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">
@@ -425,8 +443,8 @@ onMounted(async () => {
                         <search-input ref="search_input_prodi" v-if="!selected_prodi" v-model="selected_prodi"
                             :url="`${url}/prodi`" placeholder="Cari Fakultas / Prodi ...">
                             <template v-slot="{ data }">
-                                <small>{{ data.nama_fakultas  }} ( {{ data.singkatan_fakultas }})</small>
-                                <p class="mb-0">{{ data.nama_prodi  }} ({{ data.singkatan_prodi }})</p>
+                                <small>{{ data.nama_fakultas }} ( {{ data.singkatan_fakultas }})</small>
+                                <p class="mb-0">{{ data.nama_prodi }} ({{ data.singkatan_prodi }})</p>
                             </template>
                             <template #default_first>
                                 <p class="text-center text-primary cursor-pointer" @click="open_modal_add_prodi">
@@ -440,8 +458,8 @@ onMounted(async () => {
                         <div v-if="selected_prodi"
                             class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">
                             <div class="w-full">
-                                <small>{{ selected_prodi.nama_fakultas  }} ( {{ selected_prodi.singkatan_fakultas }})</small>
-                                <p class="mb-0">{{ selected_prodi.nama_prodi  }} ( {{ selected_prodi.singkatan_prodi }})</p>
+                                <small>{{ selected_prodi.nama_fakultas }} ( {{ selected_prodi.singkatan_fakultas }})</small>
+                                <p class="mb-0">{{ selected_prodi.nama_prodi }} ( {{ selected_prodi.singkatan_prodi }})</p>
                             </div>
                             <span @click="reset_prodi"
                                 class="p-3 hover:bg-red-200 rounded-full cursor-pointer transition ease-in-out duration-500">
@@ -452,7 +470,8 @@ onMounted(async () => {
                     <div class="grid grid-cols-2 gap-x-4 mb-4">
                         <div>
                             <label class="block text-sm font-medium mb-2">Profesi</label>
-                            <input type="text" class="form-control" required v-model="form_surat.profesi" placeholder="Profesi">
+                            <input type="text" class="form-control" required v-model="form_surat.profesi"
+                                placeholder="Profesi">
                             <p v-if="errors.profesi" class="text-xs text-red-600 mt-2">
                                 {{ errors.profesi }}
                             </p>
@@ -468,39 +487,6 @@ onMounted(async () => {
                     </div>
                 </template>
                 <hr class="my-4" />
-                <!-- <div class="mb-4">
-                    <label class="block text-sm font-bold mb-2">MASA MAGANG, TUGAS, TANGGUNG JAWAB DAN TEMPAT
-                        MAGANG</label>
-                    <hr class="my-4" />
-                    <div class="grid grid-cols-2 gap-x-4 mb-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Mulai Magang</label>
-                            <input type="date" class="form-control" required v-model="form_surat.mulai_berlaku"
-                                placeholder="Tanggal Mulai Magang">
-                            <p v-if="errors.mulai_berlaku" class="text-xs text-red-600 mt-2">
-                                {{ errors.mulai_berlaku }}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Akhir Magang</label>
-                            <input type="date" class="form-control" required v-model="form_surat.akhir_berlaku"
-                                placeholder="Tanggal Akhir Magang">
-                            <p v-if="errors.akhir_berlaku" class="text-xs text-red-600 mt-2">
-                                {{ errors.akhir_berlaku }}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-2">Tempat Kerja</label>
-                        <input type="text" class="form-control" required v-model="form_surat.tempat_kerja"
-                            placeholder="Tempat Kerja">
-                        <p v-if="errors.tempat_kerja" class="text-xs text-red-600 mt-2">
-                            {{ errors.tempat_kerja }}
-                        </p>
-                    </div>
-                    
-                </div> -->
-                <!-- <hr class="my-4" /> -->
                 <div class="mb-4">
                     <label class="block text-sm font-bold mb-2">JANGKA WAKTU KERJA</label>
                     <hr class="my-4" />
@@ -527,16 +513,18 @@ onMounted(async () => {
                     <hr class="my-4" />
                     <div class="mb-4">
                         <label class="block text-sm font-medium mb-2">Pendidikan</label>
-                        <input type="text" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.pendidikan">
-                        <p v-if="errors.pertelaan_perjanjian_kerja.pendidikan" class="text-xs text-red-600 mt-2">
-                            {{ errors.pertelaan_perjanjian_kerja.pendidikan }}
+                        <input type="text" class="form-control" required
+                            v-model="form_surat.pertelaan_perjanjian_kerja.pendidikan">
+                        <p v-if="errors['pertelaan_perjanjian_kerja.pendidikan']" class="text-xs text-red-600 mt-2">
+                            {{ errors['pertelaan_perjanjian_kerja.pendidikan'] }}
                         </p>
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-medium mb-2">Jangka Waktu</label>
-                        <input type="text" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.jangka_waktu">
-                        <p v-if="errors.pertelaan_perjanjian_kerja.jangka_waktu" class="text-xs text-red-600 mt-2">
-                            {{ errors.pertelaan_perjanjian_kerja.jangka_waktu }}
+                        <input type="text" class="form-control" required
+                            v-model="form_surat.pertelaan_perjanjian_kerja.jangka_waktu">
+                        <p v-if="errors['pertelaan_perjanjian_kerja.jangka_waktu']" class="text-xs text-red-600 mt-2">
+                            {{ errors['pertelaan_perjanjian_kerja.jangka_waktu'] }}
                         </p>
                     </div>
                     <!-- <div class="grid grid-cols-2 gap-x-4 mb-4">
@@ -545,103 +533,136 @@ onMounted(async () => {
                         <div class="pr-10">
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tahun Penggajian Pertama</label>
-                                <input type="number" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.tahun_satu" placeholder="cth : 2023">
-                                <p v-if="errors.pertelaan_perjanjian_kerja.tahun_satu" class="text-xs text-red-600 mt-2">
-                                    {{ errors.pertelaan_perjanjian_kerja.tahun_satu }}
+                                <input type="number" class="form-control" required
+                                    v-model="form_surat.pertelaan_perjanjian_kerja.tahun_satu" placeholder="cth : 2023">
+                                <p v-if="errors['pertelaan_perjanjian_kerja.tahun_satu']" class="text-xs text-red-600 mt-2">
+                                    {{ errors['pertelaan_perjanjian_kerja.tahun_satu'] }}
                                 </p>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Dasar</label>
-                                <input type="number" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_dasar_satu" placeholder="Tunjangan Dasar">
-                                <p v-if="errors.pertelaan_perjanjian_kerja.tunjangan_dasar_satu" class="text-xs text-red-600 mt-2">
-                                    {{ errors.pertelaan_perjanjian_kerja.tunjangan_dasar_satu }}
+                                <input type="number" class="form-control" required
+                                    v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_dasar_satu"
+                                    placeholder="Tunjangan Dasar">
+                                <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_dasar_satu']"
+                                    class="text-xs text-red-600 mt-2">
+                                    {{ errors['pertelaan_perjanjian_kerja.tunjangan_dasar_satu'] }}
                                 </p>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Fungsional</label>
-                                <input type="number" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_fungsional_satu" placeholder="Tunjangan Fungsional">
-                                <p v-if="errors.pertelaan_perjanjian_kerja.tunjangan_fungsional_satu" class="text-xs text-red-600 mt-2">
-                                    {{ errors.pertelaan_perjanjian_kerja.tunjangan_fungsional_satu }}
+                                <input type="number" class="form-control" required
+                                    v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_fungsional_satu"
+                                    placeholder="Tunjangan Fungsional">
+                                <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_fungsional_satu']"
+                                    class="text-xs text-red-600 mt-2">
+                                    {{ errors['pertelaan_perjanjian_kerja.tunjangan_fungsional_satu'] }}
                                 </p>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Struktural</label>
-                                <input type="number" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_struktural_satu" placeholder="Tunjangan Struktural">
-                                <p v-if="errors.pertelaan_perjanjian_kerja.tunjangan_struktural_satu" class="text-xs text-red-600 mt-2">
-                                    {{ errors.pertelaan_perjanjian_kerja.tunjangan_struktural_satu }}
+                                <input type="number" class="form-control" required
+                                    v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_struktural_satu"
+                                    placeholder="Tunjangan Struktural">
+                                <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_struktural_satu']"
+                                    class="text-xs text-red-600 mt-2">
+                                    {{ errors['pertelaan_perjanjian_kerja.tunjangan_struktural_satu'] }}
                                 </p>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Kemahalan</label>
-                                <input type="number" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu" placeholder="Tunjangan Kemahalan">
-                                <p v-if="errors.pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu" class="text-xs text-red-600 mt-2">
-                                    {{ errors.pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu }}
+                                <input type="number" class="form-control" required
+                                    v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu"
+                                    placeholder="Tunjangan Kemahalan">
+                                <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu']"
+                                    class="text-xs text-red-600 mt-2">
+                                    {{ errors['pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu'] }}
                                 </p>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Pendapatan Bulanan</label>
-                                <input type="number" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.pendapatan_bulanan_satu" placeholder="Pendapatan Bulanan">
-                                <p v-if="errors.pertelaan_perjanjian_kerja.pendapatan_bulanan_satu" class="text-xs text-red-600 mt-2">
-                                    {{ errors.pertelaan_perjanjian_kerja.pendapatan_bulanan_satu }}
+                                <input type="number" class="form-control" required
+                                    v-model="form_surat.pertelaan_perjanjian_kerja.pendapatan_bulanan_satu"
+                                    placeholder="Pendapatan Bulanan">
+                                <p v-if="errors['pertelaan_perjanjian_kerja.pendapatan_bulanan_satu']"
+                                    class="text-xs text-red-600 mt-2">
+                                    {{ errors['pertelaan_perjanjian_kerja.pendapatan_bulanan_satu'] }}
                                 </p>
                             </div>
                         </div>
                         <div class="pl-10">
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tahun Penggajian Kedua</label>
-                                <input type="number" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.tahun_dua" placeholder="cth : 2023">
-                                <p v-if="errors.pertelaan_perjanjian_kerja.tahun_dua" class="text-xs text-red-600 mt-2">
-                                    {{ errors.pertelaan_perjanjian_kerja.tahun_dua }}
+                                <input type="number" class="form-control" required
+                                    v-model="form_surat.pertelaan_perjanjian_kerja.tahun_dua" placeholder="cth : 2023">
+                                <p v-if="errors['pertelaan_perjanjian_kerja.tahun_dua']" class="text-xs text-red-600 mt-2">
+                                    {{ errors['pertelaan_perjanjian_kerja.tahun_dua'] }}
                                 </p>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Dasar</label>
-                                <input type="number" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_dasar_dua" placeholder="Tunjangan Dasar">
-                                <p v-if="errors.pertelaan_perjanjian_kerja.tunjangan_dasar_dua" class="text-xs text-red-600 mt-2">
-                                    {{ errors.pertelaan_perjanjian_kerja.tunjangan_dasar_dua }}
+                                <input type="number" class="form-control" required
+                                    v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_dasar_dua"
+                                    placeholder="Tunjangan Dasar">
+                                <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_dasar_dua']"
+                                    class="text-xs text-red-600 mt-2">
+                                    {{ errors['pertelaan_perjanjian_kerja.tunjangan_dasar_dua'] }}
                                 </p>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Fungsional</label>
-                                <input type="number" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_fungsional_dua" placeholder="Tunjangan Fungsional">
-                                <p v-if="errors.pertelaan_perjanjian_kerja.tunjangan_fungsional_dua" class="text-xs text-red-600 mt-2">
-                                    {{ errors.pertelaan_perjanjian_kerja.tunjangan_fungsional_dua }}
+                                <input type="number" class="form-control" required
+                                    v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_fungsional_dua"
+                                    placeholder="Tunjangan Fungsional">
+                                <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_fungsional_dua']"
+                                    class="text-xs text-red-600 mt-2">
+                                    {{ errors['pertelaan_perjanjian_kerja.tunjangan_fungsional_dua'] }}
                                 </p>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Struktural</label>
-                                <input type="number" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_struktural_dua" placeholder="Tunjangan Struktural">
-                                <p v-if="errors.pertelaan_perjanjian_kerja.tunjangan_struktural_dua" class="text-xs text-red-600 mt-2">
-                                    {{ errors.pertelaan_perjanjian_kerja.tunjangan_struktural_dua }}
+                                <input type="number" class="form-control" required
+                                    v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_struktural_dua"
+                                    placeholder="Tunjangan Struktural">
+                                <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_struktural_dua']"
+                                    class="text-xs text-red-600 mt-2">
+                                    {{ errors['pertelaan_perjanjian_kerja.tunjangan_struktural_dua'] }}
                                 </p>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Kemahalan</label>
-                                <input type="number" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua" placeholder="Tunjangan Kemahalan">
-                                <p v-if="errors.pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua" class="text-xs text-red-600 mt-2">
-                                    {{ errors.pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua }}
+                                <input type="number" class="form-control" required
+                                    v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua"
+                                    placeholder="Tunjangan Kemahalan">
+                                <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua']"
+                                    class="text-xs text-red-600 mt-2">
+                                    {{ errors['pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua'] }}
                                 </p>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Pendapatan Bulanan</label>
-                                <input type="number" class="form-control" required v-model="form_surat.pertelaan_perjanjian_kerja.pendapatan_bulanan_dua" placeholder="Pendapatan Bulanan">
-                                <p v-if="errors.pertelaan_perjanjian_kerja.pendapatan_bulanan_dua" class="text-xs text-red-600 mt-2">
-                                    {{ errors.pertelaan_perjanjian_kerja.pendapatan_bulanan_dua }}
+                                <input type="number" class="form-control" required
+                                    v-model="form_surat.pertelaan_perjanjian_kerja.pendapatan_bulanan_dua"
+                                    placeholder="Pendapatan Bulanan">
+                                <p v-if="errors['pertelaan_perjanjian_kerja.pendapatan_bulanan_dua']"
+                                    class="text-xs text-red-600 mt-2">
+                                    {{ errors['pertelaan_perjanjian_kerja.pendapatan_bulanan_dua'] }}
                                 </p>
                             </div>
                         </div>
-                        
+
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-medium mb-2">Fasilitas Lainnya</label>
                         <div class="flex gap-x-4">
                             <input type="text" class="form-control" v-model="fasilitas_lainnya"
                                 placeholder="Tugas Dan Tanggung Jawab">
-                            <button type="button" @click="form_surat.pertelaan_perjanjian_kerja.fasilitas_lainnya.push(fasilitas_lainnya), fasilitas_lainnya = ''"
+                            <button type="button"
+                                @click="form_surat.pertelaan_perjanjian_kerja.fasilitas_lainnya.push(fasilitas_lainnya), fasilitas_lainnya = ''"
                                 class="btn bg-blue-500 text-white">Tambah</button>
                         </div>
-                        <p v-if="errors.pertelaan_perjanjian_kerja.fasilitas_lainnya" class="text-xs text-red-600 mt-2">
-                            {{ errors.pertelaan_perjanjian_kerja.fasilitas_lainnya }}
+                        <p v-if="errors['pertelaan_perjanjian_kerja.fasilitas_lainnya']" class="text-xs text-red-600 mt-2">
+                            {{ errors['pertelaan_perjanjian_kerja.fasilitas_lainnya'] }}
                         </p>
                         <div v-if="form_surat.pertelaan_perjanjian_kerja.fasilitas_lainnya.length > 0" class="mt-4">
                             <div v-for="(f, index) in form_surat.pertelaan_perjanjian_kerja.fasilitas_lainnya" :key="index"
@@ -674,8 +695,8 @@ onMounted(async () => {
                             </small>
                         </template>
                     </search-input>
-                    <p v-if="errors.signer.id" class="text-xs text-red-600 mt-2" id="signer-id-error">
-                        {{ errors.signer.id }}
+                    <p v-if="errors['signer.id']" class="text-xs text-red-600 mt-2" id="signer-id-error">
+                        {{ errors['signer.id'] }}
                     </p>
                     <div v-if="selected_signer"
                         class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">
@@ -693,8 +714,8 @@ onMounted(async () => {
                     <label class="block text-sm font-medium mb-2">Pilih Jabatan Penandatangan</label>
                     <custom-select :required="true" v-model="form_surat.signer.position" :data="selected_signer.positions"
                         placeholder="Jabatan penandatangan"></custom-select>
-                    <p v-if="errors.signer.position" class="text-xs text-red-600 mt-2" id="signer-position-error">
-                        {{ errors.signer.position }}
+                    <p v-if="errors['signer.position']" class="text-xs text-red-600 mt-2" id="signer-position-error">
+                        {{ errors['signer.position'] }}
                     </p>
                 </div>
                 <div class="mb-4">
@@ -704,6 +725,7 @@ onMounted(async () => {
                         <option value="manual">Tanda Tangan Manual</option>
                         <option value="qrcode">Tanda Tangan QR Code</option>
                         <option value="digital">Tanda Tangan Digital</option>
+                        <option value="gambar tanda tangan">Tanda Tangan Berupa Gambar</option>
                     </select>
                     <p v-if="errors.signature_type" class="text-xs text-red-600 mt-2" id="signatur-type-error">
                         {{ errors.signature_type }}
