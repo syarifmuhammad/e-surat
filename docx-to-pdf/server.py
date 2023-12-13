@@ -32,7 +32,7 @@ def convert_now():
     try:
         # unoconvert --convert-to=pdf /var/www/html/e-surat/backend/storage/app/tmp/surat_keterangan_kerja/1.docx /var/www/html/e-surat/backend/storage/app/tmp/surat_keterangan_kerja/1.pdf
         # Panggil unoconv dari baris perintah untuk mengonversi dokumen
-        subprocess.run(['unoconvert', '--convert-to=pdf', payload['file_path', output_pdf]])
+        subprocess.run(['unoconvert', '--convert-to=pdf', payload['file_path'], output_pdf])
         return jsonify({'data': 'success'}), 200
     except subprocess.CalledProcessError as e:
         return jsonify({'data': e}), 500
