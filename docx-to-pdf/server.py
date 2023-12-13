@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, json
-from docx2pdf import convert
-from os.path import exists
+import os
+import subprocess
 import pythoncom
 import fitz  # PyMuPDF
 from PIL import Image
@@ -20,11 +20,19 @@ def convert_now():
     if not exists(payload['file_path']) :
         return jsonify({'error': 'File not found'}), 404
 
-    # Konversi ke PDF
-    pythoncom.CoInitialize()
-    convert(payload['file_path'])
+    # Dapatkan path dan nama file tanpa ekstensi
+    base_path = os.path.split(payload['file_path'])
+    # file_name_without_extension, _ = os.path.splitext(file_name)
 
-    return jsonify({'data': 'success'}), 200
+    # Bangun path output PDF dari path input DOCX
+    # output_pdf = os.path.join(base_path, f"{file_name_without_extension}.pdf")
+
+    try:
+        # Panggil unoconv dari baris perintah untuk mengonversi dokumen
+        subprocess.run(['unoconv', '-f', 'pdf', '-o', base_path, payload['file_path']])
+        return jsonify({'data': 'success'}), 200
+    except subprocess.CalledProcessError as e:
+        return jsonify({'data': e}), 500
 
 def pdf_to_images(pdf_path):
     doc = fitz.open(pdf_path)
