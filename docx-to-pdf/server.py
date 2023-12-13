@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, json
 import os
 import subprocess
+from os.path import exists
 # import pythoncom
 import fitz  # PyMuPDF
 from PIL import Image
