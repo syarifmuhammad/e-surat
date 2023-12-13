@@ -23,15 +23,16 @@ def convert_now():
         return jsonify({'error': 'File not found'}), 404
 
     # Dapatkan path dan nama file tanpa ekstensi
-    base_path, _ = os.path.split(payload['file_path'])
-    # file_name_without_extension, _ = os.path.splitext(file_name)
+    base_path, filename = os.path.split(payload['file_path'])
+    file_name_without_extension, _ = os.path.splitext(filename)
 
     # Bangun path output PDF dari path input DOCX
-    # output_pdf = os.path.join(base_path, f"{file_name_without_extension}.pdf")
+    output_pdf = os.path.join(base_path, f"{file_name_without_extension}.pdf")
 
     try:
+        # unoconvert --convert-to=pdf /var/www/html/e-surat/backend/storage/app/tmp/surat_keterangan_kerja/1.docx /var/www/html/e-surat/backend/storage/app/tmp/surat_keterangan_kerja/1.pdf
         # Panggil unoconv dari baris perintah untuk mengonversi dokumen
-        subprocess.run(['unoconv', '--stdout', '-f', 'pdf', '-o', base_path, payload['file_path']])
+        subprocess.run(['unoconvert', '--convert-to=pdf', payload['file_path', output_pdf]])
         return jsonify({'data': 'success'}), 200
     except subprocess.CalledProcessError as e:
         return jsonify({'data': e}), 500
