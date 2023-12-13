@@ -132,8 +132,15 @@ class SuratPerjanjianKerjaMagang extends Model
         
         $templateProcessor->setValue('mulai_berlaku', Carbon::parse($this->mulai_berlaku)->translatedFormat('d F Y'));
         $templateProcessor->setValue('akhir_berlaku', Carbon::parse($this->akhir_berlaku)->translatedFormat('d F Y'));
-        $berlaku = "6 (Enam) bulan";
-        $templateProcessor->setValue('berlaku', $berlaku);
+        $bulan = Carbon::parse($this->mulai_berlaku)->diffInMonths(Carbon::parse($this->akhir_berlaku));
+        $tahun = Carbon::parse($this->mulai_berlaku)->diffInYears(Carbon::parse($this->akhir_berlaku));
+        $masa_berlaku = "0 Bulan";
+        if ($tahun > 0) {
+            $masa_berlaku = $tahun . " (". ucwords(terbilang($tahun)) . ") Tahun";
+        } else if ($bulan > 0) {
+            $masa_berlaku = $bulan . " (Bulan)";
+        }
+        $templateProcessor->setValue('masa_berlaku', $masa_berlaku);
 
         $tugas = json_decode($this->tugas);
         $tugas_set = [];
@@ -144,7 +151,7 @@ class SuratPerjanjianKerjaMagang extends Model
         }
         $templateProcessor->cloneBlock('block_tugas', 0, true, false, $tugas_set);
         $templateProcessor->setValue('tempat_kerja', $this->tempat_kerja);
-        $templateProcessor->setValue('upah', $this->upah);
+        $templateProcessor->setValue('upah', number_format($this->upah, 0, ',', '.'));
 
         $rekening = json_decode($this->rekening);
         $templateProcessor->setValue('nama_bank', $rekening->nama_bank);

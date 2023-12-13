@@ -141,7 +141,14 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         $templateProcessor->setValue('singkatan_fakultas', $prodi->singkatan_fakultas);
         $templateProcessor->setValue('mulai_berlaku', Carbon::parse($this->mulai_berlaku)->translatedFormat('d F Y'));
         $templateProcessor->setValue('akhir_berlaku', Carbon::parse($this->akhir_berlaku)->translatedFormat('d F Y'));
-        $masa_berlaku = "6 (Enam) Tahun";
+        $bulan = Carbon::parse($this->mulai_berlaku)->diffInMonths(Carbon::parse($this->akhir_berlaku));
+        $tahun = Carbon::parse($this->mulai_berlaku)->diffInYears(Carbon::parse($this->akhir_berlaku));
+        $masa_berlaku = "0 Bulan";
+        if ($tahun > 0) {
+            $masa_berlaku = $tahun . " (". ucwords(terbilang($tahun)) . ") Tahun";
+        } else if ($bulan > 0) {
+            $masa_berlaku = $bulan . " (Bulan)";
+        }
         $templateProcessor->setValue('masa_berlaku', $masa_berlaku);
         $rekening = json_decode($this->rekening);
         $templateProcessor->setValue('nama_bank', $rekening->nama_bank);
@@ -154,17 +161,17 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         $templateProcessor->setValue('jangka_waktu', $pertelaan_perjanjian_kerja->jangka_waktu);
         $templateProcessor->setValue('pendidikan', $pertelaan_perjanjian_kerja->pendidikan);
         $templateProcessor->setValue('tahun_satu', $pertelaan_perjanjian_kerja->tahun_satu);
-        $templateProcessor->setValue('tunjangan_dasar_satu', $pertelaan_perjanjian_kerja->tunjangan_dasar_satu);
-        $templateProcessor->setValue('tunjangan_fungsional_satu', $pertelaan_perjanjian_kerja->tunjangan_fungsional_satu);
-        $templateProcessor->setValue('tunjangan_struktural_satu', $pertelaan_perjanjian_kerja->tunjangan_struktural_satu);
-        $templateProcessor->setValue('tunjangan_kemahalan_satu', $pertelaan_perjanjian_kerja->tunjangan_kemahalan_satu);
-        $templateProcessor->setValue('pendapatan_bulanan_satu', $pertelaan_perjanjian_kerja->pendapatan_bulanan_satu);
-        $templateProcessor->setValue('tahun_dua', $pertelaan_perjanjian_kerja->tahun_dua);
-        $templateProcessor->setValue('tunjangan_dasar_dua', $pertelaan_perjanjian_kerja->tunjangan_dasar_dua);
-        $templateProcessor->setValue('tunjangan_fungsional_dua', $pertelaan_perjanjian_kerja->tunjangan_fungsional_dua);
-        $templateProcessor->setValue('tunjangan_struktural_dua', $pertelaan_perjanjian_kerja->tunjangan_struktural_dua);
-        $templateProcessor->setValue('tunjangan_kemahalan_dua', $pertelaan_perjanjian_kerja->tunjangan_kemahalan_dua);
-        $templateProcessor->setValue('pendapatan_bulanan_dua', $pertelaan_perjanjian_kerja->pendapatan_bulanan_dua);
+        $templateProcessor->setValue('tunjangan_dasar_satu', number_format($pertelaan_perjanjian_kerja->tunjangan_dasar_satu, 0, ',', '.'));
+        $templateProcessor->setValue('tunjangan_fungsional_satu', number_format($pertelaan_perjanjian_kerja->tunjangan_fungsional_satu, 0, ',', '.'));
+        $templateProcessor->setValue('tunjangan_struktural_satu', number_format($pertelaan_perjanjian_kerja->tunjangan_struktural_satu, 0, ',', '.'));
+        $templateProcessor->setValue('tunjangan_kemahalan_satu', number_format($pertelaan_perjanjian_kerja->tunjangan_kemahalan_satu, 0, ',', '.'));
+        $templateProcessor->setValue('pendapatan_bulanan_satu', number_format($pertelaan_perjanjian_kerja->pendapatan_bulanan_satu, 0, ',', '.'));
+        $templateProcessor->setValue('tahun_dua', number_format($pertelaan_perjanjian_kerja->tahun_dua, 0, ',', '.'));
+        $templateProcessor->setValue('tunjangan_dasar_dua', number_format($pertelaan_perjanjian_kerja->tunjangan_dasar_dua, 0, ',', '.'));
+        $templateProcessor->setValue('tunjangan_fungsional_dua', number_format($pertelaan_perjanjian_kerja->tunjangan_fungsional_dua, 0, ',', '.'));
+        $templateProcessor->setValue('tunjangan_struktural_dua', number_format($pertelaan_perjanjian_kerja->tunjangan_struktural_dua, 0, ',', '.'));
+        $templateProcessor->setValue('tunjangan_kemahalan_dua', number_format($pertelaan_perjanjian_kerja->tunjangan_kemahalan_dua, 0, ',', '.'));
+        $templateProcessor->setValue('pendapatan_bulanan_dua', number_format($pertelaan_perjanjian_kerja->pendapatan_bulanan_dua, 0, ',', '.'));
 
         $fasilitas_lainnya = json_decode($pertelaan_perjanjian_kerja->fasilitas_lainnya);
         $fasilitas_lainnya_set = [];

@@ -238,7 +238,7 @@ const router = createRouter({
       component: LetterTemplates,
       meta: {
         is_login_required: true,
-        can_accessed: ['*'],
+        can_accessed: ['superadmin', 'admin_sdm', 'admin_sekretariat'],
         layout: 'AuthenticatedLayout',
       },
     },
@@ -268,7 +268,7 @@ const router = createRouter({
       component: ReferenceNumberSettings,
       meta: {
         is_login_required: true,
-        can_accessed: ['*'],
+        can_accessed: ['superadmin', 'admin_sekretariat'],
         layout: 'AuthenticatedLayout',
       },
     },

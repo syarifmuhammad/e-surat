@@ -133,8 +133,8 @@ class SuratPerjanjianKerjaDosenLuarBiasa extends Model
         $templateProcessor->setValue('mata_kuliah', $this->mata_kuliah);
         $templateProcessor->setValue('tahun_ajaran', $this->tahun_ajaran);
         $templateProcessor->setValue('semester', $this->semester);
-        $templateProcessor->setValue('upah', $this->upah);
-        $templateProcessor->setValue('transportasi', $this->transportasi);
+        $templateProcessor->setValue('upah', number_format($this->upah, 0, ',', '.'));
+        $templateProcessor->setValue('transportasi', number_format($this->transportasi, 0, ',', '.'));
         $rekening = json_decode($this->rekening);
         $templateProcessor->setValue('nama_bank', $rekening->nama_bank);
         $templateProcessor->setValue('atas_nama', $rekening->atas_nama);

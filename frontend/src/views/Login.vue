@@ -24,6 +24,19 @@ function submit() {
         router.push({ name: 'dashboard' })
     }).catch(e => {
         console.log(e)
+        if (e.response.status == 422 || e.response.status == 401) {
+            Swal.fire({
+                icon: "error",
+                title: "Gagal",
+                text: e.response.data.message,
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Gagal",
+                text: "Kegagal pada server, silahkan coba lagi nanti",
+            })
+        }
     }).finally(() => {
         loading.value.close()
     })
@@ -50,8 +63,8 @@ function submit() {
                         <div>
                             <label for="email" class="block text-sm mb-2">Email</label>
                             <div class="relative">
-                                <input v-model="form.email" placeholder="Masukkan email" type="email" id="email" name="email" class="form-control"
-                                    autocomplete="username" required>
+                                <input v-model="form.email" placeholder="Masukkan email" type="email" id="email"
+                                    name="email" class="form-control" autocomplete="username" required>
                             </div>
                         </div>
                         <div>
@@ -61,8 +74,8 @@ function submit() {
                                     href="../examples/html/recover-account.html">Lupa password?</a>
                             </div>
                             <div class="relative">
-                                <input v-model="form.password" placeholder="Masukkan password" type="password" id="password" name="password"
-                                    autocomplete="current-password" class="form-control" required>
+                                <input v-model="form.password" placeholder="Masukkan password" type="password" id="password"
+                                    name="password" autocomplete="current-password" class="form-control" required>
                             </div>
                         </div>
                         <div class="flex items-center gap-x-2">

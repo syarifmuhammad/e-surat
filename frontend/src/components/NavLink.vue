@@ -13,9 +13,9 @@ const props = defineProps({
     child: Array,
 })
 
-function check_route_can_access(name) {
-    if (router.hasRoute(props.name)) {
-        const theroute = router.resolve({ name: props.name })
+function check_route_can_access(name = props.name) {
+    if (router.hasRoute(name)) {
+        const theroute = router.resolve({ name: name })
         const can_accessed = theroute.meta.can_accessed.some(roles => roles === '*' || roles === useUserStore().user.roles)
         if (!can_accessed) {
             return false
