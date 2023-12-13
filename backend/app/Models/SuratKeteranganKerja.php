@@ -106,7 +106,7 @@ class SuratKeteranganKerja extends Model
 
     public function can_upload_verified_file()
     {
-        return !$this->is_signed() && ($this->signature_type == 'manual' || $this->signature_type == 'digital') && (auth()->user()->roles == 'admin_sekretariat');
+        return !$this->is_signed() && $this->have_reference_number() && ($this->signature_type == 'manual' || $this->signature_type == 'digital') && (auth()->user()->roles == 'admin_sekretariat');
     }
 
     public function generate_docx()
