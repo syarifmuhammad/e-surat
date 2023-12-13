@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, json
 import os
 import subprocess
-import pythoncom
+# import pythoncom
 import fitz  # PyMuPDF
 from PIL import Image
 import pytesseract
