@@ -31,7 +31,7 @@ def convert_now():
 
     try:
         # Panggil unoconv dari baris perintah untuk mengonversi dokumen
-        subprocess.run(['unoconv', '-f', 'pdf', '-o', base_path, payload['file_path']])
+        subprocess.run(['unoconv', '--stdout', '-f', 'pdf', '-o', base_path, payload['file_path']])
         return jsonify({'data': 'success'}), 200
     except subprocess.CalledProcessError as e:
         return jsonify({'data': e}), 500
