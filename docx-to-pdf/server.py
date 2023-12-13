@@ -23,7 +23,7 @@ def convert_now():
         return jsonify({'error': 'File not found'}), 404
 
     # Dapatkan path dan nama file tanpa ekstensi
-    base_path = os.path.split(payload['file_path'])
+    base_path, _ = os.path.split(payload['file_path'])
     # file_name_without_extension, _ = os.path.splitext(file_name)
 
     # Bangun path output PDF dari path input DOCX
