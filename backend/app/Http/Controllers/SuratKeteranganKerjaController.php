@@ -90,12 +90,12 @@ class SuratKeteranganKerjaController extends Controller
         }
 
         if ($letter->signed_file_docx != null) {
-            $fileNameServerDocx = 'app\\signed_files\\surat_keterangan_kerja\\' . $letter->signed_file_docx;
+            $fileNameServerDocx = 'app/signed_files/surat_keterangan_kerja/' . $letter->signed_file_docx;
             return response()->download(storage_path($fileNameServerDocx), $letter->signed_file_docx);
         }
 
         $filename = $letter->id . '.docx';
-        $fileNameServerDocx = "app\\tmp\\surat_keterangan_kerja\\" . $filename;
+        $fileNameServerDocx = "app/tmp/surat_keterangan_kerja/" . $filename;
 
         if (file_exists(storage_path($fileNameServerDocx))) {
             return response()->download(storage_path($fileNameServerDocx), $filename);
@@ -117,7 +117,7 @@ class SuratKeteranganKerjaController extends Controller
         }
 
         if ($letter->signed_file != null) {
-            $fileNameServerPdf = 'app\\signed_files\\surat_keterangan_kerja\\' . $letter->signed_file;
+            $fileNameServerPdf = 'app/signed_files/surat_keterangan_kerja/' . $letter->signed_file;
             return response()->download(storage_path($fileNameServerPdf), $letter->signed_file);
         }
 
@@ -144,7 +144,7 @@ class SuratKeteranganKerjaController extends Controller
             return response()->download(storage_path($tmpFileNameServerPdf), $filename);
         }
 
-        $fileNameServerDocx = "app\\tmp\\surat_keterangan_kerja\\" . $letter->id . '.docx';
+        $fileNameServerDocx = "app/tmp/surat_keterangan_kerja/" . $letter->id . '.docx';
         $templateProcessor = $letter->generate_docx();
         $templateProcessor->setValue('tanda_tangan', "");
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
@@ -272,8 +272,8 @@ class SuratKeteranganKerjaController extends Controller
         $latest_number = Letter::where('reference_number', '!=', 'NULL')->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year)->count();
         $letter->reference_number = ReferenceNumberSetting::get_and_parse_reference_number_with_date(Letter::NAME, $latest_number + 1, $letter->created_at);
         $filename = $letter->id;
-        $fileNameServerPdf = 'app/signed_files/surat_keterangan_kerja/' . $filename . '.pdf';
-        $fileNameServerDocx = 'app/signed_files/surat_keterangan_kerja/' . $filename . '.docx';
+        $fileNameServerPdf = 'app/tmp/surat_keterangan_kerja/' . $filename . '.pdf';
+        $fileNameServerDocx = 'app/tmp/surat_keterangan_kerja/' . $filename . '.docx';
         if (file_exists(storage_path($fileNameServerPdf))) {
             unlink(storage_path($fileNameServerPdf));
         }
@@ -330,7 +330,7 @@ class SuratKeteranganKerjaController extends Controller
             $templateProcessor->setImageValue('tanda_tangan', storage_path('app/signature/' . $letter->signer->signature));
         }
         $filename = $letter->id;
-        $fileNameServerDocx = "app\\signed_files\\surat_keterangan_kerja\\" . $filename . '.docx';
+        $fileNameServerDocx = "app/signed_files/surat_keterangan_kerja/" . $filename . '.docx';
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
         $letter->signed_file_docx = $fileNameServerDocx;
         $letter->save();

@@ -97,12 +97,12 @@ class SuratKeputusanPengangkatanController extends Controller
         }
 
         if ($letter->signed_file_docx != null) {
-            $fileNameServerDocx = 'app\\signed_files\\surat_keputusan_pengangkatan\\' . $letter->signed_file_docx;
+            $fileNameServerDocx = 'app/signed_files/surat_keputusan_pengangkatan/' . $letter->signed_file_docx;
             return response()->download(storage_path($fileNameServerDocx), $letter->signed_file_docx);
         }
 
         $filename = $letter->id . '.docx';
-        $fileNameServerDocx = "app\\tmp\\surat_keputusan_pengangkatan\\" . $filename;
+        $fileNameServerDocx = "app/tmp/surat_keputusan_pengangkatan/" . $filename;
 
         if (file_exists(storage_path($fileNameServerDocx))) {
             return response()->download(storage_path($fileNameServerDocx), $filename);
@@ -124,7 +124,7 @@ class SuratKeputusanPengangkatanController extends Controller
         }
 
         if ($letter->signed_file != null) {
-            $fileNameServerPdf = 'app\\signed_files\\surat_keputusan_pengangkatan\\' . $letter->signed_file;
+            $fileNameServerPdf = 'app/signed_files/surat_keputusan_pengangkatan/' . $letter->signed_file;
             return response()->download(storage_path($fileNameServerPdf), $letter->signed_file);
         }
 
@@ -151,7 +151,7 @@ class SuratKeputusanPengangkatanController extends Controller
             return response()->download(storage_path($tmpFileNameServerPdf), $filename);
         }
 
-        $fileNameServerDocx = "app\\tmp\\surat_keputusan_pengangkatan\\" . $letter->id . '.docx';
+        $fileNameServerDocx = "app/tmp/surat_keputusan_pengangkatan/" . $letter->id . '.docx';
         $templateProcessor = $letter->generate_docx();
         $templateProcessor->setValue('tanda_tangan', "");
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
@@ -337,7 +337,7 @@ class SuratKeputusanPengangkatanController extends Controller
             $templateProcessor->setImageValue('tanda_tangan', storage_path('app/signature/' . $letter->signer->signature));
         }
         $filename = $letter->id;
-        $fileNameServerDocx = "app\\signed_files\\surat_keputusan_pengangkatan\\" . $filename . '.docx';
+        $fileNameServerDocx = "app/signed_files/surat_keputusan_pengangkatan/" . $filename . '.docx';
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
         $letter->signed_file_docx = $fileNameServerDocx;
         $letter->save();
