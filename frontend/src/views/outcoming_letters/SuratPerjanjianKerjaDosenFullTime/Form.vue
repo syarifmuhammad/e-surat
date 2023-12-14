@@ -22,7 +22,9 @@ const fasilitas_lainnya = ref("")
 const form_surat = reactive({
     id: "",
     nomor_surat_sebelumnya: "",
+    tanggal_surat_sebelumnya: "",
     letter_template_id: "",
+    tanggal_surat: new Date().toISOString().slice(0, 10),
     employee: {},
     profesi: "",
     jabatan_fungsional: "",
@@ -57,7 +59,9 @@ const form_surat = reactive({
 
 const errors = reactive({
     letter_template_id: "",
+    tanggal_surat: "",
     nomor_surat_sebelumnya: "",
+    tanggal_surat_sebelumnya: "",
     'employee.id': "",
     profesi: "",
     jabatan_fungsional: "",
@@ -110,7 +114,9 @@ async function get_letter(id) {
             let data = res.data.data
             form_surat.id = data.id
             form_surat.nomor_surat_sebelumnya = data.nomor_surat_sebelumnya
+            form_surat.tanggal_surat_sebelumnya = data.tanggal_surat_sebelumnya
             form_surat.letter_template_id = data.letter_template_id
+            form_surat.tanggal_surat = data.tanggal_surat_raw
             form_surat.employee = data.employee
             form_surat.profesi = data.profesi
             form_surat.jabatan_fungsional = data.jabatan_fungsional
@@ -160,7 +166,9 @@ function reset_signer() {
 function reset_form() {
     form_surat.id = ""
     form_surat.nomor_surat_sebelumnya = ""
+    form_surat.tanggal_surat_sebelumnya = ""
     form_surat.letter_template_id = ""
+    form_surat.tanggal_surat = new Date().toISOString().slice(0, 10)
     form_surat.profesi = ""
     form_surat.jabatan_fungsional = ""
     form_surat.mulai_berlaku = ""
@@ -235,7 +243,9 @@ function save_surat() {
         // update
         let payload = {
             letter_template_id: form_surat.letter_template_id,
+            tanggal_surat: form_surat.tanggal_surat,
             nomor_surat_sebelumnya: form_surat.nomor_surat_sebelumnya,
+            tanggal_surat_sebelumnya: form_surat.tanggal_surat_sebelumnya,
             employee: {
                 id: selected_employee.value.id,
             },
@@ -277,7 +287,9 @@ function save_surat() {
         // create
         let payload = {
             letter_template_id: form_surat.letter_template_id,
+            tanggal_surat: form_surat.tanggal_surat,
             nomor_surat_sebelumnya: form_surat.nomor_surat_sebelumnya,
+            tanggal_surat_sebelumnya: form_surat.tanggal_surat_sebelumnya,
             employee: {
                 id: selected_employee.value.id,
             },
@@ -367,13 +379,32 @@ onMounted(async () => {
                     </p>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">Nomor Surat Perjanjian Kerja Yang Diamandemen (Tidak
-                        Wajib)</label>
-                    <input type="text" class="form-control" v-model="form_surat.nomor_surat_sebelumnya"
-                        placeholder="Nomor Surat Perjanjian Kerja Yang Diamandemen">
-                    <p v-if="errors.nomor_surat_sebelumnya" class="text-xs text-red-600 mt-2">
-                        {{ errors.nomor_surat_sebelumnya }}
+                    <label class="block text-sm font-medium mb-2">Tanggal Surat</label>
+                    <input type="date" class="form-control" required
+                        v-model="form_surat.tanggal_surat">
+                    <p v-if="errors['tanggal_surat']"
+                        class="text-xs text-red-600 mt-2">
+                        {{ errors['tanggal_surat'] }}
                     </p>
+                </div>
+                <div class="mb-4 grid grid-cols-2 gap-x-8">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nomor Surat Perjanjian Kerja Yang Diamandemen (Tidak
+                            Wajib)</label>
+                        <input type="text" class="form-control" v-model="form_surat.nomor_surat_sebelumnya"
+                            placeholder="Nomor Surat Perjanjian Kerja Yang Diamandemen">
+                        <p v-if="errors.nomor_surat_sebelumnya" class="text-xs text-red-600 mt-2">
+                            {{ errors.nomor_surat_sebelumnya }}
+                        </p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Tanggal Surat Perjanjian Kerja Yang Diamandemen (Tidak
+                            Wajib)</label>
+                        <input type="text" class="form-control" v-model="form_surat.tanggal_surat_sebelumnya" >
+                        <p v-if="errors.tanggal_surat_sebelumnya" class="text-xs text-red-600 mt-2">
+                            {{ errors.tanggal_surat_sebelumnya }}
+                        </p>
+                    </div>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Pegawai</label>

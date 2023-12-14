@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('surat_perjanjian_kerja_dosen_full_time', function (Blueprint $table) {
             $table->id();
             $table->string('reference_number')->nullable()->unique();
+            $table->date('tanggal_surat')->default(now());
             $table->string('nomor_surat_sebelumnya')->nullable();
+            $table->string('tanggal_surat_sebelumnya')->nullable();
             $table->unsignedBigInteger('employee_id');
             $table->string('profesi');
             $table->string('jabatan_fungsional');

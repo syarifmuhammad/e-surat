@@ -121,7 +121,7 @@ class SuratKeputusanPemberhentianDanPengangkatan extends Model
         $templateProcessor->setValue('nomor_surat', $this->get_reference_number());
         $templateProcessor->setValue('nomor_berita_acara', $this->nomor_berita_acara);
         $templateProcessor->setValue('tanggal_berita_acara', Carbon::parse($this->tanggal_berita_acara)->translatedFormat('d F Y'));
-        $templateProcessor->setValue('tanggal_surat', Carbon::parse($this->created_at)->translatedFormat('d F Y'));
+        $templateProcessor->setValue('tanggal_surat', Carbon::parse($this->tanggal_surat)->translatedFormat('d F Y'));
         $templateProcessor->setValue('tanggal_berlaku', Carbon::parse($this->tanggal_berlaku)->translatedFormat('d F Y'));
 
         // Kebutuhan data pegawai

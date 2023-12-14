@@ -118,12 +118,12 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
 
         // Kebutuhan data yang terkait dengan data surat
         $templateProcessor->setValue('nomor_surat', $this->get_reference_number());
-        $templateProcessor->setValue('tanggal_surat', Carbon::parse($this->created_at)->translatedFormat('d F Y'));
-        $templateProcessor->setValue('hari', Carbon::parse($this->created_at)->translatedFormat('l'));
-        $templateProcessor->setValue('tanggal_terbilang', ucwords(terbilang(Carbon::parse($this->created_at)->translatedFormat('d'))));
-        $templateProcessor->setValue('bulan', Carbon::parse($this->created_at)->translatedFormat('F'));
-        $templateProcessor->setValue('tahun_terbilang', ucwords(terbilang(Carbon::parse($this->created_at)->translatedFormat('Y'))));
-        $templateProcessor->setValue('tanggal_format_tgl_bln_thn', Carbon::parse($this->created_at)->format('d - m - Y'));
+        $templateProcessor->setValue('tanggal_surat', Carbon::parse($this->tanggal_surat)->translatedFormat('d F Y'));
+        $templateProcessor->setValue('hari', Carbon::parse($this->tanggal_surat)->translatedFormat('l'));
+        $templateProcessor->setValue('tanggal_terbilang', ucwords(terbilang(Carbon::parse($this->tanggal_surat)->translatedFormat('d'))));
+        $templateProcessor->setValue('bulan', Carbon::parse($this->tanggal_surat)->translatedFormat('F'));
+        $templateProcessor->setValue('tahun_terbilang', ucwords(terbilang(Carbon::parse($this->tanggal_surat)->translatedFormat('Y'))));
+        $templateProcessor->setValue('tanggal_format_tgl_bln_thn', Carbon::parse($this->tanggal_surat)->format('d - m - Y'));
 
 
         // Kebutuhan data pegawai

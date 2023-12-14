@@ -18,6 +18,7 @@ const search_input_rekening = ref(null)
 const form_surat = reactive({
     id: "",
     letter_template_id: "",
+    tanggal_surat: new Date().toISOString().slice(0, 10),
     employee: {},
     jabatan_fungsional: "",
     nidn: "",
@@ -35,6 +36,7 @@ const form_surat = reactive({
 
 const errors = reactive({
     letter_template_id: "",
+    tanggal_surat: "",
     "employee.id": "",
     jabatan_fungsional: "",
     nidn: "",
@@ -72,6 +74,7 @@ async function get_letter(id) {
             let data = res.data.data
             form_surat.id = data.id
             form_surat.letter_template_id = data.letter_template_id
+            form_surat.tanggal_surat = data.tanggal_surat_raw
             form_surat.jabatan_fungsional = data.jabatan_fungsional
             form_surat.nidn = data.nidn
             form_surat.mata_kuliah = data.mata_kuliah
@@ -115,6 +118,7 @@ function reset_signer() {
 function reset_form() {
     form_surat.id = ""
     form_surat.letter_template_id = ""
+    form_surat.tanggal_surat = new Date().toISOString().slice(0, 10)
     form_surat.jabatan_fungsional = ""
     form_surat.nidn = ""
     form_surat.mata_kuliah = ""
@@ -164,6 +168,7 @@ function save_surat() {
         // update
         let payload = {
             letter_template_id: form_surat.letter_template_id,
+            tanggal_surat: form_surat.tanggal_surat,
             employee: {
                 id: selected_employee.value.id,
             },
@@ -216,6 +221,7 @@ function save_surat() {
         // create
         let payload = {
             letter_template_id: form_surat.letter_template_id,
+            tanggal_surat: form_surat.tanggal_surat,
             employee: {
                 id: selected_employee.value.id,
             },
@@ -300,6 +306,15 @@ onMounted(async () => {
                     </select>
                     <p v-if="errors.letter_template_id" class="text-xs text-red-600 mt-2" id="letter-template-error">
                         {{ errors.letter_template_id }}
+                    </p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Tanggal Surat</label>
+                    <input type="date" class="form-control" required
+                        v-model="form_surat.tanggal_surat">
+                    <p v-if="errors['tanggal_surat']"
+                        class="text-xs text-red-600 mt-2">
+                        {{ errors['tanggal_surat'] }}
                     </p>
                 </div>
                 <div class="mb-4">

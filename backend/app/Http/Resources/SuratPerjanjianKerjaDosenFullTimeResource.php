@@ -33,6 +33,7 @@ class SuratPerjanjianKerjaDosenFullTimeResource extends JsonResource
             'id' => $this->id,
             'letter_template_id' => $this->letter_template_id,
             'nomor_surat_sebelumnya' => $this->nomor_surat_sebelumnya,
+            'tanggal_surat_sebelumnya' => $this->tanggal_surat_sebelumnya,
             'reference_number' => $reference_number,
             'employee' => [
                 'id' => $this->employee->id,
@@ -63,7 +64,8 @@ class SuratPerjanjianKerjaDosenFullTimeResource extends JsonResource
             'signature_type' => $this->signature_type,
             'is_signed' => $this->is_signed(),
             'status' => $status,
-            'created_at' => Carbon::parse($this->created_at)->translatedFormat('l, d F Y'),
+            'tanggal_surat' => Carbon::parse($this->tanggal_surat)->translatedFormat('l, d F Y'),
+            'tanggal_surat_raw' => $this->tanggal_surat,
         ];
     }
 }

@@ -240,7 +240,7 @@ function sign() {
                 <td :class="[item.defaultClass]">{{ item.pemberhentian_dalam_jabatan }}</td>
                 <td :class="[item.defaultClass]">{{ item.pengangkatan_dalam_jabatan }}</td>
                 <td :class="[item.defaultClass]">{{ item.signer.name }}</td>
-                <td :class="[item.defaultClass]">{{ item.created_at }}</td>
+                <td :class="[item.defaultClass]">{{ item.tanggal_surat }}</td>
                 <td :class="[item.defaultClass]">
                     <template v-if="item.status == 'waiting_for_reference_number'">
                         <span class="badge badge-danger text-center">Pending</span>

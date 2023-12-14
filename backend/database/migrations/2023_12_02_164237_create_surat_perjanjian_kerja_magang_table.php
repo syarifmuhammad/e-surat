@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('surat_perjanjian_kerja_magang', function (Blueprint $table) {
             $table->id();
             $table->string('reference_number')->nullable()->unique();
+            $table->date('tanggal_surat')->default(now());
             $table->unsignedBigInteger('employee_id');
             $table->date('mulai_berlaku');
             $table->date('akhir_berlaku');

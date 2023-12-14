@@ -120,7 +120,7 @@ class SuratKeteranganKerja extends Model
 
         // Kebutuhan data yang terkait dengan data surat
         $templateProcessor->setValue('nomor_surat', $this->get_reference_number());
-        $templateProcessor->setValue('tanggal_surat', Carbon::parse($this->created_at)->translatedFormat('d F Y'));
+        $templateProcessor->setValue('tanggal_surat', Carbon::parse($this->tanggal_surat)->translatedFormat('d F Y'));
 
         // Kebutuhan data pegawai
         $templateProcessor->setValue('nama', $this->employee->name);

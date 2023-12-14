@@ -34,6 +34,7 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
     {
         $validate = Validator::make($request->all(), [
             'letter_template_id' => 'required|exists:letter_templates,id',
+            'tanggal_surat' => 'required|date',
             'employee.id' => 'required|exists:employees,id',
             'jabatan_fungsional' => 'required|string',
             'nidn' => 'required|string',
@@ -70,6 +71,7 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
 
         $letter = new Letter;
         $letter->letter_template_id = $request->letter_template_id;
+        $letter->tanggal_surat = $request->tanggal_surat;
         $letter->employee_id = $request->employee['id'];
         $letter->jabatan_fungsional = $request->jabatan_fungsional;
         $letter->nidn = $request->nidn;
@@ -206,6 +208,7 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
 
         $validate = Validator::make($request->all(), [
             'letter_template_id' => 'required|exists:letter_templates,id',
+            'tanggal_surat' => 'required|date',
             'employee.id' => 'required|exists:employees,id',
             'jabatan_fungsional' => 'required|string',
             'nidn' => 'required|string',
@@ -241,6 +244,7 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
         }
 
         $letter->letter_template_id = $request->letter_template_id;
+        $letter->tanggal_surat = $request->tanggal_surat;
         $letter->employee_id = $request->employee['id'];
         $letter->jabatan_fungsional = $request->jabatan_fungsional;
         $letter->nidn = $request->nidn;
@@ -322,8 +326,8 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
         }
 
         //get the latest reference_number
-        $latest_number = Letter::where('reference_number', '!=', 'NULL')->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year)->count();
-        $letter->reference_number = ReferenceNumberSetting::get_and_parse_reference_number_with_date(Letter::NAME, $latest_number + 1, $letter->created_at);
+        $latest_number = Letter::where('reference_number', '!=', 'NULL')->whereMonth('tanggal_surat', Carbon::now()->month)->whereYear('tanggal_surat', Carbon::now()->year)->count();
+        $letter->reference_number = ReferenceNumberSetting::get_and_parse_reference_number_with_date(Letter::NAME, $latest_number + 1, $letter->tanggal_surat);
         $letter->save();
 
         $response = [

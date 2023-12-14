@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('surat_keputusan_pemberhentian_dan_pengangkatan', function (Blueprint $table) {
             $table->id();
             $table->string('reference_number')->nullable()->unique('reference_number');
+            $table->date('tanggal_surat')->default(now());
             $table->string('nomor_berita_acara');
             $table->date('tanggal_berita_acara');
             $table->unsignedBigInteger('employee_id');

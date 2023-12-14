@@ -16,6 +16,7 @@ const loading = ref(null)
 const form_surat = reactive({
     id: "",
     letter_template_id: "",
+    tanggal_surat: new Date().toISOString().slice(0, 10),
     employee: {
         position: "",
     },
@@ -27,6 +28,7 @@ const form_surat = reactive({
 
 const errors = reactive({
     letter_template_id: "",
+    tanggal_surat: "",
     "employee.id": "",
     "employee.position": "",
     "signer.id": "",
@@ -54,6 +56,7 @@ async function get_letter(id) {
         .then(res => {
             form_surat.id = res.data.data.id
             form_surat.letter_template_id = res.data.data.letter_template_id
+            form_surat.tanggal_surat = res.data.data.tanggal_surat_raw
             form_surat.employee.id = res.data.data.employee.id
             form_surat.employee.position = res.data.data.employee.position
             form_surat.signer.id = res.data.data.signer.id
@@ -93,6 +96,7 @@ function reset_signer() {
 function reset_form() {
     form_surat.id = ""
     form_surat.letter_template_id = ""
+    form_surat.tanggal_surat = new Date().toISOString().slice(0, 10)
     form_surat.employee = {
         id: "",
         position: "",
@@ -134,6 +138,7 @@ function save_surat() {
         // update
         let payload = {
             letter_template_id: form_surat.letter_template_id,
+            tanggal_surat: form_surat.tanggal_surat,
             employee: {
                 id: selected_employee.value.id,
                 position: form_surat.employee.position
@@ -179,6 +184,7 @@ function save_surat() {
         // create
         let payload = {
             letter_template_id: form_surat.letter_template_id,
+            tanggal_surat: form_surat.tanggal_surat,
             employee: {
                 id: selected_employee.value.id,
                 position: form_surat.employee.position
@@ -253,6 +259,15 @@ onMounted(async () => {
                     </select>
                     <p v-if="errors.letter_template_id" class="text-xs text-red-600 mt-2" id="letter-template-error">
                         {{ errors.letter_template_id }}
+                    </p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Tanggal Surat</label>
+                    <input type="date" class="form-control" required
+                        v-model="form_surat.tanggal_surat">
+                    <p v-if="errors['tanggal_surat']"
+                        class="text-xs text-red-600 mt-2">
+                        {{ errors['tanggal_surat'] }}
                     </p>
                 </div>
                 <div class="mb-4">

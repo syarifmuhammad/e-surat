@@ -55,7 +55,8 @@ class SuratKeteranganKerjaResource extends JsonResource
             'signature_type' => $this->signature_type,
             'is_signed' => $this->is_signed(),
             'status' => $status,
-            'created_at' => Carbon::parse($this->created_at)->translatedFormat('l, d F Y'),
+            'tanggal_surat_raw' => $this->tanggal_surat,
+            'tanggal_surat' => Carbon::parse($this->tanggal_surat)->translatedFormat('l, d F Y'),
         ];
     }
 }
