@@ -400,7 +400,7 @@ onMounted(async () => {
                     <div>
                         <label class="block text-sm font-medium mb-2">Tanggal Surat Perjanjian Kerja Yang Diamandemen (Tidak
                             Wajib)</label>
-                        <input type="text" class="form-control" v-model="form_surat.tanggal_surat_sebelumnya" >
+                        <input type="date" class="form-control" v-model="form_surat.tanggal_surat_sebelumnya" >
                         <p v-if="errors.tanggal_surat_sebelumnya" class="text-xs text-red-600 mt-2">
                             {{ errors.tanggal_surat_sebelumnya }}
                         </p>
