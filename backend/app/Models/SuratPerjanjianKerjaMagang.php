@@ -135,10 +135,10 @@ class SuratPerjanjianKerjaMagang extends Model
         $bulan = Carbon::parse($this->mulai_berlaku)->diffInMonths(Carbon::parse($this->akhir_berlaku));
         $tahun = Carbon::parse($this->mulai_berlaku)->diffInYears(Carbon::parse($this->akhir_berlaku));
         $masa_berlaku = "0 Bulan";
-        if ($tahun > 0) {
-            $masa_berlaku = $tahun . " (". ucwords(terbilang($tahun)) . ") Tahun";
+        if ($bulan % 12 == 0) {
+            $masa_berlaku = $tahun . " (". trim(ucwords(terbilang($tahun))) . ") Tahun";
         } else if ($bulan > 0) {
-            $masa_berlaku = $bulan . " (Bulan)";
+            $masa_berlaku = $bulan . " (". trim(ucwords(terbilang($bulan))) . ") Tahun";
         }
         $templateProcessor->setValue('masa_berlaku', $masa_berlaku);
 
