@@ -4,7 +4,7 @@ import { Icon } from '@iconify/vue'
 import axios from 'axios'
 import SubHeader from '@/components/SubHeader.vue'
 
-const url = 'http://127.0.0.1:8000/api'
+const url = import.meta.env.VITE_URL_API
 
 const loading = ref(false)
 const letter_types = ref([])
