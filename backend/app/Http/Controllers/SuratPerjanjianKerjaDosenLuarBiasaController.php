@@ -128,9 +128,9 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
         $filename = $letter->id . '.docx';
         $fileNameServerDocx = "app/tmp/surat_perjanjian_kerja_dosen_luar_biasa/" . $filename;
 
-        if (file_exists(storage_path($fileNameServerDocx))) {
-            return response()->download(storage_path($fileNameServerDocx), $filename);
-        }
+        // if (file_exists(storage_path($fileNameServerDocx))) {
+        //     return response()->download(storage_path($fileNameServerDocx), $filename);
+        // }
 
         $templateProcessor = $letter->generate_docx();
         $templateProcessor->setValue('tanda_tangan', '');
@@ -171,9 +171,9 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
         }
 
         $tmpFileNameServerPdf = 'app/tmp/surat_perjanjian_kerja_dosen_luar_biasa/' . $filename;
-        if (file_exists(storage_path($tmpFileNameServerPdf))) {
-            return response()->download(storage_path($tmpFileNameServerPdf), $filename);
-        }
+        // if (file_exists(storage_path($tmpFileNameServerPdf))) {
+        //     return response()->download(storage_path($tmpFileNameServerPdf), $filename);
+        // }
 
         $fileNameServerDocx = "app/tmp/surat_perjanjian_kerja_dosen_luar_biasa/" . $letter->id . '.docx';
         $templateProcessor = $letter->generate_docx();

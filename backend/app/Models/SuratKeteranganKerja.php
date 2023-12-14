@@ -54,6 +54,10 @@ class SuratKeteranganKerja extends Model
         return $query->where('signed_file', null)->where('signed_file_docx', null);
     }
 
+    public function scopeWhereSigned($query) {
+        return $query->where('signed_file', '!=', null)->orWhere('signed_file_docx', '!=', null);
+    }
+
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'employee_id', 'id');
