@@ -252,7 +252,7 @@ onMounted(async () => {
           <Icon class="text-4xl text-gray-500" icon="gg:file-document" />
           <span v-if="is_need_to_check('spk_dosen_luar_biasa')" class="text-red-500">Perlu tindak lanjut</span>
         </div>
-        <span class="font-semibold text-gray-500">Surat Perjanjian Kerja Magang</span>
+        <span class="font-semibold text-gray-500">Surat Perjanjian Kerja Dosen Luar Biasa</span>
         <h1 class="mb-2 text-4xl">{{analytics.spk_dosen_luar_biasa.count}}</h1>
         <div class="flex gap-x-4 mb-4">
           <div class="flex items-center text-red-500 text-2xl">
@@ -279,7 +279,7 @@ onMounted(async () => {
           <Icon class="text-4xl text-gray-500" icon="gg:file-document" />
           <span v-if="is_need_to_check('spk_dosen_full_time')" class="text-red-500">Perlu tindak lanjut</span>
         </div>
-        <span class="font-semibold text-gray-500">Surat Perjanjian Kerja Magang</span>
+        <span class="font-semibold text-gray-500">Surat Perjanjian Kerja Dosen Full Time</span>
         <h1 class="mb-2 text-4xl">{{analytics.spk_dosen_full_time.count}}</h1>
         <div class="flex gap-x-4 mb-4">
           <div class="flex items-center text-red-500 text-2xl">
