@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class IncomingLetter extends Model
 {
     use HasFactory;
+    protected $perPage = 10;
 
     public function scopeSearch($query, $search)
     {

@@ -33,10 +33,10 @@ class DatabaseSeeder extends Seeder
 
         //seeder to make positions
         $positions = [
-            ['name' => 'Rektor'],
-            ['name' => 'Wakil Rektor'],
-            ['name' => 'Dosen Rekayasa Perangkat Lunak'],
-            ['name' => 'Dosen Teknik Informatika'],
+            ['name' => 'Rektor', 'type' => 'struktural',],
+            ['name' => 'Wakil Rektor', 'type' => 'struktural',],
+            ['name' => 'Dosen Rekayasa Perangkat Lunak', 'type' => 'struktural',],
+            ['name' => 'Dosen Teknik Informatika', 'type' => 'struktural',],
         ];
         foreach ($positions as $position) {
             Position::create($position);
@@ -83,6 +83,7 @@ class DatabaseSeeder extends Seeder
                 'npwp' => "12345678901234567890",
                 'nama_bank' => "Bank BRI",
                 'nomor_rekening' => "1234567890",
+                'profesi' => "tpa",
             ],
             [
                 'nip' => '12345678',
@@ -92,13 +93,20 @@ class DatabaseSeeder extends Seeder
                 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
                 'email_verified_at' => now(),
                 'roles' => 'admin_sdm',
-                'position' => 'Wakil Rektor',
                 'tempat_lahir' => "Bandung",
                 'tanggal_lahir' => "1999-01-01",
                 'alamat' => "Jl. Jalan",
                 'npwp' => "12345678901234567891",
                 'nama_bank' => "Bank BNI",
                 'nomor_rekening' => "1234567891",
+                'created_by' => 1,
+                'profesi' => 'tpa',
+                'positions' => [
+                    [
+                        'position' => 'Wakil Rektor',
+                        'type' => 'struktural',
+                    ]
+                ],
             ],
             [
                 'nip' => '23456789',
@@ -108,13 +116,20 @@ class DatabaseSeeder extends Seeder
                 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
                 'email_verified_at' => now(),
                 'roles' => 'admin_sekretariat',
-                'position' => 'Rektor',
                 'tempat_lahir' => "Bandung",
                 'tanggal_lahir' => "1999-01-01",
                 'alamat' => "Jl. Jalan",
                 'npwp' => "12345678901234567892",
                 'nama_bank' => "Bank BCA",
                 'nomor_rekening' => "1234567892",
+                'created_by' => 1,
+                'profesi' => 'tpa',
+                'positions' => [
+                    [
+                        'position' => 'Rektor',
+                        'type' => 'struktural',
+                    ]
+                ],
             ],
             [
                 'nip' => '34567890',
@@ -124,13 +139,21 @@ class DatabaseSeeder extends Seeder
                 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
                 'email_verified_at' => now(),
                 'roles' => 'pegawai',
-                'position' => "Dosen Rekayasa Perangkat Lunak",
+                'type' => "Dosen Rekayasa Perangkat Lunak",
                 'tempat_lahir' => "Bandung",
                 'tanggal_lahir' => "1999-01-01",
                 'alamat' => "Jl. Jalan",
                 'npwp' => "12345678901234567893",
                 'nama_bank' => "Bank Mandiri",
                 'nomor_rekening' => "1234567893",
+                'created_by' => 2,
+                'profesi' => 'dosen',
+                'positions' => [
+                    [
+                        'position' => "Dosen Rekayasa Perangkat Lunak",
+                        'type' => 'struktural',
+                    ]
+                ],
             ]
         ];
 
@@ -144,8 +167,10 @@ class DatabaseSeeder extends Seeder
                 'tanggal_lahir' => $employee['tanggal_lahir'],
                 'alamat' => $employee['alamat'],
                 'npwp' => $employee['npwp'],
+                'created_by' => $employee['created_by'] ?? null,
+                'profesi' => $employee['profesi'],
             ]);
-            
+
             User::create([
                 'id' => $insert_employee->id,
                 'email' => $employee['email'],
@@ -155,11 +180,14 @@ class DatabaseSeeder extends Seeder
             ]);
 
             // KeyPair::storeKeys($insert_employee->id, $employee['password']);
-            if (isset($employee['position'])) {
-                EmployeePosition::create([
-                    'employee_id' => $insert_employee->id,
-                    'position' => $employee['position']
-                ]);
+            if (isset($employee['positions'])) {
+                foreach ($employee['positions'] as $p) {
+                    EmployeePosition::create([
+                        'employee_id' => $insert_employee->id,
+                        'position' => $p['position'],
+                        'type' => $p['type'],
+                    ]);
+                }
             }
 
             Rekening::create([

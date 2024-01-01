@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 class SuratPerjanjianKerjaMagang extends Model
 {
     // use HasFactory;
+    protected $perPage = 10;
     public const NAME = 'SURAT_PERJANJIAN_KERJA_MAGANG';
     protected $table = 'surat_perjanjian_kerja_magang';
     public function scopeWhereUser($query, $user)
@@ -51,11 +52,11 @@ class SuratPerjanjianKerjaMagang extends Model
     }
 
     public function scopeWhereNotSigned($query) {
-        return $query->where('signed_file', null)->where('signed_file_docx', null);
+        return $query->where('is_signed', false);
     }
 
     public function scopeWhereSigned($query) {
-        return $query->where('signed_file', '!=', null)->orWhere('signed_file_docx', '!=', null);
+        return $query->where('is_signed', true);
     }
 
     public function employee()
@@ -89,7 +90,7 @@ class SuratPerjanjianKerjaMagang extends Model
 
     public function is_signed()
     {
-        return $this->signed_file != null || $this->signed_file_docx != null;
+        return $this->is_signed;
     }
 
     public function can_give_reference_number()
@@ -99,17 +100,17 @@ class SuratPerjanjianKerjaMagang extends Model
 
     public function can_signed()
     {
-        return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && !(($this->signature_type == 'manual' || $this->signature_type == 'digital'));
+        return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && $this->signature_type != 'manual';
     }
 
     public function can_edit()
     {
-        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id);
+        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id) && !$this->is_signed();
     }
 
     public function can_upload_verified_file()
     {
-        return !$this->is_signed() && $this->have_reference_number() && ($this->signature_type == 'manual' || $this->signature_type == 'digital') && (auth()->user()->roles == 'admin_sekretariat');
+        return !$this->is_signed() && $this->have_reference_number() && $this->signature_type == 'manual' && (auth()->user()->roles == 'admin_sekretariat');
     }
 
     public function generate_docx()
@@ -142,7 +143,7 @@ class SuratPerjanjianKerjaMagang extends Model
         if ($bulan % 12 == 0) {
             $masa_berlaku = $tahun . " (". trim(ucwords(terbilang($tahun))) . ") Tahun";
         } else if ($bulan > 0) {
-            $masa_berlaku = $bulan . " (". trim(ucwords(terbilang($bulan))) . ") Tahun";
+            $masa_berlaku = $bulan . " (". trim(ucwords(terbilang($bulan))) . ") Bulan";
         }
         $templateProcessor->setValue('masa_berlaku', $masa_berlaku);
 

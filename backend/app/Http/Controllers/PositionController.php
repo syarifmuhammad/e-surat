@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PositionCollection;
 use App\Models\Position;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,7 @@ class PositionController extends Controller
     {
         $search = $request->search;
         $positions = Position::search($search)->paginate();
-        return $positions;
+        return new PositionCollection($positions);
     }
 
     /**
@@ -26,6 +27,12 @@ class PositionController extends Controller
     {
         $validate = Validator::make($request->all(), [
             'name' => "required|string|unique:positions",
+            'type' => "required|string|in:struktural,fungsional",
+        ]);
+
+        $validate->setAttributeNames([
+            'name' => 'Posisi / Jabatan',
+            'type' => "Jenis Posisi / Jabatan"
         ]);
 
         if ($validate->fails()) {
@@ -40,6 +47,7 @@ class PositionController extends Controller
         try {
             $new_position = new Position();
             $new_position->name = $request->name;
+            $new_position->type = $request->type;
             $new_position->save();
             
             DB::commit();
@@ -59,7 +67,17 @@ class PositionController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $position = Position::find($id);
+        if (!$position) {
+            return response()->json([
+                'message' => 'Data jabatan tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Berhasil menampilkan data jabatan',
+            'data' => $position
+        ]);
     }
 
     /**
@@ -67,7 +85,43 @@ class PositionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validate = Validator::make($request->all(), [
+            'name' => "required|string|unique:positions",
+            'type' => "required|string|in:struktural,fungsional",
+        ]);
+
+        if ($validate->fails()) {
+            $response = [
+                'errors' => $validate->errors(),
+                'message' => "Validasi form gagal !"
+            ];
+            return response()->json($response, 422);
+        }
+
+        $position = Position::find($id);
+
+        if (!$position) {
+            return response()->json([
+                'message' => 'Data jabatan tidak ditemukan'
+            ], 404);
+        }
+
+        DB::beginTransaction();
+        try {
+            $position->name = $request->name;
+            $position->type = $request->type;
+            $position->save();
+            
+            DB::commit();
+            return response()->json([
+                'message' => 'Berhasil menyimpan data jabatan',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -75,6 +129,27 @@ class PositionController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $position = Position::find($id);
+
+        if (!$position) {
+            return response()->json([
+                'message' => 'Data jabatan tidak ditemukan'
+            ], 404);
+        }
+
+        DB::beginTransaction();
+        try {
+            $position->delete();
+            
+            DB::commit();
+            return response()->json([
+                'message' => 'Berhasil menghapus data jabatan',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }

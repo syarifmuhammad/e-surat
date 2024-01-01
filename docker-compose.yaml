@@ -1,0 +1,31 @@
+# version: "3.7"
+# services:
+#   app:
+#     build:
+#       args:
+#         user: dayatsyarif
+#         uid: 1000
+#       context: ./backend
+#       dockerfile: Dockerfile
+#     image: backend_e_surat
+#     container_name: backend_container
+#     restart: unless-stopped
+#     working_dir: /var/www/
+#     volumes:
+#       - ./backend:/var/www
+#     networks:
+#       - e_surat_network
+#   nginx:
+#     image: nginx:alpine
+#     container_name: nginx_container
+#     restart: unless-stopped
+#     ports:
+#       - 8000:80
+#     volumes:
+#       - ./backend:/var/www
+#       - ./docker-compose/nginx:/etc/nginx/conf.d/
+#     networks:
+#       - e_surat_network
+# networks:
+#   e_surat_network:
+#     driver: bridge

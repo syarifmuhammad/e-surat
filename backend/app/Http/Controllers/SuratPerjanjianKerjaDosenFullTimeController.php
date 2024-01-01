@@ -49,21 +49,20 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
             'rekening' => 'required|exists:rekening,id',
             'signer.id' => 'required|exists:employees,id',
             'signer.position' => 'required|string',
-            'signature_type' => 'required|in:manual,qrcode,digital,gambar tanda tangan',
+            'signature_type' => 'required|in:manual,digital,gambar tanda tangan',
             'pertelaan_perjanjian_kerja.pendidikan' => 'required|string',
-            'pertelaan_perjanjian_kerja.jangka_waktu' => 'required|string',
-            'pertelaan_perjanjian_kerja.tahun_satu' => 'required|date_format:Y',
-            'pertelaan_perjanjian_kerja.tunjangan_dasar_satu' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tunjangan_fungsional_satu' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tunjangan_struktural_satu' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.pendapatan_bulanan_satu' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tahun_dua' => 'required|date_format:Y',
-            'pertelaan_perjanjian_kerja.tunjangan_dasar_dua' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tunjangan_fungsional_dua' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tunjangan_struktural_dua' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.pendapatan_bulanan_dua' => 'required|numeric',
+            'pertelaan_perjanjian_kerja.tahun_satu' => 'present|date_format:Y',
+            'pertelaan_perjanjian_kerja.tunjangan_dasar_satu' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tunjangan_fungsional_satu' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tunjangan_struktural_satu' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.pendapatan_bulanan_satu' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tahun_dua' => 'present|date_format:Y',
+            'pertelaan_perjanjian_kerja.tunjangan_dasar_dua' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tunjangan_fungsional_dua' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tunjangan_struktural_dua' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.pendapatan_bulanan_dua' => 'present|numeric',
             'pertelaan_perjanjian_kerja.fasilitas_lainnya' => 'required|array',
         ]);
 
@@ -105,7 +104,6 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
             $pertelaan = new PertelaanPerjanjianKerja();
             $pertelaan->id = $letter->id;
             $pertelaan->pendidikan = $request->pertelaan_perjanjian_kerja['pendidikan'];
-            $pertelaan->jangka_waktu = $request->pertelaan_perjanjian_kerja['jangka_waktu'];
             $pertelaan->tahun_satu = $request->pertelaan_perjanjian_kerja['tahun_satu'];
             $pertelaan->tunjangan_dasar_satu = $request->pertelaan_perjanjian_kerja['tunjangan_dasar_satu'];
             $pertelaan->tunjangan_fungsional_satu = $request->pertelaan_perjanjian_kerja['tunjangan_fungsional_satu'];
@@ -163,18 +161,8 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
             ], 404);
         }
 
-        if ($letter->signed_file_docx != null) {
-            $fileNameServerDocx = 'app/signed_files/surat_perjanjian_kerja_dosen_full_time/' . $letter->signed_file_docx;
-            return response()->download(storage_path($fileNameServerDocx), $letter->signed_file_docx);
-        }
-
         $filename = $letter->id . '.docx';
         $fileNameServerDocx = "app/tmp/surat_perjanjian_kerja_dosen_full_time/" . $filename;
-
-        // if (file_exists(storage_path($fileNameServerDocx))) {
-        //     return response()->download(storage_path($fileNameServerDocx), $filename);
-        // }
-
         $templateProcessor = $letter->generate_docx();
         $templateProcessor->setValue('tanda_tangan', '');
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
@@ -195,29 +183,6 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
             return response()->download(storage_path($fileNameServerPdf), $letter->signed_file);
         }
 
-        $filename = $letter->id . '.pdf';
-        $fileNameServerPdf = 'app/signed_files/surat_perjanjian_kerja_dosen_full_time/' . $filename;
-
-        if ($letter->signed_file_docx != null) {
-            $response = Http::post(env('APP_DOCX_CONVERTER_URL') . '/convert', ['file_path' => storage_path($letter->signed_file_docx)]);
-            if ($response->failed()) {
-                return response()->json([
-                    'errors' => "Something errors"
-                ], 500);
-            }
-
-            if ($response->successful() && file_exists(storage_path($fileNameServerPdf))) {
-                $letter->signed_file = $filename;
-                $letter->save();
-                return response()->download(storage_path($fileNameServerPdf), $filename);
-            }
-        }
-
-        $tmpFileNameServerPdf = 'app/tmp/surat_perjanjian_kerja_dosen_full_time/' . $filename;
-        // if (file_exists(storage_path($tmpFileNameServerPdf))) {
-        //     return response()->download(storage_path($tmpFileNameServerPdf), $filename);
-        // }
-
         $fileNameServerDocx = "app/tmp/surat_perjanjian_kerja_dosen_full_time/" . $letter->id . '.docx';
         $templateProcessor = $letter->generate_docx();
         $templateProcessor->setValue('tanda_tangan', "");
@@ -229,7 +194,8 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
                 'errors' => "Something errors"
             ], 500);
         }
-
+        
+        $filename = $letter->id . '.pdf';
         $tmpFileNameServerPdf = 'app/tmp/surat_perjanjian_kerja_dosen_full_time/' . $filename;
         if ($response->successful() && file_exists(storage_path($tmpFileNameServerPdf))) {
             unlink(storage_path($fileNameServerDocx));
@@ -269,21 +235,20 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
             'rekening' => 'required|exists:rekening,id',
             'signer.id' => 'required|exists:employees,id',
             'signer.position' => 'required|string',
-            'signature_type' => 'required|in:manual,qrcode,digital,gambar tanda tangan',
+            'signature_type' => 'required|in:manual,digital,gambar tanda tangan',
             'pertelaan_perjanjian_kerja.pendidikan' => 'required|string',
-            'pertelaan_perjanjian_kerja.jangka_waktu' => 'required|string',
-            'pertelaan_perjanjian_kerja.tahun_satu' => 'required|date_format:Y',
-            'pertelaan_perjanjian_kerja.tunjangan_dasar_satu' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tunjangan_fungsional_satu' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tunjangan_struktural_satu' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.pendapatan_bulanan_satu' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tahun_dua' => 'required|date_format:Y',
-            'pertelaan_perjanjian_kerja.tunjangan_dasar_dua' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tunjangan_fungsional_dua' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tunjangan_struktural_dua' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua' => 'required|numeric',
-            'pertelaan_perjanjian_kerja.pendapatan_bulanan_dua' => 'required|numeric',
+            'pertelaan_perjanjian_kerja.tahun_satu' => 'present|date_format:Y',
+            'pertelaan_perjanjian_kerja.tunjangan_dasar_satu' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tunjangan_fungsional_satu' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tunjangan_struktural_satu' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.pendapatan_bulanan_satu' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tahun_dua' => 'present|date_format:Y',
+            'pertelaan_perjanjian_kerja.tunjangan_dasar_dua' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tunjangan_fungsional_dua' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tunjangan_struktural_dua' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua' => 'present|numeric',
+            'pertelaan_perjanjian_kerja.pendapatan_bulanan_dua' => 'present|numeric',
             'pertelaan_perjanjian_kerja.fasilitas_lainnya' => 'required|array',
         ]);
 
@@ -322,7 +287,6 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
 
             $pertelaan = PertelaanPerjanjianKerja::find($letter->id);
             $pertelaan->pendidikan = $request->pertelaan_perjanjian_kerja['pendidikan'];
-            $pertelaan->jangka_waktu = $request->pertelaan_perjanjian_kerja['jangka_waktu'];
             $pertelaan->tahun_satu = $request->pertelaan_perjanjian_kerja['tahun_satu'];
             $pertelaan->tunjangan_dasar_satu = $request->pertelaan_perjanjian_kerja['tunjangan_dasar_satu'];
             $pertelaan->tunjangan_fungsional_satu = $request->pertelaan_perjanjian_kerja['tunjangan_fungsional_satu'];
@@ -377,7 +341,7 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
 
         if (!$letter->can_upload_verified_file()) {
             return response()->json([
-                'message' => "Surat dengan jenis tanda tangan selain manual dan digital tidak dapat ditandatangani dengan !"
+                'message' => "Surat dengan jenis tanda tangan selain manual tidak dapat ditandatangani dengan upload file !"
             ], 403);
         }
 
@@ -387,6 +351,7 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
         Storage::put($fileNameServer, file_get_contents($file));
 
         $letter->signed_file = $fileName;
+        $letter->is_signed = true;
         $letter->save();
 
         $response = [
@@ -400,7 +365,23 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $letter = Letter::find($id);
+        if (!$letter) {
+            return response()->json([
+                'message' => "Surat perjanjian kerja dosen full time tidak ditemukan !"
+            ], 404);
+        }
+
+        if (!$letter->can_edit()) {
+            return response()->json([
+                'message' => "Surat perjanjian kerja dosen full time tidak dapat dihapus !"
+            ], 403);
+        }
+
+        $letter->delete();
+        return response()->json([
+            'message' => "Berhasil menghapus surat perjanjian kerja dosen full time !"
+        ], 200);
     }
 
     public function give_reference_number(Request $request)
@@ -428,13 +409,19 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
     {
         $letter = Letter::find($id);
 
-        if (!$letter && $letter->can_sign()) {
+        if (!$letter) {
             return response()->json([
                 'message' => "Surat keterangan kerja tidak ditemukan !"
             ], 404);
         }
 
-        if ($letter->signature_type == 'qrcode') {
+        if (!$letter->can_signed()) {
+            return response()->json([
+                'message' => "Surat perjanjian kerja dosen full time tidak dapat ditandatangani !"
+            ], 403);
+        }
+
+        if ($letter->signature_type == 'digital') {
             $validate = Validator::make($request->all(), [
                 'password' => 'required|string',
             ]);
@@ -442,32 +429,33 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
             if ($validate->fails()) {
                 $response = [
                     'errors' => $validate->errors(),
-                    'message' => "Wajib mengisi password untuk tanda tangan qrcode !"
+                    'message' => "Wajib mengisi password untuk tanda tangan digital !"
                 ];
                 return response()->json($response, 422);
             }
         }
 
-        $templateProcessor = $letter->generate_docx();
-        if ($letter->signature_type == 'qrcode') {
-            $keypair = KeyPair::where('user_id', auth()->id())->first();
-            $data = $keypair->encrypt($request->password, $letter->id);
-            // var_dump(openssl_error_string());
-            return $data;
-            if (!$data) {
-                return response()->json([
-                    'message' => "Gagal mengenkripsi data, password atau kunci pribadi tidak valid !"
-                ], 422);
-            }
-            $qrcode = QrCode::size(300)->format('png')->generate($data);
-            $templateProcessor->setImageValue('tanda_tangan', $qrcode);
-        } else {
-            $templateProcessor->setImageValue('tanda_tangan', storage_path('app/signature/' . $letter->signer->signature));
-        }
-        $filename = $letter->id;
-        $fileNameServerDocx = "app/signed_files/surat_perjanjian_kerja_dosen_full_time/" . $filename . '.docx';
-        $templateProcessor->saveAs(storage_path($fileNameServerDocx));
-        $letter->signed_file_docx = $fileNameServerDocx;
+        // $templateProcessor = $letter->generate_docx();
+        // if ($letter->signature_type == 'digital') {
+        //     $keypair = KeyPair::where('user_id', auth()->id())->first();
+        //     $data = $keypair->encrypt($request->password, $letter->id);
+        //     // var_dump(openssl_error_string());
+        //     return $data;
+        //     if (!$data) {
+        //         return response()->json([
+        //             'message' => "Gagal mengenkripsi data, password atau kunci pribadi tidak valid !"
+        //         ], 422);
+        //     }
+        //     $qrcode = QrCode::size(300)->format('png')->generate($data);
+        //     $templateProcessor->setImageValue('tanda_tangan', $qrcode);
+        // } else {
+        //     $templateProcessor->setImageValue('tanda_tangan', storage_path('app/signature/' . $letter->signer->signature));
+        // }
+        // $filename = $letter->id;
+        // $fileNameServerDocx = "app/signed_files/surat_perjanjian_kerja_dosen_full_time/" . $filename . '.docx';
+        // $templateProcessor->saveAs(storage_path($fileNameServerDocx));
+        // $letter->signed_file_docx = $fileNameServerDocx;
+        $letter->is_signed = true;
         $letter->save();
         return response()->json([
             'message' => "Berhasil menandatangani surat keterangan kerja !"

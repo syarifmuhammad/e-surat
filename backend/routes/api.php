@@ -8,6 +8,7 @@ use App\Http\Controllers\IncomingLetterController;
 use App\Http\Controllers\LetterTemplateController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProdiController;
+use App\Http\Controllers\UnitController;
 use App\Http\Controllers\ReferenceNumberSettingController;
 use App\Http\Controllers\SuratKeteranganKerjaController;
 use App\Http\Controllers\SuratKeputusanRotasiKepegawaianController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\SuratKeputusanPengangkatanController;
 use App\Http\Controllers\SuratPerjanjianKerjaDosenFullTimeController;
 use App\Http\Controllers\SuratPerjanjianKerjaMagangController;
 use App\Http\Controllers\SuratPerjanjianKerjaDosenLuarBiasaController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -62,6 +64,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthenticationController::class, 'logout']);
     Route::apiResource('positions', PositionController::class);
     Route::apiResource('prodi', ProdiController::class);
+    Route::apiResource('unit', UnitController::class);
     Route::prefix('employees')->group(function () {
         Route::get('', [EmployeeController::class, 'index']);
         Route::post('', [EmployeeController::class, 'store']);
@@ -80,7 +83,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('analytics', [AnalyticsController::class, 'index']);
-
+    
     Route::prefix('incoming-letters')->group(function () {
         Route::prefix('categories')->group(function () {
             Route::get('', [CategoryIncomingLetterController::class, 'index']);
@@ -97,6 +100,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('outcoming-letters')->group(function () {
+        Route::get('reports', [ReportController::class, 'report_outcoming_letter']);
         Route::prefix('/templates')->group(function () {
             Route::get('/', [LetterTemplateController::class, 'index']);
             Route::get('/download_example', [LetterTemplateController::class, 'download_example']);

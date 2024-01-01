@@ -10,6 +10,7 @@ use PhpOffice\PhpWord\TemplateProcessor;
 class SuratKeputusanRotasiKepegawaian extends Model
 {
     // use HasFactory;
+    protected $perPage = 10;
     public const NAME = 'SURAT_KEPUTUSAN_ROTASI_KEPEGAWAIAN';
     protected $table = 'surat_keputusan_rotasi_kepegawaian';
     public function scopeWhereUser($query, $user)
@@ -49,12 +50,14 @@ class SuratKeputusanRotasiKepegawaian extends Model
         }
     }
 
-    public function scopeWhereNotSigned($query) {
-        return $query->where('signed_file', null)->where('signed_file_docx', null);
+    public function scopeWhereNotSigned($query)
+    {
+        return $query->where('is_signed', false);
     }
 
-    public function scopeWhereSigned($query) {
-        return $query->where('signed_file', '!=', null)->orWhere('signed_file_docx', '!=', null);
+    public function scopeWhereSigned($query)
+    {
+        return $query->where('is_signed', true);
     }
 
     public function employee()
@@ -88,7 +91,7 @@ class SuratKeputusanRotasiKepegawaian extends Model
 
     public function is_signed()
     {
-        return $this->signed_file != null || $this->signed_file_docx != null;
+        return $this->is_signed;
     }
 
     public function can_give_reference_number()
@@ -98,17 +101,17 @@ class SuratKeputusanRotasiKepegawaian extends Model
 
     public function can_signed()
     {
-        return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && !(($this->signature_type == 'manual' || $this->signature_type == 'digital'));
+        return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && $this->signature_type != 'manual';
     }
 
     public function can_edit()
     {
-        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id);
+        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id) && !$this->is_signed();
     }
 
     public function can_upload_verified_file()
     {
-        return !$this->is_signed() && $this->have_reference_number() && ($this->signature_type == 'manual' || $this->signature_type == 'digital') && (auth()->user()->roles == 'admin_sekretariat');
+        return !$this->is_signed() && $this->have_reference_number() && $this->signature_type == 'manual' && (auth()->user()->roles == 'admin_sekretariat');
     }
 
     public function generate_docx()

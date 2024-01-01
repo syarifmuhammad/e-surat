@@ -104,37 +104,43 @@ defineExpose({ open, close })
                         <div class="mb-4">
                             <label class="block text-sm font-medium mb-2">Nama Fakultas <span
                                     class="text-red-400">*</span></label>
-                            <input class="form-control" required v-model="form_prodi.nama_fakultas" placeholder="cth: Fakultas Teknologi Informasi Dan Bisnis">
+                            <input class="form-control" required v-model="form_prodi.nama_fakultas"
+                                placeholder="cth: Fakultas Teknologi Informasi Dan Bisnis">
                             <p v-if="errors.nama_fakultas" class="text-xs text-red-600 mt-2">
                                 {{ errors.nama_fakultas }}
                             </p>
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium mb-2">Nama Singkatan Fakultas <span class="text-red-400">*</span></label>
-                                <input class="form-control" required v-model="form_prodi.singkatan_fakultas" placeholder="cth: FTIB">
-                                <p v-if="errors.singkatan_fakultas" class="text-xs text-red-600 mt-2">
-                                    {{ errors.singkatan_fakultas }}
-                                </p>
-                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2">Nama Singkatan Fakultas <span
+                                    class="text-red-400">*</span></label>
+                            <input class="form-control" required v-model="form_prodi.singkatan_fakultas"
+                                placeholder="cth: FTIB">
+                            <p v-if="errors.singkatan_fakultas" class="text-xs text-red-600 mt-2">
+                                {{ errors.singkatan_fakultas }}
+                            </p>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-x-4 mb-4">
                         <div class="mb-4">
                             <label class="block text-sm font-medium mb-2">Nama Prodi <span
                                     class="text-red-400">*</span></label>
-                            <input class="form-control" required v-model="form_prodi.nama_prodi" placeholder="cth: Rekayasa Perangkat Lunak">
+                            <input class="form-control" required v-model="form_prodi.nama_prodi"
+                                placeholder="cth: Rekayasa Perangkat Lunak">
                             <p v-if="errors.nama_prodi" class="text-xs text-red-600 mt-2">
                                 {{ errors.nama_prodi }}
                             </p>
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium mb-2">Nama Singkatan Prodi <span class="text-red-400">*</span></label>
-                                <input class="form-control" required v-model="form_prodi.singkatan_prodi" placeholder="cth: RPL">
-                                <p v-if="errors.singkatan_prodi" class="text-xs text-red-600 mt-2">
-                                    {{ errors.singkatan_prodi }}
-                                </p>
-                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2">Nama Singkatan Prodi <span
+                                    class="text-red-400">*</span></label>
+                            <input class="form-control" required v-model="form_prodi.singkatan_prodi"
+                                placeholder="cth: RPL">
+                            <p v-if="errors.singkatan_prodi" class="text-xs text-red-600 mt-2">
+                                {{ errors.singkatan_prodi }}
+                            </p>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="border-t p-4 sm:px-10 flex justify-end">

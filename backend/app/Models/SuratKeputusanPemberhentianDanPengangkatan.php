@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 class SuratKeputusanPemberhentianDanPengangkatan extends Model
 {
     // use HasFactory;
+    protected $perPage = 10;
     public const NAME = 'SURAT_KEPUTUSAN_PEMBERHENTIAN_DAN_PENGANGKATAN';
     protected $table = 'surat_keputusan_pemberhentian_dan_pengangkatan';
     public function scopeWhereUser($query, $user)
@@ -51,11 +52,11 @@ class SuratKeputusanPemberhentianDanPengangkatan extends Model
     }
 
     public function scopeWhereNotSigned($query) {
-        return $query->where('signed_file', null)->where('signed_file_docx', null);
+        return $query->where('is_signed', false);
     }
 
     public function scopeWhereSigned($query) {
-        return $query->where('signed_file', '!=', null)->orWhere('signed_file_docx', '!=', null);
+        return $query->where('is_signed', true);
     }
 
     public function employee()
@@ -89,7 +90,7 @@ class SuratKeputusanPemberhentianDanPengangkatan extends Model
 
     public function is_signed()
     {
-        return $this->signed_file != null || $this->signed_file_docx != null;
+        return $this->is_signed;
     }
 
     public function can_give_reference_number()
@@ -104,7 +105,7 @@ class SuratKeputusanPemberhentianDanPengangkatan extends Model
 
     public function can_edit()
     {
-        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id);
+        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id) && !$this->is_signed();
     }
 
     public function can_upload_verified_file()
@@ -115,11 +116,6 @@ class SuratKeputusanPemberhentianDanPengangkatan extends Model
     public function generate_docx()
     {
         $templateProcessor = new TemplateProcessor(storage_path("app/letter_templates/" . $this->letter_template->file));
-
-        // Kebutuhan data yang terkait dengan pemohon atau pembuat surat
-        // $templateProcessor->setValue('nik_pemohon', $letter->resident->nik);
-        // $templateProcessor->setValue('nama_pemohon', $letter->resident->name);
-        // $templateProcessor->setValue('alamat_pemohon', $letter->resident->address);
 
         // Kebutuhan data yang terkait dengan data surat
         $templateProcessor->setValue('nomor_surat', $this->get_reference_number());

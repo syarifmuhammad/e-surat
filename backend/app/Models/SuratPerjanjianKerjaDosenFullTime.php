@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 class SuratPerjanjianKerjaDosenFullTime extends Model
 {
     // use HasFactory;
+    protected $perPage = 10;
     public const NAME = 'SURAT_PERJANJIAN_KERJA_DOSEN_FULL_TIME';
     protected $table = 'surat_perjanjian_kerja_dosen_full_time';
     public function scopeWhereUser($query, $user)
@@ -50,11 +51,11 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
     }
 
     public function scopeWhereNotSigned($query) {
-        return $query->where('signed_file', null)->where('signed_file_docx', null);
+        return $query->where('is_signed', false);
     }
 
     public function scopeWhereSigned($query) {
-        return $query->where('signed_file', '!=', null)->orWhere('signed_file_docx', '!=', null);
+        return $query->where('is_signed', true);
     }
 
     public function employee()
@@ -91,7 +92,7 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
 
     public function is_signed()
     {
-        return $this->signed_file != null || $this->signed_file_docx != null;
+        return $this->is_signed;
     }
 
     public function can_give_reference_number() {
@@ -99,26 +100,22 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
     }
 
     public function can_signed() {
-        return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && !(($this->signature_type == 'manual' || $this->signature_type == 'digital'));
+        return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && $this->signature_type != 'manual';
     }
 
-    public function can_edit() {
-        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id);
+    public function can_edit()
+    {
+        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id) && !$this->is_signed();
     }
 
     public function can_upload_verified_file()
     {
-        return !$this->is_signed() && $this->have_reference_number() && ($this->signature_type == 'manual' || $this->signature_type == 'digital') && (auth()->user()->roles == 'admin_sekretariat');
+        return !$this->is_signed() && $this->have_reference_number() && $this->signature_type == 'manual' && (auth()->user()->roles == 'admin_sekretariat');
     }
 
     public function generate_docx()
     {
         $templateProcessor = new TemplateProcessor(storage_path("app/letter_templates/" . $this->letter_template->file));
-
-        // Kebutuhan data yang terkait dengan pemohon atau pembuat surat
-        // $templateProcessor->setValue('nik_pemohon', $letter->resident->nik);
-        // $templateProcessor->setValue('nama_pemohon', $letter->resident->name);
-        // $templateProcessor->setValue('alamat_pemohon', $letter->resident->address);
 
         // Kebutuhan data yang terkait dengan data surat
         $templateProcessor->setValue('nomor_surat', $this->get_reference_number());
@@ -151,7 +148,7 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         if ($bulan % 12 == 0) {
             $masa_berlaku = $tahun . " (". trim(ucwords(terbilang($tahun))) . ") Tahun";
         } else if ($bulan > 0) {
-            $masa_berlaku = $bulan . " (". trim(ucwords(terbilang($bulan))) . ") Tahun";
+            $masa_berlaku = $bulan . " (". trim(ucwords(terbilang($bulan))) . ") Bulan";
         }
         $templateProcessor->setValue('masa_berlaku', $masa_berlaku);
         $rekening = json_decode($this->rekening);
@@ -162,7 +159,7 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         
         //pertelaan perjanjian kerja
         $pertelaan_perjanjian_kerja = $this->pertelaan_perjanjian_kerja;
-        $templateProcessor->setValue('jangka_waktu', $pertelaan_perjanjian_kerja->jangka_waktu);
+        // $templateProcessor->setValue('jangka_waktu', $pertelaan_perjanjian_kerja->jangka_waktu);
         $templateProcessor->setValue('pendidikan', $pertelaan_perjanjian_kerja->pendidikan);
         $templateProcessor->setValue('tahun_satu', $pertelaan_perjanjian_kerja->tahun_satu);
         $templateProcessor->setValue('tunjangan_dasar_satu', number_format($pertelaan_perjanjian_kerja->tunjangan_dasar_satu, 0, ',', '.'));

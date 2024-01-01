@@ -21,6 +21,7 @@ return new class extends Migration
             $table->date('tanggal_lahir');
             $table->text('alamat');
             $table->string('npwp');
+            $table->enum('profesi', ['dosen', 'tpa'])->default('dosen');
             $table->string('signature')->nullable();
             $table->timestamps();
         });

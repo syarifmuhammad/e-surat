@@ -33,10 +33,14 @@ const route_name = route.name
 async function getData() {
   loading.value = true
 
+  let construct_url = new URL(props.url)
+  construct_url.searchParams.append("page", current.value)
+  construct_url.searchParams.append("search", search.value)
+
   const {
     data: { data: data_from_api, meta: { last_page: last_page_from_api, per_page: per_page_from_api } },
   } = await axios.get(
-    `${props.url}?page=${current.value}&search=${search.value}`
+    `${construct_url.href}`
   );
 
   if (Array.isArray(data_from_api)) {
@@ -105,7 +109,7 @@ defineExpose({ getData })
       <div class="py-3 px-4">
         <div class="relative max-w-xs">
           <label class="sr-only">Search</label>
-          <input :value="search" @input="modifySearch" type="text" name="hs-table-with-pagination-search"
+          <input :value="search" @input="modifySearch" type="search" name="hs-table-with-pagination-search"
             id="hs-table-with-pagination-search"
             class="py-2 px-3 ps-9 block w-full border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-primary-400 focus:ring-primary-400 disabled:opacity-50 disabled:pointer-events-none"
             placeholder="Search for items">

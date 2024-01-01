@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Prodi extends Model
 {
     use HasFactory;
+    protected $perPage = 10;
 
     protected $table = 'prodi';
 

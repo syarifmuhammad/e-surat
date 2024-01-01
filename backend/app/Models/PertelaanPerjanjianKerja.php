@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class PertelaanPerjanjianKerja extends Model
 {
     use HasFactory;
+    protected $perPage = 10;
 
     protected $table = 'pertelaan_perjanjian_kerja';
 

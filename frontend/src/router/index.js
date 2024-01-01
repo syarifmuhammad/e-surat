@@ -5,6 +5,10 @@ const Login = () => import('@/views/Login.vue')
 const Dashboard = () => import('@/views/Dashboard.vue')
 const Position = () => import('@/views/positions/Index.vue')
 const FormPosition = () => import('@/views/positions/Form.vue')
+const Prodi = () => import('@/views/prodi/Index.vue')
+const FormProdi = () => import('@/views/prodi/Form.vue')
+const Unit = () => import('@/views/unit/Index.vue')
+const FormUnit = () => import('@/views/unit/Form.vue')
 const Employees = () => import('@/views/employees/Index.vue')
 const FormEmployees = () => import('@/views/employees/Form.vue')
 const Categories = () => import('@/views/incoming_letters/Categories.vue')
@@ -170,6 +174,82 @@ const router = createRouter({
         is_login_required: true,
         can_accessed: ['superadmin', 'admin_sdm'],
         layout: 'AuthenticatedLayout',
+        parentName: 'positions',
+      },
+    },
+    {
+      path: '/positions/:id',
+      name: 'update_positions',
+      component: FormPosition,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['superadmin', 'admin_sdm'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'positions',
+      },
+    },
+    {
+      path: '/prodi',
+      name: 'prodi',
+      component: Prodi,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['superadmin', 'admin_sdm'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/prodi/create',
+      name: 'create_prodi',
+      component: FormProdi,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['superadmin', 'admin_sdm'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'prodi',
+      },
+    },
+    {
+      path: '/prodi/:id',
+      name: 'update_prodi',
+      component: FormProdi,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['superadmin', 'admin_sdm'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'prodi',
+      },
+    },
+    {
+      path: '/unit',
+      name: 'unit',
+      component: Unit,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['superadmin', 'admin_sdm'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/unit/create',
+      name: 'create_unit',
+      component: FormUnit,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['superadmin', 'admin_sdm'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'unit',
+      },
+    },
+    {
+      path: '/unit/:id',
+      name: 'update_unit',
+      component: FormUnit,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['superadmin', 'admin_sdm'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'unit',
       },
     },
     {
@@ -190,6 +270,7 @@ const router = createRouter({
         is_login_required: true,
         can_accessed: ['superadmin', 'admin_sdm'],
         layout: 'AuthenticatedLayout',
+        parentName: 'employees',
       },
     },
     {
@@ -200,6 +281,7 @@ const router = createRouter({
         is_login_required: true,
         can_accessed: ['superadmin', 'admin_sdm'],
         layout: 'AuthenticatedLayout',
+        parentName: 'employees',
       },
     },
     {
@@ -238,7 +320,7 @@ const router = createRouter({
       component: LetterTemplates,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm', 'admin_sekretariat'],
+        can_accessed: ['superadmin', 'admin_sdm'],
         layout: 'AuthenticatedLayout',
       },
     },
@@ -250,6 +332,7 @@ const router = createRouter({
         is_login_required: true,
         can_accessed: ['admin_sdm', 'superadmin'],
         layout: 'AuthenticatedLayout',
+        parentName: 'letter_templates',
       },
     },
     {
@@ -260,6 +343,7 @@ const router = createRouter({
         is_login_required: true,
         can_accessed: ['admin_sdm', 'superadmin'],
         layout: 'AuthenticatedLayout',
+        parentName: 'letter_templates',
       },
     },
     {

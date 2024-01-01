@@ -21,10 +21,31 @@ const sidebarMenu = ref([
         child: [],
     },
     {
-        title: 'Pegawai',
-        name: 'employees',
-        icon: 'solar:user-outline',
-        child: [],
+        title: 'Data Master',
+        name: 'master',
+        icon: 'material-symbols:data-table-outline',
+        child: [
+            {
+                title: 'Posisi / Jabatan',
+                name: 'positions',
+                icon: 'solar:user-outline',
+            },
+            {
+                title: 'Jurusan / Prodi',
+                name: 'prodi',
+                icon: 'ph:code',
+            },
+            {
+                title: 'Unit Kerja',
+                name: 'unit',
+                icon: 'solar:user-outline',
+            },
+            {
+                title: 'Pegawai',
+                name: 'employees',
+                icon: 'solar:user-outline',
+            },
+        ],
     },
     {
         title: 'Surat Masuk',
@@ -166,7 +187,8 @@ const sidebarMenu = ref([
                     <RouterLink :to="'/'">
                         <h1 class="text-center">E-SURAT</h1>
                     </RouterLink>
-                    <Icon icon="ep:close-bold" class="text-xl cursor-pointer ml-8 lg:hidden" @click="sidebar_menu_is_active = false">
+                    <Icon icon="ep:close-bold" class="text-xl cursor-pointer ml-8 lg:hidden"
+                        @click="sidebar_menu_is_active = false">
                     </Icon>
                 </div>
             </div>
@@ -237,4 +259,5 @@ const sidebarMenu = ref([
     #sidebar {
         transform: translateX(0px);
     }
-}</style>
+}
+</style>

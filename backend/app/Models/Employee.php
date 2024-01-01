@@ -25,6 +25,11 @@ class Employee extends Model
         })->orWhereDoesntHave('account');
     }
 
+    public function scopeExceptHimSelf($query)
+    {
+        $query->where('id', '!=', auth()->id());
+    }
+
     public function positions()
     {
         return $this->hasMany(EmployeePosition::class, 'employee_id', 'id');

@@ -28,7 +28,7 @@ const focus = ref(false)
 
 const parent = ref(null)
 const list_search = ref(null)
-const next = ref(props.url)
+const next = ref(new URL(props.url))
 const success_search = ref(null)
 const timeout_search = ref(null)
 const busy = ref(false)
@@ -69,27 +69,28 @@ function onSearch(value_args) {
         loading.value = true;
         result_search.value = [];
         busy.value = false;
-        next.value = `${props.url}?search=${value_args}`;
+        next.value = new URL(props.url);
+        next.value.searchParams.append('search', value_args)
         getData();
     }, 500);
 }
 
 function fetchData() {
     busy.value = true;
-    let filter = "";
-    if (props.filter) {
-        for (let [key, value] of Object.entries(props.filter)) {
-            filter += `&${key}=${value}`;
-        }
-    }
-    let url = props.url
+    // let filter = "";
+    // if (props.filter) {
+    //     for (let [key, value] of Object.entries(props.filter)) {
+    //         filter += `&${key}=${value}`;
+    //     }
+    // }
+    let url = new URL(props.url)
     if (next.value != null) {
-        url = next.value + filter    
+        url = new URL(next.value)    
     }
     axios.get(url).then((response) => {
-        next.value = response.data.links
-            ? (response.data.links.next ?? "") + "&search=" + value.value + filter
-            : null;
+        if (response.data.links && response.data.links.next) {
+            next.value = new URL(response.data.links.next)
+        }
         result_search.value = []
         response.data.data.forEach((p) => {
             result_search.value.push(p);

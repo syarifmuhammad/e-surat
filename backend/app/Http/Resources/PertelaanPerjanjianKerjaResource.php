@@ -17,7 +17,6 @@ class PertelaanPerjanjianKerjaResource extends JsonResource
         return [
             'id' => $this->id,
             'pendidikan' => $this->pendidikan,
-            'jangka_waktu' => $this->jangka_waktu,
             'tahun_satu' => $this->tahun_satu,
             'tunjangan_dasar_satu' => $this->tunjangan_dasar_satu,
             'tunjangan_fungsional_satu' => $this->tunjangan_fungsional_satu,

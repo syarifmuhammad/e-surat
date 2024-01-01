@@ -18,6 +18,8 @@ const form = reactive({
     nik: "",
     name: "",
     email: "",
+    tempat_lahir: "",
+    tanggal_lahir: "",
     rekening: [],
     positions: [],
 })
@@ -27,6 +29,8 @@ const errors = reactive({
     nik: "",
     name: "",
     email: "",
+    tempat_lahir: "",
+    tanggal_lahir: "",
     rekening: "",
     positions: "",
 })
@@ -229,6 +233,22 @@ onMounted(async () => {
                             errors.email }}</p>
                     </div>
                 </div>
+                <div class="mb-4 grid grid-cols-2 gap-x-8">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Tempat Lahir <span class="text-red-400">*</span></label>
+                        <input v-model="form.tempat_lahir" type="text" class="form-control"
+                            :class="{ 'border-red-500': errors.tempat_lahir }" placeholder="Nama" required>
+                        <p v-if="errors.tempat_lahir" class="text-xs text-red-600 mt-2" id="tempat_lahir-error">{{
+                            errors.tempat_lahir }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Tanggal Lahir <span class="text-red-400">*</span></label>
+                        <input v-model="form.tanggal_lahir" type="date" class="form-control"
+                            :class="{ 'border-red-500': errors.name }" placeholder="Tanggal Lahir" required>
+                        <p v-if="errors.tanggal_lahir" class="text-xs text-red-600 mt-2" id="tanggal_lahir-error">{{
+                            errors.tanggal_lahir }}</p>
+                    </div>
+                </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Rekening <span class="text-red-400">*</span></label>
                     <p class="text-center text-primary cursor-pointer w-full form-control" @click="open_modal_add_rekening">
@@ -253,7 +273,7 @@ onMounted(async () => {
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Jabatan <span class="text-red-400">*</span></label>
-                    <search-input :url="`${url}/positions`" @selected="(data) => form.positions.push(data.name)"
+                    <search-input :url="`${url}/positions`" placeholder="Jabatan" @selected="(data) => form.positions.push(data.name)"
                         @click_default_first="">
                         <template #default_first>
                             <p class="text-center"> + Tambah Data Jabatan</p>
@@ -270,7 +290,7 @@ onMounted(async () => {
                             <div class="w-full">
                                 <p>{{ position }}</p>
                             </div>
-                            <span @click="form.positions.splice(index, 1)"
+                            <span v-if="form.positions.length > 1" @click="form.positions.splice(index, 1)"
                                 class="p-3 hover:bg-red-200 rounded-full cursor-pointer transition ease-in-out duration-500">
                                 <Icon icon="jam:trash" class="text-red-600 text-2xl" />
                             </span>

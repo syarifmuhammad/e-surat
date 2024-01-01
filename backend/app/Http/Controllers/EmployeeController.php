@@ -22,7 +22,11 @@ class EmployeeController extends Controller
      */
     public function index(Request $request)
     {
-        $employees = Employee::search($request->search)->exceptSuperAdmin()->paginate();
+        $employees = Employee::search($request->search)->exceptSuperAdmin()->exceptHimSelf();
+        if (isset($request->profesi) && ($request->profesi == 'dosen' || $request->profesi == 'tpa')) {
+            $employees = $employees->where('profesi', $request->profesi);
+        }
+        $employees = $employees->paginate();
         return new EmployeeCollection($employees);
     }
 
@@ -79,6 +83,7 @@ class EmployeeController extends Controller
             $employee->nip = $request->nip;
             $employee->email = $request->email;
             $employee->name = $request->name;
+            $employee->created_by = auth()->id();
             $employee->save();
 
             foreach ($request->rekening as $rekening) {
@@ -189,7 +194,7 @@ class EmployeeController extends Controller
             'email' => 'required|unique:employees,email,' . $id,
             'name' => 'required',
             'rekening' => 'required|array',
-            'positions' => 'required|array',
+            'positions' => 'required|array|min:1',
         ]);
 
         if ($validate->fails()) {

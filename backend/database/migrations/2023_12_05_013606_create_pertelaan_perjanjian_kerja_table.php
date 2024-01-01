@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('pertelaan_perjanjian_kerja', function (Blueprint $table) {
             $table->id();
             $table->string('pendidikan');
-            $table->string('jangka_waktu');
             $table->string('tahun_satu');
             $table->integer('tunjangan_dasar_satu');
             $table->integer('tunjangan_fungsional_satu');

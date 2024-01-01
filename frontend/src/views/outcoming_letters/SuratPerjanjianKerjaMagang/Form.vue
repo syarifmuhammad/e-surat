@@ -169,7 +169,7 @@ function save_surat() {
         // update
         let payload = {
             letter_template_id: form_surat.letter_template_id,
-            tanggal_surat: form.tanggal_surat,
+            tanggal_surat: form_surat.tanggal_surat,
             employee: {
                 id: selected_employee.value.id,
             },
@@ -221,7 +221,7 @@ function save_surat() {
         // create
         let payload = {
             letter_template_id: form_surat.letter_template_id,
-            tanggal_surat: form.tanggal_surat,
+            tanggal_surat: form_surat.tanggal_surat,
             employee: {
                 id: selected_employee.value.id,
             },

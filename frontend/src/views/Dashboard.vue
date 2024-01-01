@@ -117,7 +117,7 @@ onMounted(async () => {
           <Icon class="text-4xl text-gray-500" icon="gg:file-document" />
           <span v-if="is_need_to_check('sk_rotasi_kepegawaian')" class="text-red-500">Perlu tindak lanjut</span>
         </div>
-        <span class="font-semibold text-gray-500">Surat Keterangan Rotasi Kepegawaian</span>
+        <span class="font-semibold text-gray-500">Surat Keputusan Rotasi Kepegawaian</span>
         <h1 class="mb-2 text-4xl">{{analytics.sk_rotasi_kepegawaian.count}}</h1>
         <div class="flex gap-x-4 mb-4">
           <div class="flex items-center text-red-500 text-2xl">

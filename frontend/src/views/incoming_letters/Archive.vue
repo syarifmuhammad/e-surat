@@ -53,7 +53,7 @@ function reset_form() {
     form.perihal = ""
     form.keterangan = ""
     form.tanggal_surat = ""
-    file_surat.value.files = null
+    file_surat.value.reset()
     selected_category.value = null
 }
 

@@ -11,6 +11,7 @@ use App\Models\SuratPerjanjianKerjaDosenFullTime;
 use App\Models\SuratPerjanjianKerjaDosenLuarBiasa;
 use App\Models\SuratPerjanjianKerjaMagang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AnalyticsController extends Controller
 {
@@ -84,6 +85,83 @@ class AnalyticsController extends Controller
                 "need_reference_number" => $spk_dosen_full_time_need_reference_number,
                 "need_signed" => $spk_dosen_full_time_need_signed,
             ],
+        ], 200);
+    }
+
+    public function reports(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "bulan" => "required|date_format:Y-m"
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+        $date = explode('-', $request->bulan);
+        $bulan = $date[1];
+        $tahun = $date[0];
+        $reports = [];
+        $jumlah_hari = cal_days_in_month(CAL_GREGORIAN, $bulan, $tahun);
+        $summary = [
+            'surat_keterangan_kerja' => 0,
+            'sk_rotasi_kepegawaian' => 0,
+            'sk_pemberhentian' => 0,
+            'sk_pengangkatan' => 0,
+            'sk_pemberhentian_dan_pengangkatan' => 0,
+            'spk_magang' => 0,
+            'spk_dosen_luar_biasa' => 0,
+            'spk_dosen_full_time' => 0,
+        ];
+        for ($i = 0; $i < $jumlah_hari; $i++) {
+            $tanggal = $tahun . '-' . $bulan . '-' . str_pad($i + 1, 2, '0', STR_PAD_LEFT);
+            $surat_keterangan_kerja = SuratKeteranganKerja::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
+            $sk_rotasi_kepegawaian = SuratKeputusanRotasiKepegawaian::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
+            $sk_pemberhentian = SuratKeputusanPemberhentian::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
+            $sk_pengangkatan = SuratKeputusanPengangkatan::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
+            $sk_pemberhentian_dan_pengangkatan = SuratKeputusanPemberhentianDanPengangkatan::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
+            $spk_magang = SuratPerjanjianKerjaMagang::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
+            $spk_dosen_luar_biasa = SuratPerjanjianKerjaDosenLuarBiasa::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
+            $spk_dosen_full_time = SuratPerjanjianKerjaDosenFullTime::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
+            $report = [
+                'tanggal' => $tanggal
+            ];
+
+            if ($surat_keterangan_kerja > 0) {
+                $report['surat_keterangan_kerja'] = $surat_keterangan_kerja;
+            }
+            if ($sk_rotasi_kepegawaian > 0) {
+                $report['sk_rotasi_kepegawaian'] = $sk_rotasi_kepegawaian;
+            }
+            if ($sk_pemberhentian > 0) {
+                $report['sk_pemberhentian'] = $sk_pemberhentian;
+            }
+            if ($sk_pengangkatan > 0) {
+                $report['sk_pengangkatan'] = $sk_pengangkatan;
+            }
+            if ($sk_pemberhentian_dan_pengangkatan > 0) {
+                $report['sk_pemberhentian_dan_pengangkatan'] = $sk_pemberhentian_dan_pengangkatan;
+            }
+            if ($spk_magang > 0) {
+                $report['spk_magang'] = $spk_magang;
+            }
+            if ($spk_dosen_luar_biasa > 0) {
+                $report['spk_dosen_luar_biasa'] = $spk_dosen_luar_biasa;
+            }
+            if ($spk_dosen_full_time > 0) {
+                $report['spk_dosen_full_time'] = $spk_dosen_full_time;
+            }
+
+            $reports[] = $report;
+            foreach ($summary as $key => $s) {
+                $summary[$key] += ${$key};
+            }
+        }
+
+        return response()->json([
+            'data' => [
+                'details' => $reports,
+                'summary' => $summary,
+            ]
         ], 200);
     }
 

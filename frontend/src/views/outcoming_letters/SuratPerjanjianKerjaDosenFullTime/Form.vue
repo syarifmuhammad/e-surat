@@ -37,7 +37,6 @@ const form_surat = reactive({
     signature_type: "manual",
     pertelaan_perjanjian_kerja: {
         pendidikan: "",
-        jangka_waktu: "",
         tahun_satu: "",
         tunjangan_dasar_satu: 0,
         tunjangan_fungsional_satu: 0,
@@ -73,7 +72,6 @@ const errors = reactive({
     "signer.position": "",
     signature_type: "",
     "pertelaan_perjanjian_kerja.pendidikan": "",
-    "pertelaan_perjanjian_kerja.jangka_waktu": "",
     "pertelaan_perjanjian_kerja.tahun_satu": "",
     "pertelaan_perjanjian_kerja.tunjangan_dasar_satu": "",
     "pertelaan_perjanjian_kerja.tunjangan_fungsional_satu": "",
@@ -176,7 +174,6 @@ function reset_form() {
     form_surat.signature_type = "manual"
     form_surat.pertelaan_perjanjian_kerja = {
         pendidikan: "",
-        jangka_waktu: "",
         tahun_satu: "",
         tunjangan_dasar_satu: 0,
         tunjangan_fungsional_satu: 0,
@@ -207,7 +204,7 @@ function save_surat() {
         Swal.fire({
             icon: "error",
             title: "Gagal",
-            text: "Pegawai tidak boleh kosong",
+            text: "Dosen tidak boleh kosong",
         });
         return
     }
@@ -407,9 +404,9 @@ onMounted(async () => {
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">Pegawai</label>
-                    <search-input v-if="!selected_employee" v-model="selected_employee" :url="`${url}/employees`"
-                        id="employee" placeholder="Cari Pegawai ...">
+                    <label class="block text-sm font-medium mb-2">Dosen</label>
+                    <search-input v-if="!selected_employee" v-model="selected_employee" :url="`${url}/employees?profesi=dosen`"
+                        id="employee" placeholder="Cari Dosen ...">
                         <template v-slot="{ data }">
                             <small>{{ data.nip }}</small>
                             <p class="mb-0">{{ data.name }}</p>
@@ -548,14 +545,6 @@ onMounted(async () => {
                             v-model="form_surat.pertelaan_perjanjian_kerja.pendidikan">
                         <p v-if="errors['pertelaan_perjanjian_kerja.pendidikan']" class="text-xs text-red-600 mt-2">
                             {{ errors['pertelaan_perjanjian_kerja.pendidikan'] }}
-                        </p>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-2">Jangka Waktu</label>
-                        <input type="text" class="form-control" required
-                            v-model="form_surat.pertelaan_perjanjian_kerja.jangka_waktu">
-                        <p v-if="errors['pertelaan_perjanjian_kerja.jangka_waktu']" class="text-xs text-red-600 mt-2">
-                            {{ errors['pertelaan_perjanjian_kerja.jangka_waktu'] }}
                         </p>
                     </div>
                     <!-- <div class="grid grid-cols-2 gap-x-4 mb-4">

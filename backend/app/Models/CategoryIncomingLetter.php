@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CategoryIncomingLetter extends Model
 {
     use HasFactory;
+    protected $perPage = 10;
 
     protected $fillable = [
         'name',

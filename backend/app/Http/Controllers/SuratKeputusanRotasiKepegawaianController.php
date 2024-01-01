@@ -43,7 +43,7 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
             'employee.jabatan_akhir' => 'required|string',
             'signer.id' => 'required|exists:employees,id',
             'signer.position' => 'required|string',
-            'signature_type' => 'required|in:manual,qrcode,digital,gambar tanda tangan',
+            'signature_type' => 'required|in:manual,digital,gambar tanda tangan',
             'tanggal_berlaku' => 'required|date',
         ]);
 
@@ -104,17 +104,8 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
             ], 404);
         }
 
-        if ($letter->signed_file_docx != null) {
-            $fileNameServerDocx = 'app/signed_files/surat_keputusan_rotasi_kepegawaian/' . $letter->signed_file_docx;
-            return response()->download(storage_path($fileNameServerDocx), $letter->signed_file_docx);
-        }
-
         $filename = $letter->id . '.docx';
         $fileNameServerDocx = "app/tmp/surat_keputusan_rotasi_kepegawaian/" . $filename;
-
-        // if (file_exists(storage_path($fileNameServerDocx))) {
-        //     return response()->download(storage_path($fileNameServerDocx), $filename);
-        // }
 
         $templateProcessor = $letter->generate_docx();
         $templateProcessor->setValue('tanda_tangan', '');
@@ -136,29 +127,6 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
             return response()->download(storage_path($fileNameServerPdf), $letter->signed_file);
         }
 
-        $filename = $letter->id . '.pdf';
-        $fileNameServerPdf = 'app/signed_files/surat_keputusan_rotasi_kepegawaian/' . $filename;
-
-        if ($letter->signed_file_docx != null) {
-            $response = Http::post(env('APP_DOCX_CONVERTER_URL') . '/convert', ['file_path' => storage_path($letter->signed_file_docx)]);
-            if ($response->failed()) {
-                return response()->json([
-                    'errors' => "Something errors"
-                ], 500);
-            }
-
-            if ($response->successful() && file_exists(storage_path($fileNameServerPdf))) {
-                $letter->signed_file = $filename;
-                $letter->save();
-                return response()->download(storage_path($fileNameServerPdf), $filename);
-            }
-        }
-
-        $tmpFileNameServerPdf = 'app/tmp/surat_keputusan_rotasi_kepegawaian/' . $filename;
-        // if (file_exists(storage_path($tmpFileNameServerPdf))) {
-        //     return response()->download(storage_path($tmpFileNameServerPdf), $filename);
-        // }
-
         $fileNameServerDocx = "app/tmp/surat_keputusan_rotasi_kepegawaian/" . $letter->id . '.docx';
         $templateProcessor = $letter->generate_docx();
         $templateProcessor->setValue('tanda_tangan', "");
@@ -170,7 +138,8 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
                 'errors' => "Something errors"
             ], 500);
         }
-
+        
+        $filename = $letter->id . '.pdf';
         $tmpFileNameServerPdf = 'app/tmp/surat_keputusan_rotasi_kepegawaian/' . $filename;
         if ($response->successful() && file_exists(storage_path($tmpFileNameServerPdf))) {
             unlink(storage_path($fileNameServerDocx));
@@ -208,7 +177,7 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
             'employee.jabatan_akhir' => 'required|string',
             'signer.id' => 'required|exists:employees,id',
             'signer.position' => 'required|string',
-            'signature_type' => 'required|in:manual,qrcode,digital,gambar tanda tangan',
+            'signature_type' => 'required|in:manual,digital,gambar tanda tangan',
             'tanggal_berlaku' => 'required|date',
         ]);
 
@@ -263,7 +232,7 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
 
         if (!$letter->can_upload_verified_file()) {
             return response()->json([
-                'message' => "Surat dengan jenis tanda tangan selain manual dan digital tidak dapat ditandatangani dengan upload file !"
+                'message' => "Surat dengan jenis tanda tangan selain manual tidak dapat ditandatangani dengan upload file !"
             ], 403);
         }
 
@@ -273,6 +242,7 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
         Storage::put($fileNameServer, file_get_contents($file));
 
         $letter->signed_file = $fileName;
+        $letter->is_signed = true;
         $letter->save();
 
         $response = [
@@ -286,7 +256,23 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $letter = Letter::find($id);
+        if (!$letter) {
+            return response()->json([
+                'message' => "Surat keputusan rotasi kepegawaian tidak ditemukan !"
+            ], 404);
+        }
+
+        if (!$letter->can_edit()) {
+            return response()->json([
+                'message' => "Surat keputusan rotasi kepegawaian tidak dapat dihapus !"
+            ], 403);
+        }
+
+        $letter->delete();
+        return response()->json([
+            'message' => "Berhasil menghapus surat keputusan rotasi kepegawaian !"
+        ], 200);
     }
 
     public function give_reference_number(Request $request)
@@ -314,13 +300,19 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
     {
         $letter = Letter::find($id);
 
-        if (!$letter && $letter->can_sign()) {
+        if (!$letter) {
             return response()->json([
                 'message' => "Surat keputusan rotasi kepegawaian tidak ditemukan !"
             ], 404);
         }
 
-        if ($letter->signature_type == 'qrcode') {
+        if (!$letter->can_signed()) {
+            return response()->json([
+                'message' => "Surat keputusan rotasi kepegawaian tidak dapat ditandatangani !"
+            ], 403);
+        }
+
+        if ($letter->signature_type == 'digital') {
             $validate = Validator::make($request->all(), [
                 'password' => 'required|string',
             ]);
@@ -328,32 +320,32 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
             if ($validate->fails()) {
                 $response = [
                     'errors' => $validate->errors(),
-                    'message' => "Wajib mengisi password untuk tanda tangan qrcode !"
+                    'message' => "Wajib mengisi password untuk tanda tangan digital !"
                 ];
                 return response()->json($response, 422);
             }
         }
 
-        $templateProcessor = $letter->generate_docx();
-        if ($letter->signature_type == 'qrcode') {
-            $keypair = KeyPair::where('user_id', auth()->id())->first();
-            $data = $keypair->encrypt($request->password, $letter->id);
-            // var_dump(openssl_error_string());
-            return $data;
-            if (!$data) {
-                return response()->json([
-                    'message' => "Gagal mengenkripsi data, password atau kunci pribadi tidak valid !"
-                ], 422);
-            }
-            $qrcode = QrCode::size(300)->format('png')->generate($data);
-            $templateProcessor->setImageValue('tanda_tangan', $qrcode);
+        if ($letter->signature_type == 'digital') {
+            // $keypair = KeyPair::where('user_id', auth()->id())->first();
+            // $data = $keypair->encrypt($request->password, $letter->id);
+            // // var_dump(openssl_error_string());
+            // return $data;
+            // if (!$data) {
+            //     return response()->json([
+            //         'message' => "Gagal mengenkripsi data, password atau kunci pribadi tidak valid !"
+            //     ], 422);
+            // }
+            // $qrcode = QrCode::size(300)->format('png')->generate($data);
+            // $templateProcessor->setImageValue('tanda_tangan', $qrcode);
         } else {
-            $templateProcessor->setImageValue('tanda_tangan', storage_path('app/signature/' . $letter->signer->signature));
+            // $templateProcessor->setImageValue('tanda_tangan', storage_path('app/signature/' . $letter->signer->signature));
         }
-        $filename = $letter->id;
-        $fileNameServerDocx = "app/signed_files/surat_keputusan_rotasi_kepegawaian/" . $filename . '.docx';
-        $templateProcessor->saveAs(storage_path($fileNameServerDocx));
-        $letter->signed_file_docx = $fileNameServerDocx;
+        // $filename = $letter->id;
+        // $fileNameServerDocx = "app/signed_files/surat_keputusan_rotasi_kepegawaian/" . $filename . '.docx';
+        // $templateProcessor->saveAs(storage_path($fileNameServerDocx));
+        // $letter->signed_file_docx = $fileNameServerDocx;
+        $letter->is_signed = true;
         $letter->save();
         return response()->json([
             'message' => "Berhasil menandatangani surat keputusan rotasi kepegawaian !"

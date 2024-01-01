@@ -43,6 +43,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
+    protected $perPage = 10;
+
     protected $appends = ['is_verified', 'name'];
 
     public function employee() {
