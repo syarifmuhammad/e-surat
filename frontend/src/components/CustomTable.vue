@@ -74,7 +74,6 @@ function modifySearch({ target: { value } }) {
   search.value = value;
   timeout.value = setTimeout(() => {
     if (beforeSearch.value != value) {
-      getData();
       router.replace({ name: route.name, query: query });
       beforeSearch.value = value;
     }

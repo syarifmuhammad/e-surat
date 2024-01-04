@@ -33,9 +33,9 @@ const form = reactive({
     asal_surat: "",
     perihal: "",
     keterangan: "",
-    file_surat: "",
     tanggal_surat: "",
 })
+const existing_files = ref(null)
 
 const errors = reactive({
     reference_number: "",
@@ -67,8 +67,29 @@ function reset_category() {
     selected_category.value = null
 }
 
-function open_modal_form(form_args = null) {
+async function get_pdf(id) {
+    loading.value.open()
+    await axios.get(`${url}/incoming-letters/${id}/file`, {
+        responseType: 'blob',
+    }).then(res => {
+        existing_files.value = res.data
+        loading.value.close()
+    }).catch(err => {
+        loading.value.close()
+        Swal.fire({
+            title: 'Gagal!',
+            text: 'Surat gagal diunduh!',
+            icon: 'error',
+        })
+    })
+}
+
+async function open_modal_form(form_args = null) {
     if (form_args) {
+        await get_pdf(form_args.id)
+        if (!existing_files.value) {
+            return
+        }
         form.id = form_args.id
         selected_category.value = form_args.category
         form.reference_number = form_args.reference_number
@@ -76,9 +97,10 @@ function open_modal_form(form_args = null) {
         form.perihal = form_args.perihal
         form.keterangan = form_args.keterangan
         form.tanggal_surat = form_args.tanggal_surat
+
+        modal_form.value.open()
     }
 
-    modal_form.value.open()
 }
 
 function close_modal_form() {
@@ -108,7 +130,7 @@ function save() {
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil',
-                    text: 'Kategori berhasil diubah!',
+                    text: 'Surat masuk berhasil diubah!',
                 })
                 table.value.getData()
                 close_modal_form()
@@ -233,7 +255,8 @@ function delete_surat_masuk(id) {
                 <td :class="[item.defaultClass, { disabled: item.show }]">{{ item.perihal }}</td>
                 <td :class="[item.defaultClass, { disabled: item.show }]">{{ item.keterangan }}</td>
                 <td :class="[item.defaultClass, { disabled: item.show }]">
-                    <RouterLink target="_blank" :to="{ name: 'file_archive_incoming_letter', params: { id: item.id } }" class="btn btn-primary w-[110px] text-center">Lihat Surat</RouterLink>
+                    <RouterLink target="_blank" :to="{ name: 'file_archive_incoming_letter', params: { id: item.id } }"
+                        class="btn btn-primary w-[110px] text-center">Lihat Surat</RouterLink>
                 </td>
                 <td :class="[item.defaultClass, { disabled: item.show }]">{{ item.tanggal_surat_formated }}</td>
                 <td :class="[item.defaultClass]">
@@ -336,15 +359,14 @@ function delete_surat_masuk(id) {
                     </div>
                     <div class="mb-4">
                         <label for="input-label" class="block text-sm font-medium mb-2">Keterangan</label>
-                        <textarea v-model="form.keterangan" class="form-control"
-                            placeholder="Keterangan"></textarea>
+                        <textarea v-model="form.keterangan" class="form-control" placeholder="Keterangan"></textarea>
                         <p v-if="errors.keterangan" class="text-xs text-red-600 mt-2" id="keterangan-error">
                             {{ errors.keterangan }}
                         </p>
                     </div>
                     <div class="mb-4">
                         <label for="input-label" class="block text-sm font-medium mb-2">File</label>
-                        <UploadFile ref="file_surat" />
+                        <UploadFile :default_files="existing_files" ref="file_surat" />
                         <p v-if="errors.file_surat" class="text-xs text-red-600 mt-2" id="file_surat-error">
                             {{ errors.file_surat }}
                         </p>

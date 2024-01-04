@@ -135,15 +135,15 @@ defineExpose({
         <div class="flex flex-col justify-center items-center w-full" v-else-if="dragenter">
             Letakkan file disini
         </div>
-        <div class="flex flex-col items-center w-full min-h-[300px]" v-else-if="files != null">
+        <div class="flex flex-col items-center w-full" v-else-if="files != null">
             <button type="button"
                 class="btn cursor-pointer rounded-3xl btn-warning flex items-center mt-3 mb-2 w-25 justify-center"
                 @click="reset()">
                 Ubah File
             </button>
-            <iframe v-if="files.type == 'application/pdf'" :src="preview" class="w-full h-full"> </iframe>
+            <iframe v-if="files.type == 'application/pdf'" :src="preview" class="w-full min-h-[400px]"> </iframe>
             <div ref="docx_preview" id="docx_preview" v-else-if="files.type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"></div>
-            <img v-else class="max-h-[300px]" :src="preview" />
+            <img v-else class="min-h-[400px]" :src="preview" />
         </div>
     </div>
 </template>

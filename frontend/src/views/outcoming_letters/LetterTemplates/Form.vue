@@ -39,10 +39,8 @@ function reset_form() {
 }
 
 function base64ToFile(data, filename) {
-    // console.log(data)
     let arr = data
     let mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    // console.log(arr[1])
     let bstr = atob(arr)
     let n = bstr.length
     let u8arr = new Uint8Array(n)

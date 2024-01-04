@@ -62,11 +62,6 @@ const sidebarMenu = ref([
                 name: 'archive_incoming_letter',
                 icon: 'iconoir:archive',
             },
-            {
-                title: 'Report',
-                name: 'maintenance',
-                icon: 'carbon:report',
-            },
         ]
     },
     {
