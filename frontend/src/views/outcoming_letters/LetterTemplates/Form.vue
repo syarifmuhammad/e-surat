@@ -104,9 +104,7 @@ function save() {
     let request = new FormData()
     request.append('name', name.value)
     request.append('letter_type', letter_type.value)
-    if (is_edit_file.value) {
-        request.append('file', file.value.files)
-    }
+    request.append('file', file.value.files)
 
     if (template_id.value != "") {
         update(request)
@@ -206,11 +204,10 @@ onMounted(async () => {
                 <label class="block text-sm font-medium mb-2">File Template Surat (.docx)</label>
                 <button type="button" v-if="letter_type != ''" @click="download_example(letter_type)" class="btn btn-primary mb-2">Download Contoh Template</button>
                 <div class="mb-4 rounded-md overflow-hidden" style="box-shadow: 0 0.25rem 1rem #a1acb873;">
-                    <!-- <label class="block text-sm font-medium p-4">File Template Surat <span
-                            class="text-red-400">*</span></label> -->
                     <UploadFile ref="file" :default_files="default_files" @updated_files="is_edit_file = true"
                         :accepted_file_type="['application/vnd.openxmlformats-officedocument.wordprocessingml.document']">
                     </UploadFile>
+                    <p class="text-red-400 text-sm" v-if="errors.file != ''">{{ errors.file }}</p>
                 </div>
                 <div class="flex justify-end">
                     <button class="btn btn-primary px-24 py-3">Simpan</button>
