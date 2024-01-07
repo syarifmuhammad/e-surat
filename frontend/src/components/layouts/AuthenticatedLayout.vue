@@ -128,11 +128,12 @@ const sidebarMenu = ref([
     },
 
 ])
+
 </script>
 
 <template>
     <div id="container" class="min-h-[100vh]">
-        <header id="header" class="bg-white overflow-hidden sticky top-0 flex items-center">
+        <header id="header" class="bg-white overflow-hidden sticky top-0 flex items-center z-10">
             <div class="px-10 w-full flex justify-between items-center lg:justify-end">
                 <Icon icon="iconamoon:menu-burger-horizontal-bold" class="text-lg cursor-pointer lg:hidden"
                     @click="sidebar_menu_is_active = true"></Icon>
@@ -176,7 +177,7 @@ const sidebarMenu = ref([
             </div>
         </header>
         <aside id="sidebar" :class="{ active: sidebar_menu_is_active }"
-            class="bg-white pt-7 pb-10 overflow-y-auto fixed left-0 top-0 h-[100vh] z-10 w-[300px] lg:sticky">
+            class="bg-white pt-7 pb-10 overflow-y-auto fixed left-0 top-0 h-[100vh] z-20 w-[300px] lg:sticky">
             <div class="px-6 flex justify-center items-center">
                 <div class="flex items-center">
                     <RouterLink :to="'/'">
