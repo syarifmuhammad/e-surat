@@ -161,6 +161,29 @@ class IncomingLetterController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $incoming_letter = IncomingLetter::find($id);
+
+            if (!$incoming_letter) {
+                return response()->json([
+                    'message' => 'Surat masuk tidak ditemukan.',
+                ], 404);
+            }
+
+            $old_file = $incoming_letter->file_surat;
+            $incoming_letter->delete();
+
+            if (file_exists(storage_path('app/' . $old_file))) {
+                unlink(storage_path('app/' . $old_file));
+            }
+
+            return response()->json([
+                'message' => 'Berhasil menghapus surat masuk.',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'errors' => $e->getMessage()
+            ], 500);
+        }
     }
 }
