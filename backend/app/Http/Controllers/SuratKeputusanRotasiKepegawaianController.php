@@ -110,7 +110,7 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
         $templateProcessor = $letter->generate_docx();
         $templateProcessor->setValue('tanda_tangan', '');
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
-        return response()->download(storage_path($fileNameServerDocx), $filename);
+        return response()->download(storage_path($fileNameServerDocx), $filename)->deleteFileAfterSend();
     }
 
     public function download_pdf(string $id)
@@ -269,7 +269,14 @@ class SuratKeputusanRotasiKepegawaianController extends Controller
             ], 403);
         }
 
+        $old_file = $letter->id . '.pdf';
         $letter->delete();
+
+        $tmpFileNameServerPdf = 'app/tmp/surat_keputusan_rotasi_kepegawaian/' . $old_file;
+        if (file_exists(storage_path($tmpFileNameServerPdf))) {
+            unlink(storage_path($tmpFileNameServerPdf));
+        }
+
         return response()->json([
             'message' => "Berhasil menghapus surat keputusan rotasi kepegawaian !"
         ], 200);

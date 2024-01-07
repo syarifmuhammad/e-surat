@@ -105,14 +105,10 @@ class SuratKeputusanPemberhentianController extends Controller
         $filename = $letter->id . '.docx';
         $fileNameServerDocx = "app/tmp/surat_keputusan_pemberhentian/" . $filename;
 
-        // if (file_exists(storage_path($fileNameServerDocx))) {
-        //     return response()->download(storage_path($fileNameServerDocx), $filename);
-        // }
-
         $templateProcessor = $letter->generate_docx();
         $templateProcessor->setValue('tanda_tangan', '');
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
-        return response()->download(storage_path($fileNameServerDocx), $filename);
+        return response()->download(storage_path($fileNameServerDocx), $filename)->deleteFileAfterSend();
     }
 
     public function download_pdf(string $id)
@@ -269,7 +265,13 @@ class SuratKeputusanPemberhentianController extends Controller
             ], 403);
         }
 
+        $old_file = $letter->id . '.pdf';
         $letter->delete();
+
+        $tmpFileNameServerPdf = 'app/tmp/surat_keputusan_pemberhentian/' . $old_file;
+        if (file_exists(storage_path($tmpFileNameServerPdf))) {
+            unlink(storage_path($tmpFileNameServerPdf));
+        }
 
         $response = [
             'message' => "Berhasil menghapus surat keputusan pemberhentian dalam jabatan !"
