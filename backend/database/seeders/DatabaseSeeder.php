@@ -200,42 +200,42 @@ class DatabaseSeeder extends Seeder
 
         //create default letter template
         LetterTemplate::create([
-            'name' => 'Template 1',
+            'name' => 'Template Surat Keterangan Kerja',
             'letter_type' => 'SURAT_KETERANGAN_KERJA',
             'file' => 'b81f3481-0d57-448e-817a-8d46d2af0565.docx',
         ]);
         LetterTemplate::create([
-            'name' => 'Template 1',
+            'name' => 'Template Surat Keputusan Rotasi Kepegawaian',
             'letter_type' => 'SURAT_KEPUTUSAN_ROTASI_KEPEGAWAIAN',
             'file' => '693d726d-c3a6-40d3-9bd7-07fe11094959.docx',
         ]);
         LetterTemplate::create([
-            'name' => 'Template 1',
+            'name' => 'Template Keputusan Pemberhentian Dalam Jabatan',
             'letter_type' => 'SURAT_KEPUTUSAN_PEMBERHENTIAN',
             'file' => '402548d8-2857-4d05-a5c1-8e9ada4de791.docx',
         ]);
         LetterTemplate::create([
-            'name' => 'Template 1',
+            'name' => 'Template Keputusan Pengangkatan Dalam Jabatan',
             'letter_type' => 'SURAT_KEPUTUSAN_PENGANGKATAN',
             'file' => 'f1e522d7-a4d1-49d8-aff5-0a5e68eb422a.docx',
         ]);
         LetterTemplate::create([
-            'name' => 'Template 1',
+            'name' => 'Template Keputusan Pemberhentian dan Pengangkatan Dalam Jabatan',
             'letter_type' => 'SURAT_KEPUTUSAN_PEMBERHENTIAN_DAN_PENGANGKATAN',
             'file' => 'f2369790-d402-4a01-b107-e6f9318b75ae.docx',
         ]);
         LetterTemplate::create([
-            'name' => 'Template 1',
+            'name' => 'Template Surat Perjanjian Kerja Dosen Full Time',
             'letter_type' => 'SURAT_PERJANJIAN_KERJA_DOSEN_FULL_TIME',
             'file' => 'bcc9c6f2-ab36-4988-8d77-f2461d7483b1.docx',
         ]);
         LetterTemplate::create([
-            'name' => 'Template 1',
+            'name' => 'Template Surat Perjanjian Kerja Dosen Luar Biasa',
             'letter_type' => 'SURAT_PERJANJIAN_KERJA_DOSEN_LUAR_BIASA',
             'file' => 'edd8419e-2c5a-41b4-a261-380d971dff96.docx',
         ]);
         LetterTemplate::create([
-            'name' => 'Template 1',
+            'name' => 'Template Surat Perjanjian Kerja Magang',
             'letter_type' => 'SURAT_PERJANJIAN_KERJA_MAGANG',
             'file' => '3aed34a1-8e66-4d59-990e-a4b13a918e00.docx',
         ]);
