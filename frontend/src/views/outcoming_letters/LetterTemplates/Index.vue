@@ -41,7 +41,7 @@ function download(id, name, letter_type) {
             <div class="flex justify-between mb-6">
                 <h3 class="text-primary-400">List Template Surat</h3>
                 <RouterLink :to="{ name: 'create_letter_templates' }" type="button" class="btn btn-primary">
-                    <Icon class="text-lg" icon="fluent:add-12-filled" /> Tambah Data
+                    <Icon class="text-lg" icon="fluent:add-12-filled" /> Tambah Template Surat
                 </RouterLink>
             </div>
             <CustomTable ref="table" :thead="thead" :url="`${url}/outcoming-letters/templates`" v-slot="item">

@@ -62,7 +62,6 @@ function download_docx(id, nama) {
 function open_sweetalert_confirm_give_reference_number(id) {
     Swal.fire({
         title: 'Berikan nomor surat?',
-        text: "*Catatan : Surat tidak akan bisa diedit setelah diberikan nomor surat!",
         icon: 'warning',
         showCancelButton: true,
     }).then((result) => {
