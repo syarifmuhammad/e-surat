@@ -207,6 +207,50 @@ function sign() {
     })
 
 }
+
+function delete_letter(id) {
+    Swal.fire({
+        title: 'Apakah anda yakin?',
+        text: "Surat akan dihapus secara permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            loading.value.open()
+            axios.delete(`${url}/outcoming-letters/surat-perjanjian-kerja-dosen-full-time/${id}`)
+                .then(res => {
+                    loading.value.close()
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'Surat berhasil dihapus!',
+                    })
+                    table.value.getData()
+                })
+                .catch(err => {
+                    loading.value.close()
+                    if (err.response.status == 422) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: err.response.data.message,
+                        })
+                    } else {
+                        console.log(err.response)
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Terjadi kesalahan, silahkan coba lagi!',
+                        })
+                    }
+                })
+        }
+    })
+}
 </script>
 
 <template>
@@ -271,7 +315,7 @@ function sign() {
                             aria-labelledby="hs-dropdown-with-icons">
                             <div class="py-2 first:pt-0 last:pb-0">
                                 <RouterLink target="_blank"
-                                    :to="{ name: 'preview_surat_perjanjian_kerja_dosen_full_time', params: { id: item.id } }"
+                                    :to="{ name: 'preview_surat_keterangan_kerja', params: { id: item.id } }"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="gg:file-document"></Icon>
                                     Lihat Surat (.PDF)
@@ -287,8 +331,7 @@ function sign() {
                                     <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
                                     Berikan Nomor Surat
                                 </span>
-                                <span v-if="item.can_upload_verified_file"
-                                    @click="open_modal_upload_signed_file(item.id)"
+                                <span v-if="item.can_upload_verified_file" @click="open_modal_upload_signed_file(item.id)"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="octicon:upload-16"></Icon>
                                     Upload Surat Bertanda Tangan
@@ -300,11 +343,16 @@ function sign() {
                                     Tanda Tangani Surat
                                 </span>
                                 <RouterLink v-if="item.can_edit"
-                                    :to="{ name: 'update_surat_perjanjian_kerja_dosen_full_time', params: { id: item.id } }"
+                                    :to="{ name: 'update_surat_keterangan_kerja', params: { id: item.id } }"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="cil:pencil"></Icon>
                                     Edit Surat
                                 </RouterLink>
+                                <span v-if="item.can_edit" @click="delete_letter(item.id)"
+                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+                                    <Icon class="text-lg" icon="cil:trash"></Icon>
+                                    Hapus Surat
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -371,7 +419,8 @@ function sign() {
                     <img v-if="signature" :src="signature" class="w-1/2 mx-auto">
                     <div v-else class="mb-4 flex flex-col items-center">
                         <p class="text-center mb-4">Tanda tangan tidak ditemukan!</p>
-                        <button type="button" @click="modal_update_signature.open()" class="btn bg-blue-500 text-white ">Upload Tanda
+                        <button type="button" @click="modal_update_signature.open()"
+                            class="btn bg-blue-500 text-white ">Upload Tanda
                             Tangan</button>
                     </div>
                 </template>
