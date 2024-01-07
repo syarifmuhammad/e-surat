@@ -98,8 +98,8 @@ async function open_modal_form(form_args = null) {
         form.keterangan = form_args.keterangan
         form.tanggal_surat = form_args.tanggal_surat
 
-        modal_form.value.open()
     }
+    modal_form.value.open()
 
 }
 
@@ -195,7 +195,7 @@ function save() {
 function delete_surat_masuk(id) {
     Swal.fire({
         title: 'Apakah anda yakin?',
-        text: "Kategori akan dihapus secara permanen!",
+        text: "Surat masuk akan dihapus secara permanen!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -205,13 +205,13 @@ function delete_surat_masuk(id) {
     }).then((result) => {
         if (result.isConfirmed) {
             loading.value.open()
-            axios.delete(`${url}/incoming-letters/categories/${id}`)
+            axios.delete(`${url}/incoming-letters/${id}`)
                 .then(res => {
                     loading.value.close()
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil',
-                        text: 'Kategori berhasil dihapus!',
+                        text: 'Surat masuk berhasil dihapus!',
                     })
                     table.value.getData()
                 })
