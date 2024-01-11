@@ -111,6 +111,7 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         Route::prefix('surat-keterangan-kerja')->group(function () {
             Route::get('', [SuratKeteranganKerjaController::class, 'index']);
+            Route::get('/graph-in-months/{year}', [SuratKeteranganKerjaController::class, 'graph_in_months']);
             Route::post('', [SuratKeteranganKerjaController::class, 'store']);
             Route::get('/{id}/download/docx', [SuratKeteranganKerjaController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratKeteranganKerjaController::class, 'download_pdf']);
@@ -123,6 +124,7 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         Route::prefix('surat-keputusan-rotasi-kepegawaian')->group(function () {
             Route::get('', [SuratKeputusanRotasiKepegawaianController::class, 'index']);
+            Route::get('/graph-in-months/{year}', [SuratKeputusanRotasiKepegawaianController::class, 'graph_in_months']);
             Route::post('', [SuratKeputusanRotasiKepegawaianController::class, 'store']);
             Route::get('/{id}/download/docx', [SuratKeputusanRotasiKepegawaianController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratKeputusanRotasiKepegawaianController::class, 'download_pdf']);
@@ -136,6 +138,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('surat-keputusan-pemberhentian')->group(function () {
             Route::get('', [SuratKeputusanPemberhentianController::class, 'index']);
+            Route::get('/graph-in-months/{year}', [SuratKeputusanPemberhentianController::class, 'graph_in_months']);
             Route::post('', [SuratKeputusanPemberhentianController::class, 'store']);
             Route::get('/{id}/download/docx', [SuratKeputusanPemberhentianController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratKeputusanPemberhentianController::class, 'download_pdf']);
@@ -149,6 +152,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('surat-keputusan-pengangkatan')->group(function () {
             Route::get('', [SuratKeputusanPengangkatanController::class, 'index']);
+            Route::get('/graph-in-months/{year}', [SuratKeputusanPengangkatanController::class, 'graph_in_months']);
             Route::post('', [SuratKeputusanPengangkatanController::class, 'store']);
             Route::get('/{id}/download/docx', [SuratKeputusanPengangkatanController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratKeputusanPengangkatanController::class, 'download_pdf']);
@@ -162,6 +166,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('surat-keputusan-pemberhentian-dan-pengangkatan')->group(function () {
             Route::get('', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'index']);
+            Route::get('/graph-in-months/{year}', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'graph_in_months']);
             Route::post('', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'store']);
             Route::get('/{id}/download/docx', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'download_pdf']);
@@ -175,6 +180,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('surat-perjanjian-kerja-magang')->group(function () {
             Route::get('', [SuratPerjanjianKerjaMagangController::class, 'index']);
+            Route::get('/graph-in-months/{year}', [SuratPerjanjianKerjaMagangController::class, 'graph_in_months']);
             Route::post('', [SuratPerjanjianKerjaMagangController::class, 'store']);
             Route::get('/{id}/download/docx', [SuratPerjanjianKerjaMagangController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratPerjanjianKerjaMagangController::class, 'download_pdf']);
@@ -188,6 +194,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('surat-perjanjian-kerja-dosen-luar-biasa')->group(function () {
             Route::get('', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'index']);
+            Route::get('/graph-in-months/{year}', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'graph_in_months']);
             Route::post('', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'store']);
             Route::get('/{id}/download_docx', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'download_docx']);
             Route::get('/{id}/download_pdf', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'download_pdf']);
@@ -201,6 +208,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('surat-perjanjian-kerja-dosen-full-time')->group(function () {
             Route::get('', [SuratPerjanjianKerjaDosenFullTimeController::class, 'index']);
+            Route::get('/graph-in-months/{year}', [SuratPerjanjianKerjaDosenFullTimeController::class, 'graph_in_months']);
             Route::post('', [SuratPerjanjianKerjaDosenFullTimeController::class, 'store']);
             Route::get('/{id}/download/docx', [SuratPerjanjianKerjaDosenFullTimeController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratPerjanjianKerjaDosenFullTimeController::class, 'download_pdf']);
