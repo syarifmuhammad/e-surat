@@ -270,92 +270,106 @@ function delete_letter(id) {
                     <Icon class="text-lg" icon="fluent:add-12-filled" /> Tambah Surat Keterangan Kerja
                 </RouterLink>
             </div>
-            <CustomTable ref="table" :thead="thead" :url="`${url}/outcoming-letters/surat-keterangan-kerja`" v-slot="item">
-                <td :class="[item.defaultClass]">{{ item.key }}</td>
-                <td :class="[item.defaultClass]">
-                    {{ item.reference_number }}
-                </td>
-                <td :class="[item.defaultClass]">{{ item.employee.nip }}</td>
-                <td :class="[item.defaultClass]">{{ item.employee.name }}</td>
-                <td :class="[item.defaultClass]">{{ item.signer.name }}</td>
-                <td :class="[item.defaultClass]">{{ item.tanggal_surat }}</td>
-                <td :class="[item.defaultClass]">
-                    <template v-if="item.status == 'waiting_for_reference_number'">
-                        <span class="badge badge-danger text-center">Pending</span>
-                        <br>
-                        <small class="text-red-500 ">Catatan : Menunggu nomor surat</small>
-                    </template>
-                    <template v-if="item.status == 'waiting_for_signed'">
-                        <span class="badge badge-warning text-center">Pending</span>
-                        <br>
-                        <small class="text-yellow-500 ">Catatan : Menunggu ditandatangani</small>
-                    </template>
-                    <template v-if="item.status == 'signed'">
-                        <span class="badge badge-success text-center">Sudah Ditandatangani</span>
-                        <!-- <br>
-                        <small class="text-yellow-500 ">Catatan : Menunggu ditandatangani</small> -->
-                    </template>
-                    <!-- <span v-if="item.status == 'approved'" class="badge badge-success">Disetujui</span>
-                    <span v-if="item.status == 'rejected'" class="badge badge-danger">Ditolak</span> -->
-                </td>
-                <td :class="[item.defaultClass]">
-                    <div class="hs-dropdown relative inline-flex">
-                        <button id="hs-dropdown-with-icons" type="button"
-                            class="hs-dropdown-toggle py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
-                            Aksi
-                            <svg class="hs-dropdown-open:rotate-180 w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24"
-                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="m6 9 6 6 6-6" />
-                            </svg>
-                        </button>
-
-                        <div class="z-10 hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-[15rem] bg-white shadow-md rounded-lg p-2 mt-2 divide-y divide-gray-200"
-                            aria-labelledby="hs-dropdown-with-icons">
-                            <div class="py-2 first:pt-0 last:pb-0">
-                                <RouterLink target="_blank"
-                                    :to="{ name: 'preview_surat_keterangan_kerja', params: { id: item.id } }"
-                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="gg:file-document"></Icon>
-                                    Lihat Surat (.PDF)
-                                </RouterLink>
-                                <span @click="download_docx(item.id, item.employee.name)"
-                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
-                                    Lihat Surat (.DOCX)
-                                </span>
-                                <span v-if="item.can_give_reference_number"
-                                    @click="open_sweetalert_confirm_give_reference_number(item.id)"
-                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
-                                    Berikan Nomor Surat
-                                </span>
-                                <span v-if="item.can_upload_verified_file" @click="open_modal_upload_signed_file(item.id)"
-                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="octicon:upload-16"></Icon>
-                                    Upload Surat Bertanda Tangan
-                                </span>
-                                <span v-if="!item.can_upload_verified_file && item.can_signed"
-                                    @click="open_modal_sign(item.id, item.signature_type)"
-                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="fluent:signed-24-regular"></Icon>
-                                    Tanda Tangani Surat
-                                </span>
-                                <RouterLink v-if="item.can_edit"
-                                    :to="{ name: 'update_surat_keterangan_kerja', params: { id: item.id } }"
-                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="cil:pencil"></Icon>
-                                    Edit Surat
-                                </RouterLink>
-                                <span v-if="item.can_edit" @click="delete_letter(item.id)"
-                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="cil:trash"></Icon>
-                                    Hapus Surat
-                                </span>
-                            </div>
+            <CustomTable ref="table" :thead="thead" :url="`${url}/outcoming-letters/surat-keterangan-kerja`">
+                <!-- <template #legend>
+                    <div class="flex gap-x-6">
+                        <div class="flex flex-col items-center">
+                            <div class="w-10 h-10 bg-red-200"></div>
+                            <small>Perlu Nomor Surat</small>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-10 h-10 bg-yellow-200"></div>
+                            <small>Perlu Tanda Tangan</small>
                         </div>
                     </div>
-                </td>
+                </template> -->
+                <template v-slot="item" #default>
+                    <td :class="[item.defaultClass]">{{ item.key }}</td>
+                    <td :class="[item.defaultClass]">
+                        {{ item.reference_number }}
+                    </td>
+                    <td :class="[item.defaultClass]">{{ item.employee.nip }}</td>
+                    <td :class="[item.defaultClass]">{{ item.employee.name }}</td>
+                    <td :class="[item.defaultClass]">{{ item.signer.name }}</td>
+                    <td :class="[item.defaultClass]">{{ item.tanggal_surat }}</td>
+                    <td :class="[item.defaultClass]">
+                        <template v-if="item.status == 'waiting_for_reference_number'">
+                            <span class="badge badge-danger text-center">Pending</span>
+                            <br>
+                            <small class="text-red-500 ">Catatan : Menunggu nomor surat</small>
+                        </template>
+                        <template v-if="item.status == 'waiting_for_signed'">
+                            <span class="badge badge-warning text-center">Pending</span>
+                            <br>
+                            <small class="text-yellow-500 ">Catatan : Menunggu ditandatangani</small>
+                        </template>
+                        <template v-if="item.status == 'signed'">
+                            <span class="badge badge-success text-center">Sudah Ditandatangani</span>
+                            <!-- <br>
+                            <small class="text-yellow-500 ">Catatan : Menunggu ditandatangani</small> -->
+                        </template>
+                        <!-- <span v-if="item.status == 'approved'" class="badge badge-success">Disetujui</span>
+                        <span v-if="item.status == 'rejected'" class="badge badge-danger">Ditolak</span> -->
+                    </td>
+                    <td :class="[item.defaultClass]">
+                        <div class="hs-dropdown relative inline-flex">
+                            <button id="hs-dropdown-with-icons" type="button"
+                                class="hs-dropdown-toggle py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                                Aksi
+                                <svg class="hs-dropdown-open:rotate-180 w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24"
+                                    height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m6 9 6 6 6-6" />
+                                </svg>
+                            </button>
+    
+                            <div class="z-10 hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-[15rem] bg-white shadow-md rounded-lg p-2 mt-2 divide-y divide-gray-200"
+                                aria-labelledby="hs-dropdown-with-icons">
+                                <div class="py-2 first:pt-0 last:pb-0">
+                                    <RouterLink target="_blank"
+                                        :to="{ name: 'preview_surat_keterangan_kerja', params: { id: item.id } }"
+                                        class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+                                        <Icon class="text-lg" icon="gg:file-document"></Icon>
+                                        Lihat Surat (.PDF)
+                                    </RouterLink>
+                                    <span @click="download_docx(item.id, item.employee.name)"
+                                        class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+                                        <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
+                                        Lihat Surat (.DOCX)
+                                    </span>
+                                    <span v-if="item.can_give_reference_number"
+                                        @click="open_sweetalert_confirm_give_reference_number(item.id)"
+                                        class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+                                        <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
+                                        Berikan Nomor Surat
+                                    </span>
+                                    <span v-if="item.can_upload_verified_file" @click="open_modal_upload_signed_file(item.id)"
+                                        class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+                                        <Icon class="text-lg" icon="octicon:upload-16"></Icon>
+                                        Upload Surat Bertanda Tangan
+                                    </span>
+                                    <span v-if="!item.can_upload_verified_file && item.can_signed"
+                                        @click="open_modal_sign(item.id, item.signature_type)"
+                                        class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+                                        <Icon class="text-lg" icon="fluent:signed-24-regular"></Icon>
+                                        Tanda Tangani Surat
+                                    </span>
+                                    <RouterLink v-if="item.can_edit"
+                                        :to="{ name: 'update_surat_keterangan_kerja', params: { id: item.id } }"
+                                        class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+                                        <Icon class="text-lg" icon="cil:pencil"></Icon>
+                                        Edit Surat
+                                    </RouterLink>
+                                    <span v-if="item.can_edit" @click="delete_letter(item.id)"
+                                        class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+                                        <Icon class="text-lg" icon="cil:trash"></Icon>
+                                        Hapus Surat
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </template>
             </CustomTable>
         </div>
     </div>

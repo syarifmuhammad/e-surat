@@ -319,7 +319,7 @@ function delete_letter(id) {
                             aria-labelledby="hs-dropdown-with-icons">
                             <div class="py-2 first:pt-0 last:pb-0">
                                 <RouterLink target="_blank"
-                                    :to="{ name: 'preview_surat_keterangan_kerja', params: { id: item.id } }"
+                                    :to="{ name: 'preview_surat_keputusan_pemberhentian_dan_pengangkatan', params: { id: item.id } }"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="gg:file-document"></Icon>
                                     Lihat Surat (.PDF)
