@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB;
 
 class SuratPerjanjianKerjaMagangController extends Controller
 {
@@ -25,6 +25,25 @@ class SuratPerjanjianKerjaMagangController extends Controller
     {
         $letters = Letter::search($request->search)->whereUser(auth()->user())->paginate();
         return new ThisCollection($letters);
+    }
+
+    public function graph_in_months($year)
+    {
+        if (!$year || $year === '') {
+            $year = Carbon::now()->year;
+        }
+
+        $letters = Letter::select(DB::raw('MONTH(tanggal_surat) as month'), DB::raw('COUNT(*) as total'))
+            ->byUser()
+            ->whereYear('tanggal_surat', $year)
+            ->groupBy(DB::raw('MONTH(tanggal_surat)'))
+            ->get();
+
+        $data = array_fill(0, 12, 0);
+        foreach ($letters as $letter) {
+            $data[$letter->month - 1] = $letter->total;
+        }
+        return response()->json($data, 200);
     }
 
     /**
@@ -134,7 +153,7 @@ class SuratPerjanjianKerjaMagangController extends Controller
         $templateProcessor->setValue('tanda_tangan', "");
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
 
-        $response = Http::post(env('APP_DOCX_CONVERTER_URL') . '/convert', ['file_path' => storage_path($fileNameServerDocx)]);
+        $response = Http::post(env('APP_DOCX_CONVERTER_URL') . '/convert', ['file_path' => $fileNameServerDocx]);
         if ($response->failed()) {
             return response()->json([
                 'errors' => "Something errors"
@@ -212,7 +231,6 @@ class SuratPerjanjianKerjaMagangController extends Controller
         ];
 
         return response()->json($response, 200);
-        
     }
 
     public function upload_signed_file(Request $request)
@@ -243,7 +261,7 @@ class SuratPerjanjianKerjaMagangController extends Controller
         }
 
         $file = $request->file('signed_file');
-        $fileName = Str::replace("/", "-", $letter->get_reference_number()) . '.' . $file->getClientOriginalExtension();
+        $fileName = Str::replace("/", "-", $letter->get_reference_number()) . Str::random(4) . '.' . $file->getClientOriginalExtension();
         $fileNameServer = 'signed_files/' . $fileName;
         Storage::put($fileNameServer, file_get_contents($file));
 
