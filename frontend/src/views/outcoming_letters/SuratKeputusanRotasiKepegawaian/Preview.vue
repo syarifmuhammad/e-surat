@@ -18,7 +18,7 @@ function get_pdf(id) {
     axios.get(`${url}/outcoming-letters/surat-keputusan-rotasi-kepegawaian/${id}/download/pdf`, {
         responseType: 'blob',
     }).then(res => {
-        const url_pdf = window.URL.createObjectURL(new Blob([res.data]));
+        const url_pdf = window.URL.createObjectURL(res.data);
         pdf.value = url_pdf
     }).catch(err => {
         loading.value.close()
@@ -39,6 +39,6 @@ onMounted(() => {
 </script>
 <template>
     <Loading ref="loading"></Loading>
-    <vue-pdf-app v-if="pdf != null" style="height: 100vh;"
-        :pdf="pdf"></vue-pdf-app>
+    <iframe style="height: 100vh; width: 100%;"
+        :src="pdf"></iframe>
 </template>

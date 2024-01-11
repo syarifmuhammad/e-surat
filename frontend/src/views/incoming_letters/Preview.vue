@@ -39,6 +39,6 @@ onMounted(() => {
 </script>
 <template>
     <Loading ref="loading"></Loading>
-    <vue-pdf-app v-if="pdf != null" style="height: 100vh;"
-        :pdf="pdf"></vue-pdf-app>
+    <iframe style="height: 100vh; width: 100%;"
+        :src="pdf"></iframe>
 </template>

@@ -18,7 +18,7 @@ function get_pdf(id) {
     axios.get(`${url}/outcoming-letters/surat-perjanjian-kerja-dosen-full-time/${id}/download/pdf`, {
         responseType: 'blob',
     }).then(res => {
-        const url_pdf = window.URL.createObjectURL(new Blob([res.data]));
+        const url_pdf = window.URL.createObjectURL(res.data);
         pdf.value = url_pdf
     }).catch(err => {
         // loading.value.close()
