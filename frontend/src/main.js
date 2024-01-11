@@ -7,6 +7,7 @@ import router from './router'
 import('preline');
 import Loading from '@/components/Loading.vue'
 import './assets/main.css'
+import VueApexCharts from "vue3-apexcharts";
 
 import Swal from 'sweetalert2'
 window.Swal = Swal.mixin({
@@ -42,6 +43,7 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(VueApexCharts);
 
 app.mount('#app')
 app.component('Loading', Loading)
