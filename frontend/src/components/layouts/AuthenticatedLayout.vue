@@ -204,7 +204,9 @@ const sidebarMenu = ref([
         <main class="main bg-slate-100 p-10 overflow-hidden">
             <slot></slot>
         </main>
-        <footer id="footer" class="bg-primary-400 text-white flex justify-center items-center"></footer>
+        <footer id="footer" class="bg-primary-400 text-white flex justify-center items-center">
+            <p class="text-center">© {{ new Date().getFullYear() }} E-SURAT. All rights reserved.</p>
+        </footer>
     </div>
 </template>
 
