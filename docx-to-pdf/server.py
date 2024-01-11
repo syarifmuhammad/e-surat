@@ -1,16 +1,15 @@
 from flask import Flask, request, jsonify, json
 import os
-import subprocess
 from os.path import exists
-# import pythoncom
 import fitz  # PyMuPDF
 from PIL import Image
 import pytesseract
+import subprocess
 
 app = Flask(__name__)
 
-# pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-pytesseract.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+# pytesseract.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'
 
 @app.route('/convert', methods=['POST'])
 def convert_now():
@@ -19,22 +18,28 @@ def convert_now():
     if "file_path" not in payload:
         return jsonify({'error': 'No file_path provided'}), 400
 
-    if not exists(payload['file_path']) :
-        return jsonify({'error': 'File not found'}), 404
+    # if not exists(payload['file_path']) :
+    #     return jsonify({'error': 'File not found'}), 404
 
     # Dapatkan path dan nama file tanpa ekstensi
     base_path, filename = os.path.split(payload['file_path'])
     file_name_without_extension, _ = os.path.splitext(filename)
 
     # Bangun path output PDF dari path input DOCX
-    output_pdf = os.path.join(base_path, f"{file_name_without_extension}.pdf")
+    output_pdf = base_path + "/" + file_name_without_extension + ".pdf"
 
+    container_name = 'unoserver'
+    infile = '/data/' + payload['file_path']
+    outfile = '/data/' + output_pdf
+    # print(outfile)
     try:
         # unoconvert --convert-to=pdf /var/www/html/e-surat/backend/storage/app/tmp/surat_keterangan_kerja/1.docx /var/www/html/e-surat/backend/storage/app/tmp/surat_keterangan_kerja/1.pdf
         # Panggil unoconv dari baris perintah untuk mengonversi dokumen
-        subprocess.run(['unoconvert', '--convert-to=pdf', payload['file_path'], output_pdf])
+
+        subprocess.run(['docker', 'exec', container_name , 'unoconvert', '--convert-to=pdf', infile, outfile])
         return jsonify({'data': 'success'}), 200
     except subprocess.CalledProcessError as e:
+        print(e)
         return jsonify({'data': e}), 500
 
 def pdf_to_images(pdf_path):
