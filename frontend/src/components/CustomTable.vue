@@ -105,7 +105,7 @@ defineExpose({ getData })
 <template>
   <div class="p-1.5 min-w-full max-w-full inline-block align-middle">
     <div class="w-full border rounded-lg divide-y divide-gray-200 overflow-hidden">
-      <div class="py-3 px-4">
+      <div class="py-3 px-4 flex justify-between items-center">
         <div class="relative max-w-xs">
           <label class="sr-only">Search</label>
           <input :value="search" @input="modifySearch" type="search" name="hs-table-with-pagination-search"
@@ -121,6 +121,7 @@ defineExpose({ getData })
             </svg>
           </div>
         </div>
+        <slot name="legend"></slot>
       </div>
       <div class="overflow-auto min-w-full">
         <table v-if="!loading" class="divide-y divide-gray-200 w-full">
