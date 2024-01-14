@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
+use App\Models\EmployeePosition;
 use App\Models\KeyPair;
+use App\Models\Rekening;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -16,9 +19,9 @@ class AuthenticationController extends Controller
 {
     public function me()
     {
-        $user = auth()->user();
+        $user = Employee::find(auth()->id());
         return response()->json([
-            'data' => $user,
+            'data' => new EmployeeResource($user),
             'message' => "Berhasil mendapatkan data user !",
         ], 200);
     }
@@ -109,6 +112,122 @@ class AuthenticationController extends Controller
             return response()->json([
                 'message' => 'Email atau password salah !'
             ], 401);
+        }
+    }
+
+    public function update_me(Request $request)
+    {
+        $employee = Employee::find(auth()->id());
+
+        if (!$employee) {
+            return response()->json([
+                'message' => "Data user tidak ditemukan !"
+            ], 404);
+        }
+
+        $validate = Validator::make($request->all(), [
+            'nip' => 'required|unique:employees,nip,' . auth()->id(),
+            'nik' => 'required|unique:employees,nik,' . auth()->id(),
+            'email' => 'required|unique:employees,email,' . auth()->id(),
+            'name' => 'required',
+            'rekening' => 'required|array',
+            'positions' => 'required|array|min:1',
+        ]);
+
+        if ($validate->fails()) {
+            $response = [
+                'errors' => $validate->errors(),
+                'message' => "Validasi form gagal !"
+            ];
+            return response()->json($response, 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $employee->nip = $request->nip;
+            $employee->email = $request->email;
+            $employee->name = $request->name;
+            $employee->save();
+
+            $employee->rekening()->delete();
+            foreach ($request->rekening as $rekening) {
+                $employee_rekening = new Rekening();
+                $employee_rekening->employee_id = $employee->id;
+                $employee_rekening->nama_bank = $rekening['nama_bank'];
+                $employee_rekening->atas_nama = $rekening['atas_nama'];
+                $employee_rekening->nomor_rekening = $rekening['nomor_rekening'];
+                $employee_rekening->save();
+            }
+
+            $employee->positions()->delete();
+            foreach ($request->positions as $position) {
+                $employee_position = new EmployeePosition();
+                $employee_position->employee_id = $employee->id;
+                $employee_position->position = $position;
+                $employee_position->save();
+            }
+
+            $user = User::find($employee->id);
+            if ($user) {
+                $user->email = $request->email;
+                $user->save();
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => 'Berhasil menyimpan data user !',
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function change_password(Request $request)
+    {
+        
+        $validate = Validator::make($request->all(), [
+            'old_password' => 'required',
+            'password' => ['required', 'confirmed', Password::min(8)],
+        ], [
+            'password.confirmed' => "Konfirmasi password tidak sesuai !",
+            'password.min' => "Password minimal 8 karakter !",
+        ]);
+
+        if ($validate->fails()) {
+            $response = [
+                'errors' => $validate->errors(),
+                'message' => "Validasi form gagal !"
+            ];
+            return response()->json($response, 422);
+        }
+
+        $user = User::find(auth()->id());
+
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'errors' => [
+                    'old_password' => ["Password lama tidak sesuai !"]
+                ],
+                'message' => "Password lama tidak sesuai !"
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $user->password = Hash::make($request->password);
+            $user->save();
+            DB::commit();
+            return response()->json([
+                'message' => 'Berhasil mengubah password !',
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 }
