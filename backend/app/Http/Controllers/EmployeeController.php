@@ -230,6 +230,13 @@ class EmployeeController extends Controller
                 $employee_position->save();
             }
 
+            $user = User::find($employee->id);
+            if ($user) {
+                $user->email = $request->email;
+                $user->save();   
+            }
+
+
             DB::commit();
             return response()->json([
                 'message' => 'Berhasil menyimpan data pegawai !',
