@@ -157,11 +157,11 @@ const sidebarMenu = ref([
                             <p class="text-sm text-gray-500">Signed in as</p>
                             <p class="text-sm font-medium text-gray-800">{{ user.email }}</p>
                         </div>
-                        <a class="mt-4 flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
-                            href="#">
+                        <RouterLink class="mt-4 flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+                            :to="{ name: 'profile' }">
                             <Icon class="flex-shrink-0 w-4 h-4" icon="solar:user-outline" />
                             Profil
-                        </a>
+                    </RouterLink>
                         <span @click="useAuthStore().logout()"
                             class="text-red-500 flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100 cursor-pointer">
                             <Icon class="flex-shrink-0 w-4 h-4" icon="solar:logout-3-line-duotone" />
