@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "apexcharts": "^3.45.1",
+    "dayjs": "^1.11.10",
     "docx-preview": "^0.1.20",
     "pinia": "^2.1.7",
     "preline": "^1.9.0",
