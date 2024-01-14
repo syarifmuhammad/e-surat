@@ -18,8 +18,8 @@ const thead = [
     "#",
     "Nomor Surat",
     "NIP",
-    "Nama Pegawai",
-    "Nama Penandatangan",
+    "Pegawai",
+    "Penandatangan",
     "Tanggal Surat",
     "Status",
     "",
@@ -138,7 +138,7 @@ function upload_signed_file() {
 }
 
 function open_modal_sign(id, signature_type) {
-    if (signature_type == 'qrcode') {
+    if (signature_type == 'digital') {
         modal_sign.value.open()
         letter_id.value = id
         letter_signature_type.value = signature_type
@@ -178,16 +178,8 @@ function sign() {
         return
     }
     loading.value.open()
-    let payload = {}
-    if (letter_signature_type.value == 'qrcode') {
-        payload = {
-            password: password.value,
-            _method: 'PUT',
-        }
-    } else {
-        payload = {
-            _method: 'PUT',
-        }
+    let payload = {
+        _method: 'PUT',
     }
     axios.put(`${url}/outcoming-letters/surat-keterangan-kerja/${letter_id.value}/sign`, payload).then(res => {
         loading.value.close()
@@ -267,7 +259,7 @@ function delete_letter(id) {
                 <h3 class="text-primary-400">List Surat Keterangan Kerja</h3>
                 <RouterLink v-if="userStore.user.roles === 'superadmin' || userStore.user.roles === 'admin_sdm'"
                     :to="{ name: 'create_surat_keterangan_kerja' }" class="btn btn-primary">
-                    <Icon class="text-lg" icon="fluent:add-12-filled" /> Tambah Surat Keterangan Kerja
+                    <Icon class="text-lg" icon="fluent:add-12-filled" /> Tambah Surat
                 </RouterLink>
             </div>
             <CustomTable ref="table" :thead="thead" :url="`${url}/outcoming-letters/surat-keterangan-kerja`">
@@ -301,12 +293,13 @@ function delete_letter(id) {
                         <template v-if="item.status == 'waiting_for_signed'">
                             <span class="badge badge-warning text-center">Pending</span>
                             <br>
-                            <small class="text-yellow-500 ">Catatan : Menunggu ditandatangani</small>
+                            <small class="text-yellow-500 ">Catatan : {{ item.can_signed ? "Perlu Tanda Tangan Anda" :
+                                "Menunggu ditandatangani" }}</small>
                         </template>
                         <template v-if="item.status == 'signed'">
                             <span class="badge badge-success text-center">Sudah Ditandatangani</span>
                             <!-- <br>
-                            <small class="text-yellow-500 ">Catatan : Menunggu ditandatangani</small> -->
+                            <small class="text-yellow-500 ">Catatan : {{ item.can_signed ? "Perlu Tanda Tangan Anda" : "Menunggu ditandatangani" }}</small> -->
                         </template>
                         <!-- <span v-if="item.status == 'approved'" class="badge badge-success">Disetujui</span>
                         <span v-if="item.status == 'rejected'" class="badge badge-danger">Ditolak</span> -->
@@ -316,13 +309,13 @@ function delete_letter(id) {
                             <button id="hs-dropdown-with-icons" type="button"
                                 class="hs-dropdown-toggle py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
                                 Aksi
-                                <svg class="hs-dropdown-open:rotate-180 w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24"
-                                    height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round">
+                                <svg class="hs-dropdown-open:rotate-180 w-4 h-4" xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="m6 9 6 6 6-6" />
                                 </svg>
                             </button>
-    
+
                             <div class="z-10 hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-[15rem] bg-white shadow-md rounded-lg p-2 mt-2 divide-y divide-gray-200"
                                 aria-labelledby="hs-dropdown-with-icons">
                                 <div class="py-2 first:pt-0 last:pb-0">
@@ -343,7 +336,8 @@ function delete_letter(id) {
                                         <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
                                         Berikan Nomor Surat
                                     </span>
-                                    <span v-if="item.can_upload_verified_file" @click="open_modal_upload_signed_file(item.id)"
+                                    <span v-if="item.can_upload_verified_file"
+                                        @click="open_modal_upload_signed_file(item.id)"
                                         class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                         <Icon class="text-lg" icon="octicon:upload-16"></Icon>
                                         Upload Surat Bertanda Tangan
@@ -402,27 +396,27 @@ function delete_letter(id) {
                         Tanda Tangan Surat
                     </h3>
                 </div>
-                <template v-if="letter_signature_type == 'qrcode'">
-                    <div class="p-4 sm:px-10">
-                        <input v-model="password" type="password" class="form-control" placeholder="Masukkan password anda">
-                    </div>
-                </template>
-                <template v-else>
+                <template v-if="letter_signature_type == 'gambar tanda tangan'">
                     <img v-if="signature" :src="signature" class="w-1/2 mx-auto">
-                    <div v-else class="mb-4 flex flex-col items-center">
-                        <p class="text-center mb-4">Tanda tangan tidak ditemukan!</p>
-                        <button type="button" @click="modal_update_signature.open()"
-                            class="btn bg-blue-500 text-white ">Upload Tanda
-                            Tangan</button>
+                    <div class="mb-4 flex flex-col items-center">
+                        <p class="text-center text-yellow-500 mb-4">Catatan : Upload tanda tangan tanpa background / latar
+                        </p>
+                        <button type="button" @click="modal_update_signature.open()" class="btn bg-blue-500 text-white ">{{
+                            signature ? "Ganti Tanda Tangan" : "Upload Tanda Tangan" }}</button>
                     </div>
                 </template>
-                <div class="border-t p-4 sm:px-10 flex justify-end">
+                <template v-else-if="letter_signature_type == 'digital'">
+                    <p class="text-center mb-4 text-blue-500">Surat akan ditanda tangani secara digital menggunakan QRCODE !
+                    </p>
+                </template>
+                <div class="border-t p-4 sm:px-10 flex justify-center">
                     <button type="button" @click="modal_sign.close()"
                         class="btn btn-outline-primary px-14 py-3 mr-6">Batal</button>
-                    <button class="btn btn-primary px-14 py-3" :disabled="!signature && !password">Tanda Tangan</button>
+                    <button class="btn btn-primary px-14 py-3"
+                        :disabled="!signature && letter_signature_type == 'gambar tanda tangan'">Tanda Tangan</button>
                 </div>
             </div>
-        </form>
-    </Modal>
-    <UploadSignature ref="modal_update_signature"></UploadSignature>
-</template>
+    </form>
+</Modal>
+<UploadSignature ref="modal_update_signature" @close="open_modal_sign(letter_id, letter_signature_type)">
+</UploadSignature></template>

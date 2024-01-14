@@ -139,7 +139,7 @@ function upload_signed_file() {
 }
 
 function open_modal_sign(id, signature_type) {
-    if (signature_type == 'qrcode') {
+    if (signature_type == 'digital') {
         modal_sign.value.open()
         letter_id.value = id
         letter_signature_type.value = signature_type
@@ -180,7 +180,7 @@ function sign() {
     }
     loading.value.open()
     let payload = {}
-    if (letter_signature_type.value == 'qrcode') {
+    if (letter_signature_type.value == 'digital') {
         payload = {
             password: password.value,
             _method: 'PUT',
@@ -264,11 +264,11 @@ function delete_letter(id) {
     </SubHeader> -->
     <div class="flex flex-col bg-white rounded-lg">
         <div class="px-8 py-5 min-w-full inline-block align-middle">
-            <div class="flex justify-between mb-6">
+            <div class="flex justify-between items-center mb-6">
                 <h3 class="text-primary-400">List Surat Keputusan Pemberhentian Dalam Jabatan</h3>
                 <RouterLink v-if="userStore.user.roles === 'superadmin' || userStore.user.roles === 'admin_sdm'"
                     :to="{ name: 'create_surat_keputusan_pemberhentian' }" class="btn btn-primary">
-                    <Icon class="text-lg" icon="fluent:add-12-filled" /> Tambah Data
+                    <Icon class="text-lg" icon="fluent:add-12-filled" /> Tambah Surat
                 </RouterLink>
             </div>
             <CustomTable ref="table" :thead="thead" :url="`${url}/outcoming-letters/surat-keputusan-pemberhentian`"
@@ -291,12 +291,12 @@ function delete_letter(id) {
                     <template v-if="item.status == 'waiting_for_signed'">
                         <span class="badge badge-warning text-center">Pending</span>
                         <br>
-                        <small class="text-yellow-500 ">Catatan : Menunggu ditandatangani</small>
+                        <small class="text-yellow-500 ">Catatan : {{ item.can_signed ? "Perlu Tanda Tangan Anda" : "Menunggu ditandatangani" }}</small>
                     </template>
                     <template v-if="item.status == 'signed'">
                         <span class="badge badge-success text-center">Sudah Ditandatangani</span>
                         <!-- <br>
-                        <small class="text-yellow-500 ">Catatan : Menunggu ditandatangani</small> -->
+                        <small class="text-yellow-500 ">Catatan : {{ item.can_signed ? "Perlu Tanda Tangan Anda" : "Menunggu ditandatangani" }}</small> -->
                     </template>
                     <!-- <span v-if="item.status == 'approved'" class="badge badge-success">Disetujui</span>
                     <span v-if="item.status == 'rejected'" class="badge badge-danger">Ditolak</span> -->
@@ -391,7 +391,7 @@ function delete_letter(id) {
                         Tanda Tangan Surat
                     </h3>
                 </div>
-                <template v-if="letter_signature_type == 'qrcode'">
+                <template v-if="letter_signature_type == 'digital'">
                     <div class="p-4 sm:px-10">
                         <input v-model="password" type="password" class="form-control" placeholder="Masukkan password anda">
                     </div>
