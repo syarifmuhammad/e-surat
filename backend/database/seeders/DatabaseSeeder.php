@@ -35,8 +35,37 @@ class DatabaseSeeder extends Seeder
         $positions = [
             ['name' => 'Rektor', 'type' => 'struktural',],
             ['name' => 'Wakil Rektor', 'type' => 'struktural',],
+            ['name' => 'Sekretaris Rektorat', 'type' => 'struktural',],
             ['name' => 'Dosen Rekayasa Perangkat Lunak', 'type' => 'struktural',],
             ['name' => 'Dosen Teknik Informatika', 'type' => 'struktural',],
+            ['name' => 'Dosen Sistem Informasi', 'type' => 'struktural',],
+            ['name' => 'Dosen Teknologi Informasi', 'type' => 'struktural',],
+            ['name' => 'Dosen Sains Data', 'type' => 'struktural',],
+            ['name' => 'Dosen Teknik Industri', 'type' => 'struktural',],
+            ['name' => 'Dosen Teknik Elektro', 'type' => 'struktural',],
+            ['name' => 'Dosen Teknik Komputer', 'type' => 'struktural',],
+            ['name' => 'Dosen Teknik Telekomunikasi', 'type' => 'struktural',],
+            ['name' => 'Dosen Bisnis Digital', 'type' => 'struktural',],
+            ['name' => 'NJAD. 2', 'type' => 'fungsional',],
+            ['name' => 'NJAD. 3', 'type' => 'fungsional',],
+            ['name' => 'AA. 2', 'type' => 'fungsional',],
+            ['name' => 'AA. 3', 'type' => 'fungsional',],
+            ['name' => 'L. 2', 'type' => 'fungsional',],
+            ['name' => 'L. 3', 'type' => 'fungsional',],
+            ['name' => 'LK. 2', 'type' => 'fungsional',],
+            ['name' => 'LK. 3', 'type' => 'fungsional',],
+            ['name' => 'GB. 3', 'type' => 'fungsional',],
+            ['name' => 'MUDA. 1', 'type' => 'fungsional',],
+            ['name' => 'MUDA. 2', 'type' => 'fungsional',],
+            ['name' => 'MADYA. 1', 'type' => 'fungsional',],
+            ['name' => 'MADYA. 2', 'type' => 'fungsional',],
+            ['name' => 'MADYA. 3', 'type' => 'fungsional',],
+            ['name' => 'AHLI. 1', 'type' => 'fungsional',],
+            ['name' => 'AHLI. 2', 'type' => 'fungsional',],
+            ['name' => 'AHLI. 3', 'type' => 'fungsional',],
+            ['name' => 'UTAMA. 1', 'type' => 'fungsional',],
+            ['name' => 'UTAMA. 2', 'type' => 'fungsional',],
+            ['name' => 'UTAMA. 3', 'type' => 'fungsional',],
         ];
         foreach ($positions as $position) {
             Position::create($position);
@@ -44,6 +73,12 @@ class DatabaseSeeder extends Seeder
 
         //seeder to make prodi
         $prodi = [
+            [
+                'nama_prodi' => 'Sistem Informasi',
+                'singkatan_prodi' => 'SI',
+                'nama_fakultas' => "Fakultas Teknologi Informasi Dan Bisnis",
+                'singkatan_fakultas' => "FTIB",
+            ],
             [
                 'nama_prodi' => 'Rekayasa Perangkat Lunak',
                 'singkatan_prodi' => 'RPL',
@@ -53,12 +88,6 @@ class DatabaseSeeder extends Seeder
             [
                 'nama_prodi' => 'Teknik Informatika',
                 'singkatan_prodi' => 'IF',
-                'nama_fakultas' => "Fakultas Teknologi Informasi Dan Bisnis",
-                'singkatan_fakultas' => "FTIB",
-            ],
-            [
-                'nama_prodi' => 'Sistem Informasi',
-                'singkatan_prodi' => 'SI',
                 'nama_fakultas' => "Fakultas Teknologi Informasi Dan Bisnis",
                 'singkatan_fakultas' => "FTIB",
             ],
@@ -103,7 +132,7 @@ class DatabaseSeeder extends Seeder
                 'profesi' => 'tpa',
                 'positions' => [
                     [
-                        'position' => 'Wakil Rektor',
+                        'position' => 'Sekretaris SDM',
                         'type' => 'struktural',
                     ]
                 ],
@@ -126,7 +155,30 @@ class DatabaseSeeder extends Seeder
                 'profesi' => 'tpa',
                 'positions' => [
                     [
-                        'position' => 'Rektor',
+                        'position' => 'Sekretaris Rektorat',
+                        'type' => 'struktural',
+                    ]
+                ],
+            ],
+            [
+                'nip' => '99999999999',
+                'nik' => '99999999999',
+                'name' => 'Rektor',
+                'email' => 'rektor@example.com',
+                'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+                'email_verified_at' => now(),
+                'roles' => 'pegawai',
+                'tempat_lahir' => "Bandung",
+                'tanggal_lahir' => "1999-01-01",
+                'alamat' => "Jl. Jalan",
+                'npwp' => "12345678901234567893",
+                'nama_bank' => "Bank Mandiri",
+                'nomor_rekening' => "1234567893",
+                'created_by' => 2,
+                'profesi' => 'tpa',
+                'positions' => [
+                    [
+                        'position' => "Rektor",
                         'type' => 'struktural',
                     ]
                 ],
@@ -139,7 +191,6 @@ class DatabaseSeeder extends Seeder
                 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
                 'email_verified_at' => now(),
                 'roles' => 'pegawai',
-                'type' => "Dosen Rekayasa Perangkat Lunak",
                 'tempat_lahir' => "Bandung",
                 'tanggal_lahir' => "1999-01-01",
                 'alamat' => "Jl. Jalan",
