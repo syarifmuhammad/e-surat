@@ -143,10 +143,14 @@ class SuratKeputusanPemberhentian extends Model
         $templateProcessor->setValue('nama_penandatangan', $this->signer->name);
         $templateProcessor->setValue('jabatan_penandatangan', $this->signer_position);
 
-        // $templateProcessor->setImageValue('signature', [
-        //     'path' => storage_path('app/signature/' . $letter->official->signature),
-        //     'ratio' => true,
-        // ]);
+        if ($this->is_signed()) {
+            if ($this->signature_type == "gambar tanda tangan" || $this->signature_type == "digital") {
+                $templateProcessor->setImageValue('tanda_tangan', [
+                    'path' => storage_path('app/signed_files/' . $this->signed_file),
+                    'ratio' => true,
+                ]);
+            }
+        }
 
         return $templateProcessor;
     }

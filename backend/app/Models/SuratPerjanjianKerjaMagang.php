@@ -51,11 +51,13 @@ class SuratPerjanjianKerjaMagang extends Model
         }
     }
 
-    public function scopeWhereNotSigned($query) {
+    public function scopeWhereNotSigned($query)
+    {
         return $query->where('is_signed', false);
     }
 
-    public function scopeWhereSigned($query) {
+    public function scopeWhereSigned($query)
+    {
         return $query->where('is_signed', true);
     }
 
@@ -133,17 +135,17 @@ class SuratPerjanjianKerjaMagang extends Model
         $templateProcessor->setValue('tempat_lahir', $this->employee->tempat_lahir);
         $templateProcessor->setValue('tanggal_lahir', Carbon::parse($this->employee->tanggal_lahir)->translatedFormat('d F Y'));
         $templateProcessor->setValue('alamat', $this->employee->alamat);
-        
-        
+
+
         $templateProcessor->setValue('mulai_berlaku', Carbon::parse($this->mulai_berlaku)->translatedFormat('d F Y'));
         $templateProcessor->setValue('akhir_berlaku', Carbon::parse($this->akhir_berlaku)->translatedFormat('d F Y'));
         $bulan = Carbon::parse($this->mulai_berlaku)->diffInMonths(Carbon::parse($this->akhir_berlaku));
         $tahun = Carbon::parse($this->mulai_berlaku)->diffInYears(Carbon::parse($this->akhir_berlaku));
         $masa_berlaku = "0 Bulan";
         if ($bulan % 12 == 0) {
-            $masa_berlaku = $tahun . " (". trim(ucwords(terbilang($tahun))) . ") Tahun";
+            $masa_berlaku = $tahun . " (" . trim(ucwords(terbilang($tahun))) . ") Tahun";
         } else if ($bulan > 0) {
-            $masa_berlaku = $bulan . " (". trim(ucwords(terbilang($bulan))) . ") Bulan";
+            $masa_berlaku = $bulan . " (" . trim(ucwords(terbilang($bulan))) . ") Bulan";
         }
         $templateProcessor->setValue('masa_berlaku', $masa_berlaku);
 
@@ -168,10 +170,14 @@ class SuratPerjanjianKerjaMagang extends Model
         $templateProcessor->setValue('nama_penandatangan', $this->signer->name);
         $templateProcessor->setValue('jabatan_penandatangan', $this->signer_position);
 
-        // $templateProcessor->setImageValue('signature', [
-        //     'path' => storage_path('app/signature/' . $letter->official->signature),
-        //     'ratio' => true,
-        // ]);
+        if ($this->is_signed()) {
+            if ($this->signature_type == "gambar tanda tangan" || $this->signature_type == "digital") {
+                $templateProcessor->setImageValue('tanda_tangan', [
+                    'path' => storage_path('app/signed_files/' . $this->signed_file),
+                    'ratio' => true,
+                ]);
+            }
+        }
 
         return $templateProcessor;
     }

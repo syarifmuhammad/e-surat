@@ -51,11 +51,13 @@ class SuratKeputusanPemberhentianDanPengangkatan extends Model
         }
     }
 
-    public function scopeWhereNotSigned($query) {
+    public function scopeWhereNotSigned($query)
+    {
         return $query->where('is_signed', false);
     }
 
-    public function scopeWhereSigned($query) {
+    public function scopeWhereSigned($query)
+    {
         return $query->where('is_signed', true);
     }
 
@@ -100,7 +102,7 @@ class SuratKeputusanPemberhentianDanPengangkatan extends Model
 
     public function can_signed()
     {
-        return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && !(($this->signature_type == 'manual' || $this->signature_type == 'digital'));
+        return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && !$this->signature_type == 'manual';
     }
 
     public function can_edit()
@@ -110,7 +112,7 @@ class SuratKeputusanPemberhentianDanPengangkatan extends Model
 
     public function can_upload_verified_file()
     {
-        return !$this->is_signed() && $this->have_reference_number() && ($this->signature_type == 'manual' || $this->signature_type == 'digital') && (auth()->user()->roles == 'admin_sekretariat');
+        return !$this->is_signed() && $this->have_reference_number() && $this->signature_type == 'manual' && (auth()->user()->roles == 'admin_sekretariat');
     }
 
     public function generate_docx()
@@ -136,10 +138,14 @@ class SuratKeputusanPemberhentianDanPengangkatan extends Model
         $templateProcessor->setValue('nama_penandatangan', $this->signer->name);
         $templateProcessor->setValue('jabatan_penandatangan', $this->signer_position);
 
-        // $templateProcessor->setImageValue('signature', [
-        //     'path' => storage_path('app/signature/' . $letter->official->signature),
-        //     'ratio' => true,
-        // ]);
+        if ($this->is_signed()) {
+            if ($this->signature_type == "gambar tanda tangan" || $this->signature_type == "digital") {
+                $templateProcessor->setImageValue('tanda_tangan', [
+                    'path' => storage_path('app/signed_files/' . $this->signed_file),
+                    'ratio' => true,
+                ]);
+            }
+        }
 
         return $templateProcessor;
     }

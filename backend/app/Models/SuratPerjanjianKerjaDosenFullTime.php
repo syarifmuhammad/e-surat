@@ -50,11 +50,13 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         }
     }
 
-    public function scopeWhereNotSigned($query) {
+    public function scopeWhereNotSigned($query)
+    {
         return $query->where('is_signed', false);
     }
 
-    public function scopeWhereSigned($query) {
+    public function scopeWhereSigned($query)
+    {
         return $query->where('is_signed', true);
     }
 
@@ -68,11 +70,13 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         return $this->belongsTo(Employee::class, 'signer_id', 'id');
     }
 
-    public function letter_template() {
+    public function letter_template()
+    {
         return $this->belongsTo(LetterTemplate::class, 'letter_template_id', 'id');
     }
 
-    public function pertelaan_perjanjian_kerja() {
+    public function pertelaan_perjanjian_kerja()
+    {
         return $this->hasOne(PertelaanPerjanjianKerja::class, 'id', 'id');
     }
 
@@ -95,11 +99,13 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         return $this->is_signed;
     }
 
-    public function can_give_reference_number() {
+    public function can_give_reference_number()
+    {
         return !$this->have_reference_number() && auth()->user()->roles == 'admin_sekretariat';
     }
 
-    public function can_signed() {
+    public function can_signed()
+    {
         return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && $this->signature_type != 'manual';
     }
 
@@ -146,9 +152,9 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         $tahun = Carbon::parse($this->mulai_berlaku)->diffInYears(Carbon::parse($this->akhir_berlaku));
         $masa_berlaku = "0 Bulan";
         if ($bulan % 12 == 0) {
-            $masa_berlaku = $tahun . " (". trim(ucwords(terbilang($tahun))) . ") Tahun";
+            $masa_berlaku = $tahun . " (" . trim(ucwords(terbilang($tahun))) . ") Tahun";
         } else if ($bulan > 0) {
-            $masa_berlaku = $bulan . " (". trim(ucwords(terbilang($bulan))) . ") Bulan";
+            $masa_berlaku = $bulan . " (" . trim(ucwords(terbilang($bulan))) . ") Bulan";
         }
         $templateProcessor->setValue('masa_berlaku', $masa_berlaku);
         $rekening = json_decode($this->rekening);
@@ -156,7 +162,7 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         $templateProcessor->setValue('atas_nama', $rekening->atas_nama);
         $templateProcessor->setValue('nomor_rekening', $rekening->nomor_rekening);
         $templateProcessor->setValue('npwp', $this->employee->npwp);
-        
+
         //pertelaan perjanjian kerja
         $pertelaan_perjanjian_kerja = $this->pertelaan_perjanjian_kerja;
         // $templateProcessor->setValue('jangka_waktu', $pertelaan_perjanjian_kerja->jangka_waktu);
@@ -186,11 +192,15 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         // Kebutuhan data yang terkait dengan pejabat yang menandatangan
         $templateProcessor->setValue('nama_penandatangan', $this->signer->name);
         $templateProcessor->setValue('jabatan_penandatangan', $this->signer_position);
-        
-        // $templateProcessor->setImageValue('signature', [
-        //     'path' => storage_path('app/signature/' . $letter->official->signature),
-        //     'ratio' => true,
-        // ]);
+
+        if ($this->is_signed()) {
+            if ($this->signature_type == "gambar tanda tangan" || $this->signature_type == "digital") {
+                $templateProcessor->setImageValue('tanda_tangan', [
+                    'path' => storage_path('app/signed_files/' . $this->signed_file),
+                    'ratio' => true,
+                ]);
+            }
+        }
 
         return $templateProcessor;
     }
