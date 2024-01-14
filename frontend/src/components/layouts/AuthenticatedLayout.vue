@@ -35,11 +35,11 @@ const sidebarMenu = ref([
                 name: 'prodi',
                 icon: 'ph:code',
             },
-            {
-                title: 'Unit Kerja',
-                name: 'unit',
-                icon: 'solar:user-outline',
-            },
+            // {
+            //     title: 'Unit Kerja',
+            //     name: 'unit',
+            //     icon: 'solar:user-outline',
+            // },
             {
                 title: 'Pegawai',
                 name: 'employees',
@@ -81,7 +81,7 @@ const sidebarMenu = ref([
             },
             {
                 title: 'Report',
-                name: 'maintenance',
+                name: 'report_outcoming_letter',
                 icon: 'carbon:report',
             },
             {
