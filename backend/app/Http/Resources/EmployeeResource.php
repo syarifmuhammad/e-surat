@@ -22,6 +22,7 @@ class EmployeeResource extends JsonResource
             'email' => $this->email,
             'rekening' => $this->rekening,
             'positions' => $this->positions->pluck('position'),
+            'jabatan_fungsional' => $this->positions->where('position.type', 'fungsional')->pluck('position'),
             'roles' => $this->account ? $this->account->roles : 'pegawai',
             'profesi' => $this->profesi,
             'is_registered' => $this->isRegistered(),
