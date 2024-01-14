@@ -59,6 +59,8 @@ Route::post('/register', [AuthenticationController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthenticationController::class, 'me']);
+    Route::put('/me', [AuthenticationController::class, 'update_me']);
+    Route::put('/change-password', [AuthenticationController::class, 'change_password']);
     Route::get('/signature', [EmployeeController::class, 'signature']);
     Route::put('/signature', [EmployeeController::class, 'update_signature']);
     Route::post('/logout', [AuthenticationController::class, 'logout']);
