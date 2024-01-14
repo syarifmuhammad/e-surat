@@ -26,7 +26,9 @@ async function get_signature() {
     await axios.get(`${url}/${employee_id ? `employee/${employee_id}/signature` : `signature`}`, {
         responseType: 'blob',
     }).then(res => {
-        existing_signature.value = res.data
+        if (res.data.type.startsWith('image/')) {
+            existing_signature.value = res.data
+        }
         loading.value.close()
     }).catch(err => {
         loading.value.close()

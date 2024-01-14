@@ -17,7 +17,7 @@ class PositionController extends Controller
     {
         $search = $request->search;
         $positions = Position::search($search);
-        if ($request->type && ($request->type == 'struktural' || $request->type == 'fungsional') ) {
+        if (isset($request->type) && ($request->type == 'struktural' || $request->type == 'fungsional') ) {
                 $positions = $positions->where('type', $request->type);
         }
         $positions = $positions->paginate();

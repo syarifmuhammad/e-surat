@@ -144,6 +144,8 @@ class SuratKeputusanPengangkatan extends Model
                     'ratio' => true,
                 ]);
             }
+        } else {
+            $templateProcessor->setValue('tanda_tangan', '');
         }
 
         return $templateProcessor;

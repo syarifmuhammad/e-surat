@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('tempat_lahir');
             $table->date('tanggal_lahir');
-            $table->text('alamat');
-            $table->string('npwp');
+            $table->text('alamat')->default("");
+            $table->string('npwp')->default("");
             $table->enum('profesi', ['dosen', 'tpa'])->default('dosen');
             $table->string('signature')->nullable();
             $table->timestamps();

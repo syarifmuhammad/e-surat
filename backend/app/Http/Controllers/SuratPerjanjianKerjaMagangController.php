@@ -25,7 +25,7 @@ class SuratPerjanjianKerjaMagangController extends Controller
      */
     public function index(Request $request)
     {
-        $letters = Letter::search($request->search)->whereUser(auth()->user())->orderBy('is_signed')->orderBy('reference_number')->orderBy('id')->paginate();
+        $letters = Letter::search($request->search)->whereUser(auth()->user())->orderBy('is_signed')->orderBy('is_signed2')->orderBy('reference_number')->orderBy('id')->paginate();
         return new ThisCollection($letters);
     }
 
@@ -145,20 +145,19 @@ class SuratPerjanjianKerjaMagangController extends Controller
             ], 404);
         }
 
-        if ($letter->signed_file != null) {
-            $fileNameServerPdf = 'app/signed_files/surat_perjanjian_kerja_magang/' . $letter->signed_file;
+        if ($letter->signed_file != null && $letter->signature_type == "manual") {
+            $fileNameServerPdf = 'app/signed_files/' . $letter->signed_file;
             return response()->download(storage_path($fileNameServerPdf), $letter->signed_file);
         }
 
         $fileNameServerDocx = "app/tmp/surat_perjanjian_kerja_magang/" . $letter->id . '.docx';
         $templateProcessor = $letter->generate_docx();
-        $templateProcessor->setValue('tanda_tangan', "");
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
 
         $response = Http::post(env('APP_DOCX_CONVERTER_URL') . '/convert', ['file_path' => $fileNameServerDocx]);
         if ($response->failed()) {
             return response()->json([
-                'errors' => "Something errors"
+                'errors' => $response->json(),
             ], 500);
         }
 
@@ -269,6 +268,7 @@ class SuratPerjanjianKerjaMagangController extends Controller
 
         $letter->signed_file = $fileName;
         $letter->is_signed = true;
+        $letter->is_signed2 = true;
         $letter->save();
 
         $response = [
@@ -320,7 +320,6 @@ class SuratPerjanjianKerjaMagangController extends Controller
         //get the latest reference_number
         $latest_number = Letter::where('reference_number', '!=', 'NULL')->whereMonth('tanggal_surat', Carbon::now()->month)->whereYear('tanggal_surat', Carbon::now()->year)->count();
         $letter->reference_number = ReferenceNumberSetting::get_and_parse_reference_number_with_date(Letter::NAME, $latest_number + 1, $letter->tanggal_surat);
-        $letter->tmp_file = null;
         $letter->save();
 
         $response = [
@@ -340,7 +339,7 @@ class SuratPerjanjianKerjaMagangController extends Controller
             ], 404);
         }
 
-        if (!$letter->can_signed()) {
+        if (!$letter->can_signed() && !$letter->can_signed2()) {
             return response()->json([
                 'message' => "Surat perjanjian kerja magang tidak dapat ditanda tangani !"
             ], 404);
@@ -348,11 +347,22 @@ class SuratPerjanjianKerjaMagangController extends Controller
         $fileName = null;
         try {
             if ($letter->signature_type == 'digital') {
-                $letter_as_base64 = base64_encode($letter);
-                $encrypt_letter = Crypt::encrypt($letter_as_base64);
-                $url_confirmation = env('APP_URL') . "/api/confirm-signature?data=$encrypt_letter";
-                $fileName = "surat_perjanjian_kerja_magang" . Str::replace("/", "-", $letter->get_reference_number()) . '.png';
-                QrCode::size(500)->generate($url_confirmation, storage_path('app/signed_files/' . $fileName));
+                $payload = [
+                    'letter' => $letter->id,
+                    'employee' => auth()->id(),
+                    'letter_type' => 'surat_perjanjian_kerja_magang',
+                    'random_key' => Str::random(8),
+                ];
+                $encrypt_payload = Crypt::encrypt($payload);
+                $url_confirmation = env('APP_URL') . "/api/confirm-signature?data=$encrypt_payload";
+                
+                if ($letter->can_signed()) {
+                    $fileName = "surat_perjanjian_kerja_magang_" . Str::replace("/", "-", $letter->get_reference_number()) . '_1.png';
+                } else if ($letter->can_signed2()) {
+                    $fileName = "surat_perjanjian_kerja_magang_" . Str::replace("/", "-", $letter->get_reference_number()) . '_2.png';
+                }
+
+                QrCode::format('png')->size(500)->generate($url_confirmation, storage_path('app/signed_files/' . $fileName));
             } else if ($letter->signature_type == 'gambar tanda tangan') {
                 $signature = Employee::find(auth()->id())->signature;
 
@@ -362,14 +372,25 @@ class SuratPerjanjianKerjaMagangController extends Controller
                     ], 404);
                 }
 
-                $fileName = "surat_perjanjian_kerja_magang" . Str::replace("/", "-", $letter->get_reference_number()) . '.' . pathinfo(storage_path('signature/' . $signature), PATHINFO_EXTENSION);
+                if ($letter->can_signed()) {
+                    $fileName = "surat_perjanjian_kerja_magang_" . Str::replace("/", "-", $letter->get_reference_number()) . '_1' . '.' . pathinfo(storage_path('signature/' . $signature), PATHINFO_EXTENSION);
+                } else if ($letter->can_signed2()) {
+                    $fileName = "surat_perjanjian_kerja_magang_" . Str::replace("/", "-", $letter->get_reference_number()) . '_2' . '.' . pathinfo(storage_path('signature/' . $signature), PATHINFO_EXTENSION);
+                }
+
                 if (!Storage::copy('signature/' . $signature, 'signed_files/' . $fileName)) {
                     throw new \Exception("Gagal mengcopy gambar tanda tangan !");
                 }
             }
 
-            $letter->signed_file = $fileName;
-            $letter->is_signed = true;
+            if ($letter->can_signed()) {
+                $letter->signed_file = $fileName;
+                $letter->is_signed = true;
+            } else if ($letter->can_signed2()) {
+                $letter->signed_file2 = $fileName;
+                $letter->is_signed2 = true;
+            }
+            
             $letter->save();
             return response()->json([
                 'message' => "Berhasil menandatangani surat perjanjian kerja magang !"

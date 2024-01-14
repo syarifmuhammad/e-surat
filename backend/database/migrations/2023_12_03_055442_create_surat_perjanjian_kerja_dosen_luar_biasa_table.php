@@ -30,6 +30,8 @@ return new class extends Migration
             $table->unsignedBigInteger('letter_template_id');
             $table->boolean('is_signed')->default(false);
             $table->string('signed_file')->nullable();
+            $table->boolean('is_signed2')->default(false);
+            $table->string('signed_file2')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
 

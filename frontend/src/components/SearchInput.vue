@@ -28,6 +28,7 @@ const focus = ref(false)
 
 const parent = ref(null)
 const list_search = ref(null)
+const before = ref("")    
 const next = ref(new URL(props.url))
 const success_search = ref(null)
 const timeout_search = ref(null)
@@ -50,7 +51,7 @@ watch(() => props.defaultValue, (first, second) => {
 });
 
 function handleScroll() {
-    const { scrollHeight, scrollTop, clientHeight } = list_search;
+    const { scrollHeight, scrollTop, clientHeight } = list_search.value;
     if (scrollTop + clientHeight >= scrollHeight - 3) {
         getData();
     }
@@ -87,11 +88,16 @@ function fetchData() {
     if (next.value != null) {
         url = new URL(next.value)    
     }
+
+    if (next.value == before.value) {
+        return;
+    }
+
     axios.get(url).then((response) => {
+        before.value = next.value;
         if (response.data.links && response.data.links.next) {
             next.value = new URL(response.data.links.next)
         }
-        result_search.value = []
         response.data.data.forEach((p) => {
             result_search.value.push(p);
         });
@@ -130,6 +136,7 @@ function onFocusOut(event) {
 
 onMounted(() => {
     onSearch('');
+    list_search.value.addEventListener("scroll", handleScroll);
 })
 
 defineExpose({ fetchData })

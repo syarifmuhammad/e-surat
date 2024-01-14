@@ -25,7 +25,7 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
      */
     public function index(Request $request)
     {
-        $letters = Letter::search($request->search)->whereUser(auth()->user())->orderBy('is_signed')->orderBy('reference_number')->orderBy('id')->paginate();
+        $letters = Letter::search($request->search)->whereUser(auth()->user())->orderBy('is_signed')->orderBy('is_signed2')->orderBy('reference_number')->orderBy('id')->paginate();
         return new ThisCollection($letters);
     }
 
@@ -144,7 +144,6 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
         $filename = $letter->id . '.docx';
         $fileNameServerDocx = "app/tmp/surat_perjanjian_kerja_dosen_luar_biasa/" . $filename;
         $templateProcessor = $letter->generate_docx();
-        $templateProcessor->setValue('tanda_tangan', '');
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
         return response()->download(storage_path($fileNameServerDocx), $filename)->deleteFileAfterSend();
     }
@@ -158,23 +157,22 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
             ], 404);
         }
 
-        if ($letter->signed_file != null) {
-            $fileNameServerPdf = 'app/signed_files/surat_perjanjian_kerja_dosen_luar_biasa/' . $letter->signed_file;
+        if ($letter->signed_file != null && $letter->signature_type == "manual") {
+            $fileNameServerPdf = 'app/signed_files/' . $letter->signed_file;
             return response()->download(storage_path($fileNameServerPdf), $letter->signed_file);
         }
 
         $fileNameServerDocx = "app/tmp/surat_perjanjian_kerja_dosen_luar_biasa/" . $letter->id . '.docx';
         $templateProcessor = $letter->generate_docx();
-        $templateProcessor->setValue('tanda_tangan', "");
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
 
         $response = Http::post(env('APP_DOCX_CONVERTER_URL') . '/convert', ['file_path' => $fileNameServerDocx]);
         if ($response->failed()) {
             return response()->json([
-                'errors' => "Something errors"
+                'errors' => $response->json(),
             ], 500);
         }
-        
+
         $filename = $letter->id . '.pdf';
         $tmpFileNameServerPdf = 'app/tmp/surat_perjanjian_kerja_dosen_luar_biasa/' . $filename;
         if ($response->successful() && file_exists(storage_path($tmpFileNameServerPdf))) {
@@ -279,7 +277,7 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
 
         if (!$letter->can_upload_verified_file()) {
             return response()->json([
-                'message' => "Surat dengan jenis tanda tangan selain manual tidak dapat ditandatangani dengan !"
+                'message' => "Surat dengan jenis tanda tangan selain manual tidak dapat ditandatangani dengan upload file!"
             ], 403);
         }
 
@@ -290,6 +288,7 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
 
         $letter->signed_file = $fileName;
         $letter->is_signed = true;
+        $letter->is_signed2 = true;
         $letter->save();
 
         $response = [
@@ -360,7 +359,7 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
             ], 404);
         }
 
-        if (!$letter->can_signed()) {
+        if (!$letter->can_signed() && !$letter->can_signed2()) {
             return response()->json([
                 'message' => "Surat perjanjian kerja dosen luar biasa tidak dapat ditanda tangani !"
             ], 404);
@@ -368,11 +367,22 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
         $fileName = null;
         try {
             if ($letter->signature_type == 'digital') {
-                $letter_as_base64 = base64_encode($letter);
-                $encrypt_letter = Crypt::encrypt($letter_as_base64);
-                $url_confirmation = env('APP_URL') . "/api/confirm-signature?data=$encrypt_letter";
-                $fileName = "surat_perjanjian_kerja_dosen_luar_biasa_" . Str::replace("/", "-", $letter->get_reference_number()) . '.png';
-                QrCode::size(500)->generate($url_confirmation, storage_path('app/signed_files/' . $fileName));
+                $payload = [
+                    'letter' => $letter->id,
+                    'employee' => auth()->id(),
+                    'letter_type' => 'surat_perjanjian_kerja_dosen_luar_biasa',
+                    'random_key' => Str::random(8),
+                ];
+                $encrypt_payload = Crypt::encrypt($payload);
+                $url_confirmation = env('APP_URL') . "/api/confirm-signature?data=$encrypt_payload";
+
+                if ($letter->can_signed()) {
+                    $fileName = "surat_perjanjian_kerja_dosen_luar_biasa_" . Str::replace("/", "-", $letter->get_reference_number()) . '_1.png';
+                } else if ($letter->can_signed2()) {
+                    $fileName = "surat_perjanjian_kerja_dosen_luar_biasa_" . Str::replace("/", "-", $letter->get_reference_number()) . '_2.png';
+                }
+
+                QrCode::format('png')->size(500)->generate($url_confirmation, storage_path('app/signed_files/' . $fileName));
             } else if ($letter->signature_type == 'gambar tanda tangan') {
                 $signature = Employee::find(auth()->id())->signature;
 
@@ -382,14 +392,25 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
                     ], 404);
                 }
 
-                $fileName = "surat_perjanjian_kerja_dosen_luar_biasa_" . Str::replace("/", "-", $letter->get_reference_number()) . '.' . pathinfo(storage_path('signature/' . $signature), PATHINFO_EXTENSION);
+                if ($letter->can_signed()) {
+                    $fileName = "surat_perjanjian_kerja_dosen_luar_biasa_" . Str::replace("/", "-", $letter->get_reference_number()) . '_1' . '.' . pathinfo(storage_path('signature/' . $signature), PATHINFO_EXTENSION);
+                } else if ($letter->can_signed2()) {
+                    $fileName = "surat_perjanjian_kerja_dosen_luar_biasa_" . Str::replace("/", "-", $letter->get_reference_number()) . '_2' . '.' . pathinfo(storage_path('signature/' . $signature), PATHINFO_EXTENSION);
+                }
+
                 if (!Storage::copy('signature/' . $signature, 'signed_files/' . $fileName)) {
                     throw new \Exception("Gagal mengcopy gambar tanda tangan !");
                 }
             }
 
-            $letter->signed_file = $fileName;
-            $letter->is_signed = true;
+            if ($letter->can_signed()) {
+                $letter->signed_file = $fileName;
+                $letter->is_signed = true;
+            } else if ($letter->can_signed2()) {
+                $letter->signed_file2 = $fileName;
+                $letter->is_signed2 = true;
+            }
+
             $letter->save();
             return response()->json([
                 'message' => "Berhasil menandatangani surat perjanjian kerja dosen luar biasa !"

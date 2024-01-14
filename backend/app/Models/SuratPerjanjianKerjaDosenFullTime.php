@@ -52,12 +52,12 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
 
     public function scopeWhereNotSigned($query)
     {
-        return $query->where('is_signed', false);
+        return $query->where('is_signed', false)->orWhere('is_signed2', false);
     }
 
     public function scopeWhereSigned($query)
     {
-        return $query->where('is_signed', true);
+        return $query->where('is_signed', true)->where('is_signed2', true);
     }
 
     public function employee()
@@ -68,6 +68,11 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
     public function signer()
     {
         return $this->belongsTo(Employee::class, 'signer_id', 'id');
+    }
+
+    public function signer2()
+    {
+        return $this->belongsTo(Employee::class, 'employee_id', 'id');
     }
 
     public function letter_template()
@@ -99,6 +104,11 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         return $this->is_signed;
     }
 
+    public function is_signed2()
+    {
+        return $this->is_signed2;
+    }
+
     public function can_give_reference_number()
     {
         return !$this->have_reference_number() && auth()->user()->roles == 'admin_sekretariat';
@@ -109,14 +119,19 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && $this->signature_type != 'manual';
     }
 
+    public function can_signed2()
+    {
+        return !$this->is_signed2() && $this->have_reference_number() && auth()->id() == $this->employee_id && $this->signature_type != 'manual';
+    }
+
     public function can_edit()
     {
-        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id) && !$this->is_signed();
+        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id) && !$this->is_signed() && !$this->is_signed2();
     }
 
     public function can_upload_verified_file()
     {
-        return !$this->is_signed() && $this->have_reference_number() && $this->signature_type == 'manual' && (auth()->user()->roles == 'admin_sekretariat');
+        return !$this->is_signed() && !$this->is_signed2() && $this->have_reference_number() && $this->signature_type == 'manual' && (auth()->user()->roles == 'admin_sekretariat');
     }
 
     public function generate_docx()
@@ -140,7 +155,7 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         $templateProcessor->setValue('alamat', $this->employee->alamat);
         $templateProcessor->setValue('tempat_lahir', $this->employee->tempat_lahir);
         $templateProcessor->setValue('tanggal_lahir', Carbon::parse($this->employee->tanggal_lahir)->translatedFormat('d F Y'));
-        $templateProcessor->setValue('profesi', $this->profesi);
+        $templateProcessor->setValue('profesi', strtoupper($this->employee->profesi));
         $templateProcessor->setValue('jabatan_fungsional', $this->jabatan_fungsional);
         $prodi = json_decode($this->prodi);
         $templateProcessor->setValue('nama_prodi', $prodi->nama_prodi);
@@ -167,18 +182,18 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         $pertelaan_perjanjian_kerja = $this->pertelaan_perjanjian_kerja;
         // $templateProcessor->setValue('jangka_waktu', $pertelaan_perjanjian_kerja->jangka_waktu);
         $templateProcessor->setValue('pendidikan', $pertelaan_perjanjian_kerja->pendidikan);
-        $templateProcessor->setValue('tahun_satu', $pertelaan_perjanjian_kerja->tahun_satu);
-        $templateProcessor->setValue('tunjangan_dasar_satu', number_format($pertelaan_perjanjian_kerja->tunjangan_dasar_satu, 0, ',', '.'));
-        $templateProcessor->setValue('tunjangan_fungsional_satu', number_format($pertelaan_perjanjian_kerja->tunjangan_fungsional_satu, 0, ',', '.'));
-        $templateProcessor->setValue('tunjangan_struktural_satu', number_format($pertelaan_perjanjian_kerja->tunjangan_struktural_satu, 0, ',', '.'));
-        $templateProcessor->setValue('tunjangan_kemahalan_satu', number_format($pertelaan_perjanjian_kerja->tunjangan_kemahalan_satu, 0, ',', '.'));
-        $templateProcessor->setValue('pendapatan_bulanan_satu', number_format($pertelaan_perjanjian_kerja->pendapatan_bulanan_satu, 0, ',', '.'));
-        $templateProcessor->setValue('tahun_dua', number_format($pertelaan_perjanjian_kerja->tahun_dua, 0, ',', '.'));
-        $templateProcessor->setValue('tunjangan_dasar_dua', number_format($pertelaan_perjanjian_kerja->tunjangan_dasar_dua, 0, ',', '.'));
-        $templateProcessor->setValue('tunjangan_fungsional_dua', number_format($pertelaan_perjanjian_kerja->tunjangan_fungsional_dua, 0, ',', '.'));
-        $templateProcessor->setValue('tunjangan_struktural_dua', number_format($pertelaan_perjanjian_kerja->tunjangan_struktural_dua, 0, ',', '.'));
-        $templateProcessor->setValue('tunjangan_kemahalan_dua', number_format($pertelaan_perjanjian_kerja->tunjangan_kemahalan_dua, 0, ',', '.'));
-        $templateProcessor->setValue('pendapatan_bulanan_dua', number_format($pertelaan_perjanjian_kerja->pendapatan_bulanan_dua, 0, ',', '.'));
+        $templateProcessor->setValue('tahun_satu', $pertelaan_perjanjian_kerja->tahun_satu ?? '');
+        $templateProcessor->setValue('tunjangan_dasar_satu', $pertelaan_perjanjian_kerja->tunjangan_dasar_satu ? "Rp " . number_format($pertelaan_perjanjian_kerja->tunjangan_dasar_satu, 0, ',', '.') : "");
+        $templateProcessor->setValue('tunjangan_fungsional_satu', $pertelaan_perjanjian_kerja->tunjangan_fungsional_satu ? "Rp " . number_format($pertelaan_perjanjian_kerja->tunjangan_fungsional_satu, 0, ',', '.') : "");
+        $templateProcessor->setValue('tunjangan_struktural_satu', $pertelaan_perjanjian_kerja->tunjangan_struktural_satu ? "Rp " . number_format($pertelaan_perjanjian_kerja->tunjangan_struktural_satu, 0, ',', '.') : "");
+        $templateProcessor->setValue('tunjangan_kemahalan_satu', $pertelaan_perjanjian_kerja->tunjangan_kemahalan_satu ? "Rp " . number_format($pertelaan_perjanjian_kerja->tunjangan_kemahalan_satu, 0, ',', '.') : "");
+        $templateProcessor->setValue('pendapatan_bulanan_satu', $pertelaan_perjanjian_kerja->pendapatan_bulanan_satu ? "Rp " . number_format($pertelaan_perjanjian_kerja->pendapatan_bulanan_satu, 0, ',', '.') : "");
+        $templateProcessor->setValue('tahun_dua', $pertelaan_perjanjian_kerja->tahun_dua ?? "" );
+        $templateProcessor->setValue('tunjangan_dasar_dua', $pertelaan_perjanjian_kerja->tunjangan_dasar_dua ? "Rp " . number_format($pertelaan_perjanjian_kerja->tunjangan_dasar_dua, 0, ',', '.') : "");
+        $templateProcessor->setValue('tunjangan_fungsional_dua', $pertelaan_perjanjian_kerja->tunjangan_fungsional_dua ? "Rp " . number_format($pertelaan_perjanjian_kerja->tunjangan_fungsional_dua, 0, ',', '.') : "");
+        $templateProcessor->setValue('tunjangan_struktural_dua', $pertelaan_perjanjian_kerja->tunjangan_struktural_dua ? "Rp " . number_format($pertelaan_perjanjian_kerja->tunjangan_struktural_dua, 0, ',', '.') : "");
+        $templateProcessor->setValue('tunjangan_kemahalan_dua', $pertelaan_perjanjian_kerja->tunjangan_kemahalan_dua ? "Rp " . number_format($pertelaan_perjanjian_kerja->tunjangan_kemahalan_dua, 0, ',', '.') : "");
+        $templateProcessor->setValue('pendapatan_bulanan_dua', $pertelaan_perjanjian_kerja->pendapatan_bulanan_dua ? "Rp " . number_format($pertelaan_perjanjian_kerja->pendapatan_bulanan_dua, 0, ',', '.') : "");
 
         $fasilitas_lainnya = json_decode($pertelaan_perjanjian_kerja->fasilitas_lainnya);
         $fasilitas_lainnya_set = [];
@@ -187,6 +202,13 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
                 'fasilitas_lainnya' => $value,
             ]);
         }
+
+        if (count($fasilitas_lainnya_set) < 1) {
+            array_push($fasilitas_lainnya_set, [
+                'fasilitas_lainnya' => '',
+            ]);
+        }
+
         $templateProcessor->cloneBlock('block_fasilitas_lainnya', 0, true, false, $fasilitas_lainnya_set);
 
         // Kebutuhan data yang terkait dengan pejabat yang menandatangan
@@ -200,6 +222,19 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
                     'ratio' => true,
                 ]);
             }
+        } else {
+            $templateProcessor->setValue('tanda_tangan', '');
+        }
+
+        if ($this->is_signed2()) {
+            if ($this->signature_type == "gambar tanda tangan" || $this->signature_type == "digital") {
+                $templateProcessor->setImageValue('tanda_tangan_pihak_kedua', [
+                    'path' => storage_path('app/signed_files/' . $this->signed_file2),
+                    'ratio' => true,
+                ]);
+            }
+        } else {
+            $templateProcessor->setValue('tanda_tangan_pihak_kedua', '');
         }
 
         return $templateProcessor;

@@ -55,14 +55,14 @@ class IncomingLetterController extends Controller
             $file_surat = 'app/' . $file;
             $incoming_letter->file_surat = $file;
             $incoming_letter->created_by = auth()->user()->id;
-            // $response = Http::post(env('APP_DOCX_CONVERTER_URL') . '/ocr', ['file_path' => storage_path($incoming_letter->file_surat)]);
-            // if ($response->failed()) {
-            //     throw new \Exception("Something errors");
-            // }
+            $response = Http::post(env('APP_DOCX_CONVERTER_URL') . '/ocr', ['file_path' => storage_path($file_surat)]);
+            if ($response->failed()) {
+                throw new \Exception($response->json());
+            }
 
-            // if ($response->successful()) {
-            //     $incoming_letter->ocr_text = $response->json()['data'];
-            // }
+            if ($response->successful()) {
+                $incoming_letter->ocr_text = $response->json()['data'];
+            }
             $incoming_letter->save();
 
             return response()->json([
@@ -128,14 +128,14 @@ class IncomingLetterController extends Controller
             $old_file = $incoming_letter->file_surat;
             $incoming_letter->file_surat = $file;
             $incoming_letter->created_by = auth()->user()->id;
-            // $response = Http::post(env('APP_DOCX_CONVERTER_URL') . '/ocr', ['file_path' => storage_path($incoming_letter->file_surat)]);
-            // if ($response->failed()) {
-            //     throw new \Exception("Something errors");
-            // }
+            $response = Http::post(env('APP_DOCX_CONVERTER_URL') . '/ocr', ['file_path' => storage_path($file_surat)]);
+            if ($response->failed()) {
+                throw new \Exception($response->json());
+            }
 
-            // if ($response->successful()) {
-            //     $incoming_letter->ocr_text = $response->json()['data'];
-            // }
+            if ($response->successful()) {
+                $incoming_letter->ocr_text = $response->json()['data'];
+            }
             $incoming_letter->save();
 
             if (file_exists(storage_path('app/' . $old_file))) {

@@ -21,6 +21,7 @@ const thead = [
     "Nama Pegawai",
     "Nama Penandatangan",
     "Tanggal Surat",
+    "Jenis TTD",
     "Status",
     "",
 ]
@@ -34,7 +35,6 @@ const verified_file = ref(null)
 const letter_id = ref(null)
 const letter_signature_type = ref("")
 const signature = ref(null)
-const password = ref("")
 
 function download_docx(id, nama) {
     loading.value.open()
@@ -76,7 +76,7 @@ function give_reference_number(id) {
     axios.post(`${url}/outcoming-letters/surat-perjanjian-kerja-dosen-luar-biasa/${id}/reference-number`, {
         _method: 'PUT',
     }).then(res => {
-        loading.value = false
+        loading.value.close()
         Swal.fire({
             title: 'Berhasil!',
             text: 'Nomor surat berhasil diberikan!',
@@ -84,7 +84,7 @@ function give_reference_number(id) {
         })
         table.value.getData()
     }).catch(err => {
-        loading.value = false
+        loading.value.close()
         Swal.fire({
             title: 'Gagal!',
             text: 'Nomor surat gagal diberikan!',
@@ -96,6 +96,10 @@ function give_reference_number(id) {
 function open_modal_upload_signed_file(id) {
     modal_upload_signed_file.value.open()
     letter_id.value = id
+}
+function close_modal_upload_signed_file() {
+    modal_upload_signed_file.value.close()
+    letter_id.value = null
 }
 
 function upload_signed_file() {
@@ -115,25 +119,27 @@ function upload_signed_file() {
         })
         return
     }
-    loading.value = true
+    loading.value.open()
     let request = new FormData()
     request.append('signed_file', verified_file.value.files)
     request.append('_method', 'PUT')
     axios.post(`${url}/outcoming-letters/surat-perjanjian-kerja-dosen-luar-biasa/${letter_id.value}/upload-signed-file`, request).then(res => {
-        loading.value = false
+        loading.value.close()
         Swal.fire({
             title: 'Berhasil!',
             text: 'File berhasil diupload!',
             icon: 'success',
         })
         table.value.getData()
+        close_modal_upload_signed_file()
     }).catch(err => {
-        loading.value = false
+        loading.value.close()
         Swal.fire({
             title: 'Gagal!',
             text: 'File gagal diupload!',
             icon: 'error',
         })
+        close_modal_upload_signed_file()
     })
 }
 
@@ -178,16 +184,8 @@ function sign() {
         return
     }
     loading.value.open()
-    let payload = {}
-    if (letter_signature_type.value == 'digital') {
-        payload = {
-            password: password.value,
-            _method: 'PUT',
-        }
-    } else {
-        payload = {
-            _method: 'PUT',
-        }
+    let payload = {
+        _method: 'PUT',
     }
     axios.put(`${url}/outcoming-letters/surat-perjanjian-kerja-dosen-luar-biasa/${letter_id.value}/sign`, payload).then(res => {
         loading.value.close()
@@ -280,16 +278,35 @@ function delete_letter(id) {
                 <td :class="[item.defaultClass]">{{ item.employee.name }}</td>
                 <td :class="[item.defaultClass]">{{ item.signer.name }}</td>
                 <td :class="[item.defaultClass]">{{ item.tanggal_surat }}</td>
+                <td :class="[item.defaultClass]">{{ item.signature_type.toString().toUpperCase() }}</td>
                 <td :class="[item.defaultClass]">
                     <template v-if="item.status == 'waiting_for_reference_number'">
                         <span class="badge badge-danger text-center">Pending</span>
                         <br>
                         <small class="text-red-500 ">Catatan : Menunggu nomor surat</small>
                     </template>
+                    <template v-if="item.status == 'waiting_for_signed_and_signed2'">
+                        <span class="badge badge-warning text-center">Pending</span>
+                        <br>
+                        <small class="text-yellow-500 ">
+                            Catatan :
+                            {{ item.can_signed || item.can_signed2 ? "Perlu Tanda Tangan Anda" : "Menunggu ditandatangani"
+                            }}
+                        </small>
+                    </template>
                     <template v-if="item.status == 'waiting_for_signed'">
                         <span class="badge badge-warning text-center">Pending</span>
                         <br>
-                        <small class="text-yellow-500 ">Catatan : {{ item.can_signed ? "Perlu Tanda Tangan Anda" : "Menunggu ditandatangani" }}</small>
+                        <small class="text-yellow-500 ">
+                            Catatan :
+                            {{ item.can_signed ? "Perlu Tanda Tangan Anda" : "Menunggu ditandatangani pihak pertama" }}
+                        </small>
+                    </template>
+                    <template v-if="item.status == 'waiting_for_signed2'">
+                        <span class="badge badge-warning text-center">Pending</span>
+                        <br>
+                        <small class="text-yellow-500 ">Catatan : {{ item.can_signed2 ? "Perlu Tanda Tangan Anda" :
+                            "Menunggu ditandatangani pihak kedua" }}</small>
                     </template>
                     <template v-if="item.status == 'signed'">
                         <span class="badge badge-success text-center">Sudah Ditandatangani</span>
@@ -336,14 +353,14 @@ function delete_letter(id) {
                                     <Icon class="text-lg" icon="octicon:upload-16"></Icon>
                                     Upload Surat Bertanda Tangan
                                 </span>
-                                <span v-if="!item.can_upload_verified_file && item.can_signed"
+                                <span v-if="!item.can_upload_verified_file && (item.can_signed || item.can_signed2)"
                                     @click="open_modal_sign(item.id, item.signature_type)"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="fluent:signed-24-regular"></Icon>
                                     Tanda Tangani Surat
                                 </span>
                                 <RouterLink v-if="item.can_edit"
-                                    :to="{ name: 'update_surat_keterangan_kerja', params: { id: item.id } }"
+                                    :to="{ name: 'update_surat_perjanjian_kerja_dosen_luar_biasa', params: { id: item.id } }"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="cil:pencil"></Icon>
                                     Edit Surat
@@ -389,27 +406,28 @@ function delete_letter(id) {
                         Tanda Tangan Surat
                     </h3>
                 </div>
-                <template v-if="letter_signature_type == 'digital'">
-                    <div class="p-4 sm:px-10">
-                        <input v-model="password" type="password" class="form-control" placeholder="Masukkan password anda">
-                    </div>
-                </template>
-                <template v-else>
+                <template v-if="letter_signature_type == 'gambar tanda tangan'">
                     <img v-if="signature" :src="signature" class="w-1/2 mx-auto">
-                    <div v-else class="mb-4 flex flex-col items-center">
-                        <p class="text-center mb-4">Tanda tangan tidak ditemukan!</p>
-                        <button type="button" @click="modal_update_signature.open()"
-                            class="btn bg-blue-500 text-white ">Upload Tanda
-                            Tangan</button>
+                    <div class="mb-4 flex flex-col items-center">
+                        <p class="text-center text-yellow-500 mb-4">Catatan : Upload tanda tangan tanpa background / latar
+                        </p>
+                        <button type="button" @click="modal_update_signature.open()" class="btn bg-blue-500 text-white ">{{
+                            signature ? "Ganti Tanda Tangan" : "Upload Tanda Tangan" }}</button>
                     </div>
                 </template>
-                <div class="border-t p-4 sm:px-10 flex justify-end">
+                <template v-else-if="letter_signature_type == 'digital'">
+                    <p class="text-center mb-4 text-blue-500">Surat akan ditanda tangani secara digital menggunakan QRCODE !
+                    </p>
+                </template>
+                <div class="border-t p-4 sm:px-10 flex justify-center">
                     <button type="button" @click="modal_sign.close()"
                         class="btn btn-outline-primary px-14 py-3 mr-6">Batal</button>
-                    <button class="btn btn-primary px-14 py-3" :disabled="!signature && !password">Tanda Tangan</button>
+                    <button class="btn btn-primary px-14 py-3"
+                        :disabled="!signature && letter_signature_type == 'gambar tanda tangan'">Tanda Tangan</button>
                 </div>
             </div>
         </form>
     </Modal>
-    <UploadSignature ref="modal_update_signature"></UploadSignature>
+    <UploadSignature ref="modal_update_signature" @close="open_modal_sign(letter_id, letter_signature_type)">
+    </UploadSignature>
 </template>

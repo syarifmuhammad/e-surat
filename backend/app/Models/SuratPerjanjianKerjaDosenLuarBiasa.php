@@ -53,12 +53,12 @@ class SuratPerjanjianKerjaDosenLuarBiasa extends Model
 
     public function scopeWhereNotSigned($query)
     {
-        return $query->where('is_signed', false);
+        return $query->where('is_signed', false)->orWhere('is_signed2', false);
     }
 
     public function scopeWhereSigned($query)
     {
-        return $query->where('is_signed', true);
+        return $query->where('is_signed', true)->where('is_signed2', true);
     }
 
     public function employee()
@@ -69,6 +69,11 @@ class SuratPerjanjianKerjaDosenLuarBiasa extends Model
     public function signer()
     {
         return $this->belongsTo(Employee::class, 'signer_id', 'id');
+    }
+
+    public function signer2()
+    {
+        return $this->belongsTo(Employee::class, 'employee_id', 'id');
     }
 
     public function letter_template()
@@ -95,6 +100,11 @@ class SuratPerjanjianKerjaDosenLuarBiasa extends Model
         return $this->is_signed;
     }
 
+    public function is_signed2()
+    {
+        return $this->is_signed2;
+    }
+
     public function can_give_reference_number()
     {
         return !$this->have_reference_number() && auth()->user()->roles == 'admin_sekretariat';
@@ -105,14 +115,19 @@ class SuratPerjanjianKerjaDosenLuarBiasa extends Model
         return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id && $this->signature_type != 'manual';
     }
 
+    public function can_signed2()
+    {
+        return !$this->is_signed2() && $this->have_reference_number() && auth()->id() == $this->employee_id && $this->signature_type != 'manual';
+    }
+
     public function can_edit()
     {
-        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id) && !$this->is_signed();
+        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id) && !$this->is_signed() && !$this->is_signed2();
     }
 
     public function can_upload_verified_file()
     {
-        return !$this->is_signed() && $this->have_reference_number() && $this->signature_type == 'manual' && (auth()->user()->roles == 'admin_sekretariat');
+        return !$this->is_signed() && !$this->is_signed2() && $this->have_reference_number() && $this->signature_type == 'manual' && (auth()->user()->roles == 'admin_sekretariat');
     }
 
     public function generate_docx()
@@ -158,6 +173,19 @@ class SuratPerjanjianKerjaDosenLuarBiasa extends Model
                     'ratio' => true,
                 ]);
             }
+        } else {
+            $templateProcessor->setValue('tanda_tangan', '');
+        }
+
+        if ($this->is_signed2()) {
+            if ($this->signature_type == "gambar tanda tangan" || $this->signature_type == "digital") {
+                $templateProcessor->setImageValue('tanda_tangan_pihak_kedua', [
+                    'path' => storage_path('app/signed_files/' . $this->signed_file2),
+                    'ratio' => true,
+                ]);
+            }
+        } else {
+            $templateProcessor->setValue('tanda_tangan_pihak_kedua', '');
         }
 
         return $templateProcessor;

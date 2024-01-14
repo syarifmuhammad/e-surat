@@ -114,14 +114,14 @@ class AnalyticsController extends Controller
         ];
         for ($i = 0; $i < $jumlah_hari; $i++) {
             $tanggal = $tahun . '-' . $bulan . '-' . str_pad($i + 1, 2, '0', STR_PAD_LEFT);
-            $surat_keterangan_kerja = SuratKeteranganKerja::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
-            $sk_rotasi_kepegawaian = SuratKeputusanRotasiKepegawaian::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
-            $sk_pemberhentian = SuratKeputusanPemberhentian::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
-            $sk_pengangkatan = SuratKeputusanPengangkatan::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
-            $sk_pemberhentian_dan_pengangkatan = SuratKeputusanPemberhentianDanPengangkatan::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
-            $spk_magang = SuratPerjanjianKerjaMagang::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
-            $spk_dosen_luar_biasa = SuratPerjanjianKerjaDosenLuarBiasa::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
-            $spk_dosen_full_time = SuratPerjanjianKerjaDosenFullTime::whereDate('created_at', $tanggal)->whereNotNull('verified_file')->count();
+            $surat_keterangan_kerja = SuratKeteranganKerja::whereDate('created_at', $tanggal)->whereSigned()->count();
+            $sk_rotasi_kepegawaian = SuratKeputusanRotasiKepegawaian::whereDate('created_at', $tanggal)->whereSigned()->count();
+            $sk_pemberhentian = SuratKeputusanPemberhentian::whereDate('created_at', $tanggal)->whereSigned()->count();
+            $sk_pengangkatan = SuratKeputusanPengangkatan::whereDate('created_at', $tanggal)->whereSigned()->count();
+            $sk_pemberhentian_dan_pengangkatan = SuratKeputusanPemberhentianDanPengangkatan::whereDate('created_at', $tanggal)->whereSigned()->count();
+            $spk_magang = SuratPerjanjianKerjaMagang::whereDate('created_at', $tanggal)->whereSigned()->count();
+            $spk_dosen_luar_biasa = SuratPerjanjianKerjaDosenLuarBiasa::whereDate('created_at', $tanggal)->whereSigned()->count();
+            $spk_dosen_full_time = SuratPerjanjianKerjaDosenFullTime::whereDate('created_at', $tanggal)->whereSigned()->count();
             $report = [
                 'tanggal' => $tanggal
             ];

@@ -18,8 +18,11 @@ const form = reactive({
     nik: "",
     name: "",
     email: "",
+    profesi: "",
     tempat_lahir: "",
     tanggal_lahir: "",
+    alamat: "",
+    npwp: "",
     rekening: [],
     positions: [],
 })
@@ -33,8 +36,11 @@ const errors = reactive({
     nik: "",
     name: "",
     email: "",
+    profesi: "",
     tempat_lahir: "",
     tanggal_lahir: "",
+    alamat: "",
+    npwp: "",
     rekening: "",
     positions: "",
     old_password: "",
@@ -52,8 +58,11 @@ async function get_employee() {
             form.nip = data.nip
             form.nik = data.nik
             form.name = data.name
+            form.profesi = data.profesi
             form.tempat_lahir = data.tempat_lahir
             form.tanggal_lahir = data.tanggal_lahir
+            form.alamat = data.alamat
+            form.npwp = data.npwp
             form.email = data.email
             form.rekening = data.rekening
             form.positions = data.positions
@@ -76,8 +85,15 @@ function reset_errors() {
 
 function reset() {
     form.nip = ""
+    form.nik = ""
     form.name = ""
     form.email = ""
+    form.profesi = ""
+    form.tempat_lahir = ""
+    form.tanggal_lahir = ""
+    form.alamat = ""
+    form.npwp = ""
+    form.rekening = []
     form.positions = []
     reset_errors()
 }
@@ -239,7 +255,7 @@ onMounted(async () => {
                     <div>
                         <label class="block text-sm font-medium mb-2">Email <span class="text-red-400">*</span></label>
                         <input v-model="form.email" type="email" class="form-control"
-                            :class="{ 'border-red-500': errors.name }" placeholder="Email" required>
+                            :class="{ 'border-red-500': errors.email }" placeholder="Email" required>
                         <p v-if="errors.email" class="text-xs text-red-600 mt-2" id="email-error">{{
                             errors.email }}</p>
                     </div>
@@ -257,10 +273,37 @@ onMounted(async () => {
                         <label class="block text-sm font-medium mb-2">Tanggal Lahir <span
                                 class="text-red-400">*</span></label>
                         <input v-model="form.tanggal_lahir" type="date" class="form-control"
-                            :class="{ 'border-red-500': errors.name }" placeholder="Tanggal Lahir" required>
+                            :class="{ 'border-red-500': errors.tanggal_lahir }" placeholder="Tanggal Lahir" required>
                         <p v-if="errors.tanggal_lahir" class="text-xs text-red-600 mt-2" id="tanggal_lahir-error">{{
                             errors.tanggal_lahir }}</p>
                     </div>
+                </div>
+                <div class="mb-4 grid grid-cols-2 gap-x-8">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Profesi <span class="text-red-400">*</span></label>
+                        <select v-model="form.profesi" class="form-control" :class="{ 'border-red-500': errors.profesi }"
+                            required>
+                            <option value="dosen">DOSEN</option>
+                            <option value="tpa">TPA</option>
+                        </select>
+                        <p v-if="errors.profesi" class="text-xs text-red-600 mt-2" id="profesi-error">{{
+                            errors.profesi }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">NPWP <span
+                                class="text-red-400">*</span></label>
+                        <input v-model="form.npwp" type="text" class="form-control"
+                            :class="{ 'border-red-500': errors.npwp }" placeholder="NPWP" required>
+                        <p v-if="errors.npwp" class="text-xs text-red-600 mt-2" id="npwp-error">{{
+                            errors.npwp }}</p>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Alamat <span class="text-red-400">*</span></label>
+                    <textarea v-model="form.alamat" class="form-control" :class="{ 'border-red-500': errors.alamat }"
+                        placeholder="Alamat" required></textarea>
+                    <p v-if="errors.alamat" class="text-xs text-red-600 mt-2" id="alamat-error">{{
+                        errors.alamat }}</p>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Rekening <span class="text-red-400">*</span></label>
@@ -348,9 +391,11 @@ onMounted(async () => {
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Konfirmasi Password Baru</label>
                     <input v-model="password_confirmation" type="password" class="form-control"
-                        :class="{ 'border-red-500': errors.password_confirmation }" placeholder="Konfirmasi password Baru Anda" required>
-                    <p v-if="errors.password_confirmation" class="text-xs text-red-600 mt-2" id="password_confirmation-error">{{
-                        errors.password_confirmation }}</p>
+                        :class="{ 'border-red-500': errors.password_confirmation }"
+                        placeholder="Konfirmasi password Baru Anda" required>
+                    <p v-if="errors.password_confirmation" class="text-xs text-red-600 mt-2"
+                        id="password_confirmation-error">{{
+                            errors.password_confirmation }}</p>
                 </div>
                 <button class="btn btn-primary px-8 py-3">Ubah Password</button>
             </form>

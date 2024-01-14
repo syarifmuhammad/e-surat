@@ -24,9 +24,13 @@ class SuratPerjanjianKerjaDosenFullTimeResource extends JsonResource
 
         if (!$this->have_reference_number()) {
             $status = 'waiting_for_reference_number';
+        } else if ($this->have_reference_number() && !$this->is_signed() && !$this->is_signed2()) {
+            $status = 'waiting_for_signed_and_signed2';
         } else if ($this->have_reference_number() && !$this->is_signed()) {
             $status = 'waiting_for_signed';
-        } else if ($this->is_signed()) {
+        } else if ($this->have_reference_number() && !$this->is_signed2()) {
+            $status = 'waiting_for_signed2';
+        } else if ($this->is_signed() && $this->is_signed2()) {
             $status = 'signed';
         }
         return [
@@ -42,7 +46,7 @@ class SuratPerjanjianKerjaDosenFullTimeResource extends JsonResource
                 'name' => $this->employee->name,
                 'positions' => $this->employee->positions->pluck('position'),
             ],
-            'profesi' => $this->profesi,
+            'profesi' => $this->employee->profesi,
             'jabatan_fungsional' => $this->jabatan_fungsional,
             'prodi' => json_decode($this->prodi),
             'mulai_berlaku' => $this->mulai_berlaku,
@@ -59,10 +63,12 @@ class SuratPerjanjianKerjaDosenFullTimeResource extends JsonResource
             'have_reference_number' => $this->have_reference_number(),
             'can_give_reference_number' => $this->can_give_reference_number(),
             'can_signed' => $this->can_signed(),
+            'can_signed2' => $this->can_signed2(),
             'can_edit' => $this->can_edit(),
             'can_upload_verified_file' => $this->can_upload_verified_file(),
             'signature_type' => $this->signature_type,
             'is_signed' => $this->is_signed(),
+            'is_signed2' => $this->is_signed2(),
             'status' => $status,
             'tanggal_surat' => Carbon::parse($this->tanggal_surat)->translatedFormat('l, d F Y'),
             'tanggal_surat_raw' => $this->tanggal_surat,

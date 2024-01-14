@@ -21,6 +21,8 @@ class EmployeeResource extends JsonResource
             'name' => $this->name,
             'tempat_lahir' => $this->tempat_lahir,
             'tanggal_lahir' => $this->tanggal_lahir,
+            'alamat' => $this->alamat,
+            'npwp' => $this->npwp,
             'email' => $this->email,
             'rekening' => $this->rekening,
             'positions' => $this->positions->pluck('position'),

@@ -138,20 +138,19 @@ class SuratKeputusanPemberhentianDanPengangkatanController extends Controller
             ], 404);
         }
 
-        if ($letter->signed_file != null) {
-            $fileNameServerPdf = 'app/signed_files/surat_keputusan_pemberhentian_dan_pengangkatan/' . $letter->signed_file;
+        if ($letter->signed_file != null && $letter->signature_type == "manual") {
+            $fileNameServerPdf = 'app/signed_files/' . $letter->signed_file;
             return response()->download(storage_path($fileNameServerPdf), $letter->signed_file);
         }
 
         $fileNameServerDocx = "app/tmp/surat_keputusan_pemberhentian_dan_pengangkatan/" . $letter->id . '.docx';
         $templateProcessor = $letter->generate_docx();
-        $templateProcessor->setValue('tanda_tangan', "");
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
 
         $response = Http::post(env('APP_DOCX_CONVERTER_URL') . '/convert', ['file_path' => $fileNameServerDocx]);
         if ($response->failed()) {
             return response()->json([
-                'errors' => "Something errors"
+                'errors' => $response->json(),
             ], 500);
         }
 
@@ -337,11 +336,16 @@ class SuratKeputusanPemberhentianDanPengangkatanController extends Controller
         $fileName = null;
         try {
             if ($letter->signature_type == 'digital') {
-                $letter_as_base64 = base64_encode($letter);
-                $encrypt_letter = Crypt::encrypt($letter_as_base64);
-                $url_confirmation = env('APP_URL') . "/api/confirm-signature?data=$encrypt_letter";
+                $payload = [
+                    'letter' => $letter->id,
+                    'employee' => auth()->id(),
+                    'letter_type' => 'surat_keputusan_pemberhentian_dan_pengangkatan',
+                    'random_key' => Str::random(8),
+                ];
+                $encrypt_payload = Crypt::encrypt($payload);
+                $url_confirmation = env('APP_URL') . "/api/confirm-signature?data=$encrypt_payload";
                 $fileName = "surat_keputusan_pemberhentian_dan_pengangkatan" . Str::replace("/", "-", $letter->get_reference_number()) . '.png';
-                QrCode::size(500)->generate($url_confirmation, storage_path('app/signed_files/' . $fileName));
+                QrCode::format('png')->size(500)->generate($url_confirmation, storage_path('app/signed_files/' . $fileName));
             } else if ($letter->signature_type == 'gambar tanda tangan') {
                 $signature = Employee::find(auth()->id())->signature;
 

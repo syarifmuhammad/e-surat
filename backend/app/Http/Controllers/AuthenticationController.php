@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
 use App\Models\EmployeePosition;
-use App\Models\KeyPair;
 use App\Models\Rekening;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -67,7 +66,6 @@ class AuthenticationController extends Controller
             $user->email_verified_at = now();
             $user->save();
 
-            KeyPair::storeKeys($user->id, $request->password);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -130,6 +128,11 @@ class AuthenticationController extends Controller
             'nik' => 'required|unique:employees,nik,' . auth()->id(),
             'email' => 'required|unique:employees,email,' . auth()->id(),
             'name' => 'required',
+            'profesi' => 'required|in:dosen,tpa',
+            'tempat_lahir' => 'required',
+            'tanggal_lahir' => 'required|date',
+            'alamat' => 'required',
+            'npwp' => 'required',
             'rekening' => 'required|array',
             'positions' => 'required|array|min:1',
         ]);
@@ -145,8 +148,14 @@ class AuthenticationController extends Controller
         DB::beginTransaction();
         try {
             $employee->nip = $request->nip;
+            $employee->nik = $request->nik;
             $employee->email = $request->email;
             $employee->name = $request->name;
+            $employee->profesi = $request->profesi;
+            $employee->tempat_lahir = $request->tempat_lahir;
+            $employee->tanggal_lahir = $request->tanggal_lahir;
+            $employee->alamat = $request->alamat;
+            $employee->npwp = $request->npwp;
             $employee->save();
 
             $employee->rekening()->delete();

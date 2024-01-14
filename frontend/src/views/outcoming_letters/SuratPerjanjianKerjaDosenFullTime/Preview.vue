@@ -2,8 +2,6 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
-import VuePdfApp from "vue3-pdf-app";
-import "vue3-pdf-app/dist/icons/main.css";
 
 import Loading from '@/components/Loading.vue'
 
@@ -39,6 +37,6 @@ onMounted(() => {
 </script>
 <template>
     <Loading ref="loading"></Loading>
-    <vue-pdf-app style="height: 100vh;"
-        :pdf="pdf"></vue-pdf-app>
+    <iframe style="height: 100vh; width: 100%;"
+        :src="pdf"></iframe>
 </template>

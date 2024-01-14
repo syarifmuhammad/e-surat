@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Http\Resources\EmployeeCollection;
@@ -65,6 +64,11 @@ class EmployeeController extends Controller
             'nik' => 'required|unique:employees,nik',
             'email' => 'required|unique:employees,email',
             'name' => 'required',
+            'profesi' => 'required|in:dosen,tpa',
+            'tempat_lahir' => 'required',
+            'tanggal_lahir' => 'required|date',
+            'alamat' => 'required',
+            'npwp' => 'required',
             'rekening' => 'required|array',
             'positions' => 'required|array',
         ]);
@@ -81,8 +85,14 @@ class EmployeeController extends Controller
         try {
             $employee = new Employee;
             $employee->nip = $request->nip;
+            $employee->nik = $request->nik;
             $employee->email = $request->email;
             $employee->name = $request->name;
+            $employee->profesi = $request->profesi;
+            $employee->tempat_lahir = $request->tempat_lahir;
+            $employee->tanggal_lahir = $request->tanggal_lahir;
+            $employee->alamat = $request->alamat;
+            $employee->npwp = $request->npwp;
             $employee->created_by = auth()->id();
             $employee->save();
 
@@ -193,6 +203,11 @@ class EmployeeController extends Controller
             'nik' => 'required|unique:employees,nik,' . $id,
             'email' => 'required|unique:employees,email,' . $id,
             'name' => 'required',
+            'profesi' => 'required|in:dosen,tpa',
+            'tempat_lahir' => 'required',
+            'tanggal_lahir' => 'required|date',
+            'alamat' => 'required',
+            'npwp' => 'required',
             'rekening' => 'required|array',
             'positions' => 'required|array|min:1',
         ]);
@@ -208,8 +223,14 @@ class EmployeeController extends Controller
         DB::beginTransaction();
         try {
             $employee->nip = $request->nip;
+            $employee->nik = $request->nik;
             $employee->email = $request->email;
             $employee->name = $request->name;
+            $employee->profesi = $request->profesi;
+            $employee->tempat_lahir = $request->tempat_lahir;
+            $employee->tanggal_lahir = $request->tanggal_lahir;
+            $employee->alamat = $request->alamat;
+            $employee->npwp = $request->npwp;
             $employee->save();
 
             $employee->rekening()->delete();

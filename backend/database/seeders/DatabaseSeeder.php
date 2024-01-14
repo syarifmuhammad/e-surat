@@ -9,13 +9,11 @@ use Illuminate\Database\Seeder;
 use App\Models\Position;
 use App\Models\Employee;
 use App\Models\EmployeePosition;
-use App\Models\KeyPair;
 use App\Models\LetterTemplate;
 use App\Models\Prodi;
 use App\Models\ReferenceNumberSetting;
 use App\Models\Rekening;
 use App\Models\User;
-use League\CommonMark\Reference\Reference;
 
 class DatabaseSeeder extends Seeder
 {
@@ -24,12 +22,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
 
         //seeder to make positions
         $positions = [
@@ -46,6 +38,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Dosen Teknik Komputer', 'type' => 'struktural',],
             ['name' => 'Dosen Teknik Telekomunikasi', 'type' => 'struktural',],
             ['name' => 'Dosen Bisnis Digital', 'type' => 'struktural',],
+            ['name' => 'Dosen Luar Biasa', 'type' => 'struktural',],
             ['name' => 'NJAD. 2', 'type' => 'fungsional',],
             ['name' => 'NJAD. 3', 'type' => 'fungsional',],
             ['name' => 'AA. 2', 'type' => 'fungsional',],
@@ -205,6 +198,29 @@ class DatabaseSeeder extends Seeder
                         'type' => 'struktural',
                     ]
                 ],
+            ],
+            [
+                'nip' => '643824376437',
+                'nik' => '97351743743',
+                'name' => 'Dosen Luar Biasa Dummy',
+                'email' => 'dosenluarbiasa@example.com',
+                'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+                'email_verified_at' => now(),
+                'roles' => 'pegawai',
+                'tempat_lahir' => "Bandung",
+                'tanggal_lahir' => "1999-01-01",
+                'alamat' => "Jl. Jalan",
+                'npwp' => "12345678901234567893",
+                'nama_bank' => "Bank Mandiri",
+                'nomor_rekening' => "1234567893",
+                'created_by' => 2,
+                'profesi' => 'dosen',
+                'positions' => [
+                    [
+                        'position' => "Dosen Luar Biasa",
+                        'type' => 'struktural',
+                    ]
+                ],
             ]
         ];
 
@@ -230,7 +246,6 @@ class DatabaseSeeder extends Seeder
                 'roles' => $employee['roles'],
             ]);
 
-            // KeyPair::storeKeys($insert_employee->id, $employee['password']);
             if (isset($employee['positions'])) {
                 foreach ($employee['positions'] as $p) {
                     EmployeePosition::create([

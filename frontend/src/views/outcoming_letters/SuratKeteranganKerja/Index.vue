@@ -21,6 +21,7 @@ const thead = [
     "Pegawai",
     "Penandatangan",
     "Tanggal Surat",
+    "Jenis TTD",
     "Status",
     "",
 ]
@@ -34,7 +35,6 @@ const verified_file = ref(null)
 const letter_id = ref(null)
 const letter_signature_type = ref("")
 const signature = ref(null)
-const password = ref("")
 
 function download_docx(id, nama) {
     loading.value.open()
@@ -284,6 +284,7 @@ function delete_letter(id) {
                     <td :class="[item.defaultClass]">{{ item.employee.name }}</td>
                     <td :class="[item.defaultClass]">{{ item.signer.name }}</td>
                     <td :class="[item.defaultClass]">{{ item.tanggal_surat }}</td>
+                    <td :class="[item.defaultClass]">{{ item.signature_type.toString().toUpperCase() }}</td>
                     <td :class="[item.defaultClass]">
                         <template v-if="item.status == 'waiting_for_reference_number'">
                             <span class="badge badge-danger text-center">Pending</span>
@@ -416,7 +417,8 @@ function delete_letter(id) {
                         :disabled="!signature && letter_signature_type == 'gambar tanda tangan'">Tanda Tangan</button>
                 </div>
             </div>
-    </form>
-</Modal>
-<UploadSignature ref="modal_update_signature" @close="open_modal_sign(letter_id, letter_signature_type)">
-</UploadSignature></template>
+        </form>
+    </Modal>
+    <UploadSignature ref="modal_update_signature" @close="open_modal_sign(letter_id, letter_signature_type)">
+    </UploadSignature>
+</template>

@@ -18,12 +18,12 @@ use App\Http\Controllers\SuratKeputusanPengangkatanController;
 use App\Http\Controllers\SuratPerjanjianKerjaDosenFullTimeController;
 use App\Http\Controllers\SuratPerjanjianKerjaMagangController;
 use App\Http\Controllers\SuratPerjanjianKerjaDosenLuarBiasaController;
+use App\Http\Controllers\SignatureConfirmationController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use PhpOffice\PhpWord\TemplateProcessor;
-use App\Models\KeyPair;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,12 +50,9 @@ Route::get('/unique', function (Request $request) {
     ]);
 });
 
-// Route::get('/test-key-pair', function (Request $request) {
-//     KeyPair::storeKeys(1, 'password');
-// });
-
 Route::post('/login', [AuthenticationController::class, 'login']);
 Route::post('/register', [AuthenticationController::class, 'store']);
+Route::get('/confirm-signature', [SignatureConfirmationController::class, 'confirm_signature']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthenticationController::class, 'me']);
@@ -198,14 +195,14 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'index']);
             Route::get('/graph-in-months/{year}', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'graph_in_months']);
             Route::post('', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'store']);
-            Route::get('/{id}/download_docx', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'download_docx']);
-            Route::get('/{id}/download_pdf', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'download_pdf']);
+            Route::get('/{id}/download/docx', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'download_docx']);
+            Route::get('/{id}/download/pdf', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'download_pdf']);
             Route::get('/{id}', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'show']);
             Route::put('/{id}/upload-signed-file', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'upload_signed_file']);
             Route::put('/{id}', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'update']);
             Route::delete('/{id}', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'destroy']);
             Route::put('/{id}/reference-number', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'give_reference_number']);
-            Route::post('/{id}/sign', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'sign']);
+            Route::put('/{id}/sign', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'sign']);
         });
 
         Route::prefix('surat-perjanjian-kerja-dosen-full-time')->group(function () {

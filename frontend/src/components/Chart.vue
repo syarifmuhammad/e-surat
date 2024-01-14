@@ -243,7 +243,7 @@ const options = {
 const series = computed(() => {
     return [
         {
-            name: 'Surat Masuk',
+            name: 'Surat Keluar',
             data: props.data
         }
     ]

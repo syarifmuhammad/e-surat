@@ -18,8 +18,11 @@ const form = reactive({
     nik: "",
     name: "",
     email: "",
+    profesi: "",
     tempat_lahir: "",
     tanggal_lahir: "",
+    alamat: "",
+    npwp: "",
     rekening: [],
     positions: [],
 })
@@ -29,8 +32,11 @@ const errors = reactive({
     nik: "",
     name: "",
     email: "",
+    profesi: "",
     tempat_lahir: "",
     tanggal_lahir: "",
+    alamat: "",
+    npwp: "",
     rekening: "",
     positions: "",
 })
@@ -46,6 +52,11 @@ async function get_letter(id) {
             form.nik = data.nik
             form.name = data.name
             form.email = data.email
+            form.profesi = data.profesi
+            form.tempat_lahir = data.tempat_lahir
+            form.tanggal_lahir = data.tanggal_lahir
+            form.alamat = data.alamat
+            form.npwp = data.npwp
             form.rekening = data.rekening
             form.positions = data.positions
         })
@@ -66,9 +77,17 @@ function reset_errors() {
 }
 
 function reset() {
+    form.id = ""
     form.nip = ""
+    form.nik = ""
     form.name = ""
     form.email = ""
+    form.profesi = ""
+    form.tempat_lahir = ""
+    form.tanggal_lahir = ""
+    form.alamat = ""
+    form.npwp = ""
+    form.rekening = []
     form.positions = []
     reset_errors()
 }
@@ -109,7 +128,7 @@ function save() {
             text: "Jabatan tidak boleh sama",
         });
         return
-    } 
+    }
 
     reset_errors()
 
@@ -228,26 +247,54 @@ onMounted(async () => {
                     <div>
                         <label class="block text-sm font-medium mb-2">Email <span class="text-red-400">*</span></label>
                         <input v-model="form.email" type="email" class="form-control"
-                            :class="{ 'border-red-500': errors.name }" placeholder="Email" required>
+                            :class="{ 'border-red-500': errors.email }" placeholder="Email" required>
                         <p v-if="errors.email" class="text-xs text-red-600 mt-2" id="email-error">{{
                             errors.email }}</p>
                     </div>
                 </div>
                 <div class="mb-4 grid grid-cols-2 gap-x-8">
                     <div>
-                        <label class="block text-sm font-medium mb-2">Tempat Lahir <span class="text-red-400">*</span></label>
+                        <label class="block text-sm font-medium mb-2">Tempat Lahir <span
+                                class="text-red-400">*</span></label>
                         <input v-model="form.tempat_lahir" type="text" class="form-control"
-                            :class="{ 'border-red-500': errors.tempat_lahir }" placeholder="Nama" required>
+                            :class="{ 'border-red-500': errors.tempat_lahir }" placeholder="Tempat Lahir" required>
                         <p v-if="errors.tempat_lahir" class="text-xs text-red-600 mt-2" id="tempat_lahir-error">{{
                             errors.tempat_lahir }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-2">Tanggal Lahir <span class="text-red-400">*</span></label>
+                        <label class="block text-sm font-medium mb-2">Tanggal Lahir <span
+                                class="text-red-400">*</span></label>
                         <input v-model="form.tanggal_lahir" type="date" class="form-control"
-                            :class="{ 'border-red-500': errors.name }" placeholder="Tanggal Lahir" required>
+                            :class="{ 'border-red-500': errors.tanggal_lahir }" placeholder="Tanggal Lahir" required>
                         <p v-if="errors.tanggal_lahir" class="text-xs text-red-600 mt-2" id="tanggal_lahir-error">{{
                             errors.tanggal_lahir }}</p>
                     </div>
+                </div>
+                <div class="mb-4 grid grid-cols-2 gap-x-8">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Profesi <span class="text-red-400">*</span></label>
+                        <select v-model="form.profesi" class="form-control" :class="{ 'border-red-500': errors.profesi }"
+                            required>
+                            <option value="dosen">DOSEN</option>
+                            <option value="tpa">TPA</option>
+                        </select>
+                        <p v-if="errors.profesi" class="text-xs text-red-600 mt-2" id="profesi-error">{{
+                            errors.profesi }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">NPWP <span class="text-red-400">*</span></label>
+                        <input v-model="form.npwp" type="text" class="form-control"
+                            :class="{ 'border-red-500': errors.npwp }" placeholder="NPWP" required>
+                        <p v-if="errors.npwp" class="text-xs text-red-600 mt-2" id="npwp-error">{{
+                            errors.npwp }}</p>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Alamat <span class="text-red-400">*</span></label>
+                    <textarea v-model="form.alamat" class="form-control" :class="{ 'border-red-500': errors.alamat }"
+                        placeholder="Alamat" required></textarea>
+                    <p v-if="errors.alamat" class="text-xs text-red-600 mt-2" id="alamat-error">{{
+                        errors.alamat }}</p>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Rekening <span class="text-red-400">*</span></label>
@@ -273,8 +320,8 @@ onMounted(async () => {
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Jabatan <span class="text-red-400">*</span></label>
-                    <search-input :url="`${url}/positions`" placeholder="Jabatan" @selected="(data) => form.positions.push(data.name)"
-                        @click_default_first="">
+                    <search-input :url="`${url}/positions`" placeholder="Jabatan"
+                        @selected="(data) => form.positions.push(data.name)" @click_default_first="">
                         <template #default_first>
                             <p class="text-center"> + Tambah Data Jabatan</p>
                         </template>

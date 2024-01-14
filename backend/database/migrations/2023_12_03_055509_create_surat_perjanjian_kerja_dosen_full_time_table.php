@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('nomor_surat_sebelumnya')->nullable();
             $table->string('tanggal_surat_sebelumnya')->nullable();
             $table->unsignedBigInteger('employee_id');
-            $table->string('profesi');
             $table->string('jabatan_fungsional');
             $table->json('prodi');
             $table->date('mulai_berlaku');
@@ -30,6 +29,8 @@ return new class extends Migration
             $table->unsignedBigInteger('letter_template_id');
             $table->boolean('is_signed')->default(false);
             $table->string('signed_file')->nullable();
+            $table->boolean('is_signed2')->default(false);
+            $table->string('signed_file2')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
 
