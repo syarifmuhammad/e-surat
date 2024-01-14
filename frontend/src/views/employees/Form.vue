@@ -305,7 +305,9 @@ onMounted(async () => {
                         <option value="admin_sdm">Admin Bagian Sekretariat</option>
                     </select>
                 </div> -->
-                <div class="flex justify-end">
+                <div class="flex justify-end gap-x-6">
+                    <router-link :to="{ name: 'employees' }"
+                        class="btn btn-outline border hover:border-primary-500 px-24 py-3">Kembali</router-link>
                     <button class="btn btn-primary px-24 py-3">Simpan</button>
                 </div>
             </form>

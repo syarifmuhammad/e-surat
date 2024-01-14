@@ -234,7 +234,8 @@ function delete_category(id) {
                         </p>
                     </div>
                 </div>
-                <div class="border-t p-4 sm:px-10 flex justify-end">
+                <div class="border-t p-4 sm:px-10 gap-x-6 flex justify-end">
+                    <button type="button" @click="close_modal_form_category">Batal</button>
                     <button class="btn btn-primary px-14 py-3">Simpan</button>
                 </div>
             </form>
