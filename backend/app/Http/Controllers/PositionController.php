@@ -16,7 +16,11 @@ class PositionController extends Controller
     public function index(Request $request)
     {
         $search = $request->search;
-        $positions = Position::search($search)->paginate();
+        $positions = Position::search($search);
+        if ($request->type && ($request->type == 'struktural' || $request->type == 'fungsional') ) {
+                $positions = $positions->where('type', $request->type);
+        }
+        $positions = $positions->paginate();
         return new PositionCollection($positions);
     }
 
