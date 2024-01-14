@@ -100,7 +100,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('outcoming-letters')->group(function () {
-        Route::get('reports', [ReportController::class, 'report_outcoming_letter']);
+        // Route::get('reports', [ReportController::class, 'report_outcoming_letter']);
         Route::prefix('/templates')->group(function () {
             Route::get('/', [LetterTemplateController::class, 'index']);
             Route::get('/download_example', [LetterTemplateController::class, 'download_example']);
