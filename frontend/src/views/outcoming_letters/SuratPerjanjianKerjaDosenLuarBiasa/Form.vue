@@ -52,6 +52,7 @@ const errors = reactive({
 })
 
 const letter_templates = ref([])
+const jabatan_fungsional = ref([])
 const selected_employee = ref(null)
 const selected_rekening = ref(null)
 const selected_signer = ref(null)
@@ -62,6 +63,18 @@ async function get_letter_templates() {
         .then(res => {
             letter_templates.value = res.data.data
             form_surat.letter_template_id = letter_templates.value[0].id
+        })
+        .catch(err => {
+            console.log(err)
+        })
+}
+
+async function get_jabatan_fungsional() {
+    await axios.get(`${url}/positions?type=fungsional`)
+        .then(res => {
+            jabatan_fungsional.value = res.data.data.map(p => {
+                return p.name
+            })
         })
         .catch(err => {
             console.log(err)
@@ -285,6 +298,7 @@ onMounted(async () => {
         await get_letter(route.params.id)
     }
     await get_letter_templates()
+    await get_jabatan_fungsional()
     loading.value.close()
 })
 
@@ -292,8 +306,9 @@ onMounted(async () => {
 
 <template>
     <Loading ref="loading"></Loading>
-    <SubHeader  :title="route.name == 'update_surat_perjanjian_kerja_dosen_luar_biasa' ? `Edit Surat Perjanjian Kerja Dosen Luar Biasa` : `Tambah Surat Perjanjian Kerja Dosen Luar Biasa`"
-    :back_url="{ name: 'surat_perjanjian_kerja_dosen_luar_biasa' }" />
+    <SubHeader
+        :title="route.name == 'update_surat_perjanjian_kerja_dosen_luar_biasa' ? `Edit Surat Perjanjian Kerja Dosen Luar Biasa` : `Tambah Surat Perjanjian Kerja Dosen Luar Biasa`"
+        :back_url="{ name: 'surat_perjanjian_kerja_dosen_luar_biasa' }" />
     <div class="flex flex-col bg-white rounded-lg">
         <div class="px-8 py-5 min-w-full inline-block align-middle">
             <form @submit.prevent="save_surat">
@@ -310,10 +325,8 @@ onMounted(async () => {
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Tanggal Surat</label>
-                    <input type="date" class="form-control" required
-                        v-model="form_surat.tanggal_surat">
-                    <p v-if="errors['tanggal_surat']"
-                        class="text-xs text-red-600 mt-2">
+                    <input type="date" class="form-control" required v-model="form_surat.tanggal_surat">
+                    <p v-if="errors['tanggal_surat']" class="text-xs text-red-600 mt-2">
                         {{ errors['tanggal_surat'] }}
                     </p>
                 </div>
@@ -389,20 +402,22 @@ onMounted(async () => {
                             </p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-2">Jabatan Fungsional</label>
-                            <input type="text" class="form-control" required v-model="form_surat.jabatan_fungsional"
-                                placeholder="Jabatan Fungsional">
-                            <p v-if="errors.jabatan_fungsional" class="text-xs text-red-600 mt-2">
-                                {{ errors.jabatan_fungsional }}
+                            <label class="block text-sm font-medium mb-2">Mata Kuliah</label>
+                            <input type="text" class="form-control" required v-model="form_surat.mata_kuliah"
+                                placeholder="Mata Kuliah">
+                            <p v-if="errors.mata_kuliah" class="text-xs text-red-600 mt-2">
+                                {{ errors.mata_kuliah }}
                             </p>
                         </div>
                     </div>
                     <div class="mb-4">
-                        <label class="block text-sm font-medium mb-2">Mata Kuliah</label>
-                        <input type="text" class="form-control" required v-model="form_surat.mata_kuliah"
-                            placeholder="Mata Kuliah">
-                        <p v-if="errors.mata_kuliah" class="text-xs text-red-600 mt-2">
-                            {{ errors.mata_kuliah }}
+                        <label class="block text-sm font-medium mb-2">Jabatan Fungsional</label>
+                        <custom-select :required="true" v-model="form_surat.jabatan_fungsional" :data="jabatan_fungsional"
+                            placeholder="Jabatan Fungsional"></custom-select>
+                        <!-- <input type="text" class="form-control" required v-model="form_surat.jabatan_fungsional"
+                            placeholder="Jabatan Fungsional"> -->
+                        <p v-if="errors.jabatan_fungsional" class="text-xs text-red-600 mt-2">
+                            {{ errors.jabatan_fungsional }}
                         </p>
                     </div>
                 </template>
@@ -487,7 +502,6 @@ onMounted(async () => {
                     <select class="form-control" required v-model="form_surat.signature_type"
                         placeholder="Jenis Tanda Tangan">
                         <option value="manual">Tanda Tangan Manual</option>
-                        <!-- <option value="qrcode">Tanda Tangan QR Code</option> -->
                         <option value="digital">Tanda Tangan Digital</option>
                         <option value="gambar tanda tangan">Tanda Tangan Berupa Gambar</option>
                     </select>
@@ -495,7 +509,9 @@ onMounted(async () => {
                         {{ errors.signature_type }}
                     </p>
                 </div>
-                <div class="flex justify-end">
+                <div class="flex justify-end gap-x-6">
+                    <router-link :to="{ name: 'surat_perjanjian_kerja_dosen_luar_biasa' }"
+                        class="btn btn-outline border hover:border-primary-500 px-24 py-3">Kembali</router-link>
                     <button class="btn btn-primary px-24 py-3">Simpan</button>
                 </div>
             </form>

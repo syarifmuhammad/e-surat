@@ -26,7 +26,6 @@ const form_surat = reactive({
     letter_template_id: "",
     tanggal_surat: new Date().toISOString().slice(0, 10),
     employee: {},
-    profesi: "",
     jabatan_fungsional: "",
     mulai_berlaku: "",
     akhir_berlaku: "",
@@ -62,7 +61,6 @@ const errors = reactive({
     nomor_surat_sebelumnya: "",
     tanggal_surat_sebelumnya: "",
     'employee.id': "",
-    profesi: "",
     jabatan_fungsional: "",
     mulai_berlaku: "",
     akhir_berlaku: "",
@@ -88,6 +86,7 @@ const errors = reactive({
 })
 
 const letter_templates = ref([])
+const jabatan_fungsional = ref([])
 const selected_employee = ref(null)
 const selected_rekening = ref(null)
 const selected_prodi = ref(null)
@@ -106,6 +105,18 @@ async function get_letter_templates() {
         })
 }
 
+async function get_jabatan_fungsional() {
+    await axios.get(`${url}/positions?type=fungsional`)
+        .then(res => {
+            jabatan_fungsional.value = res.data.data.map(p => {
+                return p.name
+            })
+        })
+        .catch(err => {
+            console.log(err)
+        })
+}
+
 async function get_letter(id) {
     await axios.get(`${url}/outcoming-letters/surat-perjanjian-kerja-dosen-full-time/${id}`)
         .then(res => {
@@ -116,7 +127,6 @@ async function get_letter(id) {
             form_surat.letter_template_id = data.letter_template_id
             form_surat.tanggal_surat = data.tanggal_surat_raw
             form_surat.employee = data.employee
-            form_surat.profesi = data.profesi
             form_surat.jabatan_fungsional = data.jabatan_fungsional
             form_surat.mulai_berlaku = data.mulai_berlaku
             form_surat.akhir_berlaku = data.akhir_berlaku
@@ -167,7 +177,6 @@ function reset_form() {
     form_surat.tanggal_surat_sebelumnya = ""
     form_surat.letter_template_id = ""
     form_surat.tanggal_surat = new Date().toISOString().slice(0, 10)
-    form_surat.profesi = ""
     form_surat.jabatan_fungsional = ""
     form_surat.mulai_berlaku = ""
     form_surat.akhir_berlaku = ""
@@ -246,7 +255,6 @@ function save_surat() {
             employee: {
                 id: selected_employee.value.id,
             },
-            profesi: form_surat.profesi,
             jabatan_fungsional: form_surat.jabatan_fungsional,
             mulai_berlaku: form_surat.mulai_berlaku,
             akhir_berlaku: form_surat.akhir_berlaku,
@@ -290,7 +298,6 @@ function save_surat() {
             employee: {
                 id: selected_employee.value.id,
             },
-            profesi: form_surat.profesi,
             jabatan_fungsional: form_surat.jabatan_fungsional,
             mulai_berlaku: form_surat.mulai_berlaku,
             akhir_berlaku: form_surat.akhir_berlaku,
@@ -351,6 +358,7 @@ onMounted(async () => {
         await get_letter(route.params.id)
     }
     await get_letter_templates()
+    await get_jabatan_fungsional()
     loading.value.close()
 })
 
@@ -377,14 +385,12 @@ onMounted(async () => {
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Tanggal Surat</label>
-                    <input type="date" class="form-control" required
-                        v-model="form_surat.tanggal_surat">
-                    <p v-if="errors['tanggal_surat']"
-                        class="text-xs text-red-600 mt-2">
+                    <input type="date" class="form-control" required v-model="form_surat.tanggal_surat">
+                    <p v-if="errors['tanggal_surat']" class="text-xs text-red-600 mt-2">
                         {{ errors['tanggal_surat'] }}
                     </p>
                 </div>
-                <div class="mb-4 grid grid-cols-2 gap-x-8">
+                <!-- <div class="mb-4 grid grid-cols-2 gap-x-8">
                     <div>
                         <label class="block text-sm font-medium mb-2">Nomor Surat Perjanjian Kerja Yang Diamandemen (Tidak
                             Wajib)</label>
@@ -397,16 +403,16 @@ onMounted(async () => {
                     <div>
                         <label class="block text-sm font-medium mb-2">Tanggal Surat Perjanjian Kerja Yang Diamandemen (Tidak
                             Wajib)</label>
-                        <input type="date" class="form-control" v-model="form_surat.tanggal_surat_sebelumnya" >
+                        <input type="date" class="form-control" v-model="form_surat.tanggal_surat_sebelumnya">
                         <p v-if="errors.tanggal_surat_sebelumnya" class="text-xs text-red-600 mt-2">
                             {{ errors.tanggal_surat_sebelumnya }}
                         </p>
                     </div>
-                </div>
+                </div> -->
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Dosen</label>
-                    <search-input v-if="!selected_employee" v-model="selected_employee" :url="`${url}/employees?profesi=dosen`"
-                        id="employee" placeholder="Cari Dosen ...">
+                    <search-input v-if="!selected_employee" v-model="selected_employee"
+                        :url="`${url}/employees?profesi=dosen`" id="employee" placeholder="Cari Dosen ...">
                         <template v-slot="{ data }">
                             <small>{{ data.nip }}</small>
                             <p class="mb-0">{{ data.name }}</p>
@@ -495,8 +501,8 @@ onMounted(async () => {
                             </span>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-x-4 mb-4">
-                        <div>
+                    <div class="mb-4">
+                        <!-- <div>
                             <label class="block text-sm font-medium mb-2">Profesi</label>
                             <input type="text" class="form-control" required v-model="form_surat.profesi"
                                 placeholder="Profesi">
@@ -504,14 +510,16 @@ onMounted(async () => {
                                 {{ errors.profesi }}
                             </p>
                         </div>
-                        <div>
+                        <div> -->
                             <label class="block text-sm font-medium mb-2">Jabatan Fungsional</label>
-                            <input type="text" class="form-control" required v-model="form_surat.jabatan_fungsional"
-                                placeholder="Jabatan Fungsional">
+                            <custom-select :required="true" v-model="form_surat.jabatan_fungsional" :data="jabatan_fungsional"
+                            placeholder="Jabatan Fungsional"></custom-select>
+                            <!-- <input type="text" class="form-control" required v-model="form_surat.jabatan_fungsional"
+                                placeholder="Jabatan Fungsional"> -->
                             <p v-if="errors.jabatan_fungsional" class="text-xs text-red-600 mt-2">
                                 {{ errors.jabatan_fungsional }}
                             </p>
-                        </div>
+                        <!-- </div> -->
                     </div>
                 </template>
                 <hr class="my-4" />
@@ -553,7 +561,7 @@ onMounted(async () => {
                         <div class="pr-10">
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tahun Penggajian Pertama</label>
-                                <input type="number" class="form-control" required
+                                <input type="number" class="form-control"
                                     v-model="form_surat.pertelaan_perjanjian_kerja.tahun_satu" placeholder="cth : 2023">
                                 <p v-if="errors['pertelaan_perjanjian_kerja.tahun_satu']" class="text-xs text-red-600 mt-2">
                                     {{ errors['pertelaan_perjanjian_kerja.tahun_satu'] }}
@@ -561,7 +569,7 @@ onMounted(async () => {
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Dasar</label>
-                                <input type="number" class="form-control" required
+                                <input type="number" class="form-control"
                                     v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_dasar_satu"
                                     placeholder="Tunjangan Dasar">
                                 <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_dasar_satu']"
@@ -571,7 +579,7 @@ onMounted(async () => {
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Fungsional</label>
-                                <input type="number" class="form-control" required
+                                <input type="number" class="form-control"
                                     v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_fungsional_satu"
                                     placeholder="Tunjangan Fungsional">
                                 <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_fungsional_satu']"
@@ -581,7 +589,7 @@ onMounted(async () => {
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Struktural</label>
-                                <input type="number" class="form-control" required
+                                <input type="number" class="form-control"
                                     v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_struktural_satu"
                                     placeholder="Tunjangan Struktural">
                                 <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_struktural_satu']"
@@ -591,7 +599,7 @@ onMounted(async () => {
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Kemahalan</label>
-                                <input type="number" class="form-control" required
+                                <input type="number" class="form-control"
                                     v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu"
                                     placeholder="Tunjangan Kemahalan">
                                 <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_kemahalan_satu']"
@@ -601,7 +609,7 @@ onMounted(async () => {
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Pendapatan Bulanan</label>
-                                <input type="number" class="form-control" required
+                                <input type="number" class="form-control"
                                     v-model="form_surat.pertelaan_perjanjian_kerja.pendapatan_bulanan_satu"
                                     placeholder="Pendapatan Bulanan">
                                 <p v-if="errors['pertelaan_perjanjian_kerja.pendapatan_bulanan_satu']"
@@ -613,7 +621,7 @@ onMounted(async () => {
                         <div class="pl-10">
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tahun Penggajian Kedua</label>
-                                <input type="number" class="form-control" required
+                                <input type="number" class="form-control"
                                     v-model="form_surat.pertelaan_perjanjian_kerja.tahun_dua" placeholder="cth : 2023">
                                 <p v-if="errors['pertelaan_perjanjian_kerja.tahun_dua']" class="text-xs text-red-600 mt-2">
                                     {{ errors['pertelaan_perjanjian_kerja.tahun_dua'] }}
@@ -621,7 +629,7 @@ onMounted(async () => {
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Dasar</label>
-                                <input type="number" class="form-control" required
+                                <input type="number" class="form-control"
                                     v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_dasar_dua"
                                     placeholder="Tunjangan Dasar">
                                 <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_dasar_dua']"
@@ -631,7 +639,7 @@ onMounted(async () => {
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Fungsional</label>
-                                <input type="number" class="form-control" required
+                                <input type="number" class="form-control"
                                     v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_fungsional_dua"
                                     placeholder="Tunjangan Fungsional">
                                 <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_fungsional_dua']"
@@ -641,7 +649,7 @@ onMounted(async () => {
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Struktural</label>
-                                <input type="number" class="form-control" required
+                                <input type="number" class="form-control"
                                     v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_struktural_dua"
                                     placeholder="Tunjangan Struktural">
                                 <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_struktural_dua']"
@@ -651,7 +659,7 @@ onMounted(async () => {
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Tunjangan Kemahalan</label>
-                                <input type="number" class="form-control" required
+                                <input type="number" class="form-control"
                                     v-model="form_surat.pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua"
                                     placeholder="Tunjangan Kemahalan">
                                 <p v-if="errors['pertelaan_perjanjian_kerja.tunjangan_kemahalan_dua']"
@@ -661,7 +669,7 @@ onMounted(async () => {
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Pendapatan Bulanan</label>
-                                <input type="number" class="form-control" required
+                                <input type="number" class="form-control"
                                     v-model="form_surat.pertelaan_perjanjian_kerja.pendapatan_bulanan_dua"
                                     placeholder="Pendapatan Bulanan">
                                 <p v-if="errors['pertelaan_perjanjian_kerja.pendapatan_bulanan_dua']"
@@ -743,7 +751,6 @@ onMounted(async () => {
                     <select class="form-control" required v-model="form_surat.signature_type"
                         placeholder="Jenis Tanda Tangan">
                         <option value="manual">Tanda Tangan Manual</option>
-                        <!-- <option value="qrcode">Tanda Tangan QR Code</option> -->
                         <option value="digital">Tanda Tangan Digital</option>
                         <option value="gambar tanda tangan">Tanda Tangan Berupa Gambar</option>
                     </select>
@@ -751,7 +758,9 @@ onMounted(async () => {
                         {{ errors.signature_type }}
                     </p>
                 </div>
-                <div class="flex justify-end">
+                <div class="flex justify-end gap-x-6">
+                    <router-link :to="{ name: 'surat_perjanjian_kerja_dosen_full_time' }"
+                        class="btn btn-outline border hover:border-primary-500 px-24 py-3">Kembali</router-link>
                     <button class="btn btn-primary px-24 py-3">Simpan</button>
                 </div>
             </form>

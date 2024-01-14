@@ -134,7 +134,8 @@ onMounted(async () => {
         <div class="px-8 py-5 min-w-full inline-block align-middle">
             <form @submit.prevent="save">
                 <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">Nama Unit Kerja <span class="text-red-400">*</span></label>
+                    <label class="block text-sm font-medium mb-2">Nama Unit Kerja <span
+                            class="text-red-400">*</span></label>
                     <input class="form-control" required v-model="form.nama"
                         placeholder="cth: Lembaga Penelitian & Pengabdian Masyarakat">
                     <p v-if="errors.nama" class="text-xs text-red-600 mt-2">
@@ -149,7 +150,9 @@ onMounted(async () => {
                         {{ errors.singkatan }}
                     </p>
                 </div>
-                <div class="flex justify-end">
+                <div class="flex justify-end gap-x-6">
+                    <router-link :to="{ name: 'unit' }"
+                        class="btn btn-outline border hover:border-primary-500 px-24 py-3">Kembali</router-link>
                     <button class="btn btn-primary px-24 py-3">Simpan</button>
                 </div>
             </form>

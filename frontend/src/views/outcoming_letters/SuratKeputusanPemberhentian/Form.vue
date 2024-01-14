@@ -445,7 +445,6 @@ onMounted(async () => {
                     <select class="form-control" required v-model="form_surat.signature_type"
                         placeholder="Jenis Tanda Tangan">
                         <option value="manual">Tanda Tangan Manual</option>
-                        <!-- <option value="qrcode">Tanda Tangan QR Code</option> -->
                         <option value="digital">Tanda Tangan Digital</option>
                         <option value="gambar tanda tangan">Tanda Tangan Berupa Gambar</option>
                     </select>
@@ -453,7 +452,9 @@ onMounted(async () => {
                         {{ errors.signature_type }}
                     </p>
                 </div>
-                <div class="flex justify-end">
+                <div class="flex justify-end gap-x-6">
+                    <router-link :to="{ name: 'surat_keputusan_pemberhentian' }"
+                        class="btn btn-outline border hover:border-primary-500 px-24 py-3">Kembali</router-link>
                     <button class="btn btn-primary px-24 py-3">Simpan</button>
                 </div>
             </form>
