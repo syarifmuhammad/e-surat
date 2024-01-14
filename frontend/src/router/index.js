@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 const Register = () => import('@/views/Register.vue')
 const AskVerification = () => import('@/views/AskVerification.vue')
 const Login = () => import('@/views/Login.vue')
+const Profile = () => import('@/views/Profile.vue')
 const Dashboard = () => import('@/views/Dashboard.vue')
 const Position = () => import('@/views/positions/Index.vue')
 const FormPosition = () => import('@/views/positions/Form.vue')
@@ -17,18 +18,7 @@ const PreviewIncomingLetter = () => import('@/views/incoming_letters/Preview.vue
 const ReferenceNumberSettings = () => import('@/views/outcoming_letters/ReferenceNumberSettings.vue')
 const LetterTemplates = () => import('@/views/outcoming_letters/LetterTemplates/Index.vue')
 const FormLetterTemplates = () => import('@/views/outcoming_letters/LetterTemplates/Form.vue')
-
-// import Login from '@/views/Login.vue'
-
-// import Dashboard from '@/views/Dashboard.vue'
-// import Position from '@/views/positions/Index.vue'
-// import FormPosition from '@/views/positions/Form.vue'
-// import Employees from '@/views/employees/Index.vue'
-// import FormEmployees from '@/views/employees/Form.vue'
-// import Categories from '@/views/incoming_letters/Categories.vue'
-// import Archive from '@/views/incoming_letters/Archive.vue'
-// import ReferenceNumberSettings from '@/views/outcoming_letters/ReferenceNumberSettings.vue'
-// import LetterTemplates from '@/views/outcoming_letters/LetterTemplates/Index.vue'
+const Report = () => import('@/views/outcoming_letters/Report.vue')
 
 //surat keterangan kerja
 const SuratKeteranganKerja = () => import('@/views/outcoming_letters/SuratKeteranganKerja/Index.vue')
@@ -144,6 +134,16 @@ const router = createRouter({
         is_login_required: false,
         can_accessed: ['*'],
         layout: 'GuestLayout',
+      }
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: Profile,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
       }
     },
     {
@@ -353,6 +353,16 @@ const router = createRouter({
       meta: {
         is_login_required: true,
         can_accessed: ['superadmin', 'admin_sekretariat'],
+        layout: 'AuthenticatedLayout',
+      },
+    },
+    {
+      path: '/surat-keluar/report',
+      name: 'report_outcoming_letter',
+      component: Report,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['superadmin', 'admin_sekretariat', 'admin_sdm'],
         layout: 'AuthenticatedLayout',
       },
     },
