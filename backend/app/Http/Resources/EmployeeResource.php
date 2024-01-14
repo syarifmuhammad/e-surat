@@ -19,6 +19,8 @@ class EmployeeResource extends JsonResource
             'nip' => $this->nip,
             'nik' => $this->nik,
             'name' => $this->name,
+            'tempat_lahir' => $this->tempat_lahir,
+            'tanggal_lahir' => $this->tanggal_lahir,
             'email' => $this->email,
             'rekening' => $this->rekening,
             'positions' => $this->positions->pluck('position'),
