@@ -283,7 +283,7 @@ class EmployeeController extends Controller
             }
 
             $validate = Validator::make($request->all(), [
-                'roles' => 'required|string|in:pegawai,admin_sdm,admin_sekretariat',
+                'roles' => 'required|string|in:pegawai,admin_unit,admin_sekretariat',
             ]);
 
             if ($validate->fails()) {
@@ -383,6 +383,26 @@ class EmployeeController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $employee = Employee::find($id);
+
+        if (!$employee) {
+            return response()->json([
+                'message' => "Data pegawai tidak ditemukan !"
+            ], 404);
+        }
+
+        DB::beginTransaction();
+        try {
+            $employee->delete();
+            DB::commit();
+            return response()->json([
+                'message' => 'Berhasil menghapus data pegawai !',
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }
