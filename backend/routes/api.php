@@ -73,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}/roles', [EmployeeController::class, 'update_roles']);
         Route::put('/{id}/signature', [EmployeeController::class, 'update_signature_by_admin']);
         Route::put('/{id}', [EmployeeController::class, 'update']);
+        Route::delete('/{id}', [EmployeeController::class, 'destroy']);
     });
 
     Route::group(['prefix' => 'reference-number-settings'], function () {
@@ -106,6 +107,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}', [LetterTemplateController::class, 'show']);
             Route::get('/{id}/download', [LetterTemplateController::class, 'download']);
             Route::post('/', [LetterTemplateController::class, 'store']);
+            Route::put('/{id}/set-active-or-not', [LetterTemplateController::class, 'set_active_or_not']);
             Route::put('/{id}', [LetterTemplateController::class, 'update']);
         });
         Route::prefix('surat-keterangan-kerja')->group(function () {
