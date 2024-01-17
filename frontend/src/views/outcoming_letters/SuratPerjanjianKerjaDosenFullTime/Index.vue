@@ -263,7 +263,7 @@ function delete_letter(id) {
         <div class="px-8 py-5 min-w-full inline-block align-middle">
             <div class="flex justify-between mb-6">
                 <h3 class="text-primary-400">List Surat Perjanjian Kerja Dosen Full Time</h3>
-                <RouterLink v-if="userStore.user.roles === 'superadmin' || userStore.user.roles === 'admin_sdm'"
+                <RouterLink v-if="userStore.user.roles === 'superadmin' || userStore.user.roles === 'admin_unit'"
                     :to="{ name: 'create_surat_perjanjian_kerja_dosen_full_time' }" class="btn btn-primary">
                     <Icon class="text-lg" icon="fluent:add-12-filled" /> Tambah Surat
                 </RouterLink>
@@ -339,7 +339,7 @@ function delete_letter(id) {
                                 </RouterLink>
                                 <span @click="download_docx(item.id, item.employee.name)"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
+                                     <Icon class="text-lg" icon="gg:file-document"></Icon>
                                     Lihat Surat (.DOCX)
                                 </span>
                                 <span v-if="item.can_give_reference_number"
