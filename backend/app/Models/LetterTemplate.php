@@ -39,4 +39,13 @@ class LetterTemplate extends Model
         }
     }
 
+    public function scopeIsActive($query, $is_active = true) {
+        $query->where('is_active', $is_active);
+    }
+
+
+    public function is_active() {
+        return $this->is_active;
+    }
+
 }
