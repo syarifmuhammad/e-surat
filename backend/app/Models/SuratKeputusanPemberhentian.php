@@ -107,7 +107,7 @@ class SuratKeputusanPemberhentian extends Model
 
     public function can_edit()
     {
-        return (auth()->user()->roles == 'admin_sdm' || $this->created_by == auth()->user()->id) && !$this->is_signed();
+        return (auth()->user()->roles == 'admin_unit' || $this->created_by == auth()->user()->id) && !$this->is_signed();
     }
 
     public function can_upload_verified_file()
