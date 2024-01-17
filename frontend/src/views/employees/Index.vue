@@ -66,6 +66,50 @@ function save_form_edit_roles() {
     })
 }
 
+function delete_employee(id) {
+    Swal.fire({
+        title: 'Apakah anda yakin?',
+        text: "Data pegawai akan dihapus secara permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            loading.value.open()
+            axios.delete(`${url}/employees/${id}`).then(res => {
+                if (res.status == 200) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Berhasil",
+                        text: res.data.message,
+                    });
+                    table.value.getData()
+                }
+            }).catch(e => {
+                if (e.response.status == 422) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal",
+                        text: e.response.data.message,
+                    });
+                } else {
+                    console.log(e)
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal",
+                        text: "Terjadi kesalahan, karena pegawai sudah memiliki data terkait",
+                    })
+                }
+            }).finally(() => {
+                loading.value.close()
+            })
+        }
+    });
+}
+
 function check_routes(name, roles) {
     if (!router.hasRoute(name)) {
         return false
@@ -133,9 +177,9 @@ function check_routes(name, roles) {
                                     <Icon class="text-lg" icon="cil:pencil"></Icon>
                                     Edit
                                 </RouterLink>
-                                <span v-if="item.quantity < 1"
+                                <span @click="delete_employee(item.id)"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="jam:trash"></Icon>
+                                    <Icon class="text-lg" icon="cil:trash"></Icon>
                                     Hapus
                                 </span>
                             </div>
@@ -158,7 +202,7 @@ function check_routes(name, roles) {
                         <label class="block text-sm font-medium mb-2">Roles <span class="text-red-400">*</span></label>
                         <select v-model="form_edit_roles.roles" class="form-control" required>
                             <option value="pegawai">Pegawai</option>
-                            <option value="admin_sdm">Admin SDM</option>
+                            <option value="admin_unit">Admin Unit</option>
                             <option value="admin_sekretariat">Admin Sekretariat</option>
                         </select>
                     </div>
