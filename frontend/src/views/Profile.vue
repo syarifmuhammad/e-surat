@@ -298,7 +298,7 @@ onMounted(async () => {
                             errors.npwp }}</p>
                     </div>
                 </div>
-                <div>
+                <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Alamat <span class="text-red-400">*</span></label>
                     <textarea v-model="form.alamat" class="form-control" :class="{ 'border-red-500': errors.alamat }"
                         placeholder="Alamat" required></textarea>
@@ -331,9 +331,9 @@ onMounted(async () => {
                     <label class="block text-sm font-medium mb-2">Jabatan <span class="text-red-400">*</span></label>
                     <search-input :url="`${url}/positions`" placeholder="Jabatan"
                         @selected="(data) => form.positions.push(data.name)" @click_default_first="">
-                        <template #default_first>
+                        <!-- <template #default_first>
                             <p class="text-center"> + Tambah Data Jabatan</p>
-                        </template>
+                        </template> -->
                         <template v-slot="{ data }">
                             <p>{{ data.name }}</p>
                         </template>
@@ -357,8 +357,8 @@ onMounted(async () => {
                     <label class="block text-sm font-medium mb-2">Role User <span class="text-red-400">*</span></label>
                     <select v-model="form.roles" class="form-control" required>
                         <option value="pegawai">Pegawai</option>
-                        <option value="admin_sdm">Admin Bagian SDM</option>
-                        <option value="admin_sdm">Admin Bagian Sekretariat</option>
+                        <option value="admin_unit">Admin Bagian SDM</option>
+                        <option value="admin_unit">Admin Bagian Sekretariat</option>
                     </select>
                 </div> -->
                 <div class="flex justify-end gap-x-6">
