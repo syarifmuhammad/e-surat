@@ -11,6 +11,7 @@ const thead = [
     "#",
     "Name",
     "Jenis Surat",
+    "Aktif ?",
     "",
 ]
 
@@ -32,6 +33,43 @@ function download(id, name, letter_type) {
         loading.value.close()
     })
 }
+
+function set_active_or_not(id, is_active) {
+    Swal.fire({
+        title: 'Apakah anda yakin?',
+        text: `Anda akan ${is_active ? 'menonaktifkan' : 'mengaktifkan'} template surat ini`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: `${is_active ? 'Nonaktifkan' : 'Aktifkan'}`,
+        cancelButtonText: `Tidak`,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            loading.value.open()
+            axios.put(`${url}/outcoming-letters/templates/${id}/set-active-or-not`, {
+                is_active: !is_active
+            }).then(res => {
+                if (res.status == 200) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Berhasil",
+                        text: res.data.message,
+                    });
+                    table.value.getData()
+                }
+            }).catch(e => {
+                if (e.response.status == 422) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal",
+                        text: e.response.data.message,
+                    });
+                }
+            }).finally(() => {
+                loading.value.close()
+            })
+        }
+    })
+}
 </script>
 
 <template>
@@ -48,6 +86,13 @@ function download(id, name, letter_type) {
                 <td :class="[item.defaultClass]">{{ item.id }}</td>
                 <td :class="[item.defaultClass]">{{ item.name }}</td>
                 <td :class="[item.defaultClass]">{{ item.letter_type }}</td>
+                <td :class="[item.defaultClass]">
+                    <span :class="'cursor-pointer badge-' + (item.is_active ? 'success' : 'danger')"
+                        @click="set_active_or_not(item.id, item.is_active)">
+                        {{ item.is_active ? 'Aktif' : 'Tidak Aktif' }}
+                        <Icon icon="cil:pencil" />
+                    </span>
+                </td>
                 <td :class="[item.defaultClass]">
                     <div class="hs-dropdown relative inline-flex">
                         <button id="hs-dropdown-with-icons" type="button"
