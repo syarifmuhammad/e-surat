@@ -138,8 +138,15 @@ function save() {
             .catch(err => {
                 loading.value.close()
                 if (err.response.status == 422) {
+                    Object.entries(err.response.data.errors).forEach(([key, value]) => {
+                        errors[key] = value[0]
+                    })
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal",
+                        text: "Silahkan periksa kembali form anda"
+                    });
                     modal_form.value.open()
-                    errors.name = err.response.data.errors.name[0]
                 } else {
                     console.log(err.response)
                     Swal.fire({
@@ -176,8 +183,15 @@ function save() {
             .catch(err => {
                 loading.value.close()
                 if (err.response.status == 422) {
+                    Object.entries(e.response.data.errors).forEach(([key, value]) => {
+                        errors[key] = value[0]
+                    })
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal",
+                        text: "Silahkan periksa kembali form anda"
+                    });
                     modal_form.value.open()
-                    errors.name = err.response.data.errors.name[0]
                 } else {
                     console.log(err.response)
                     Swal.fire({
@@ -301,7 +315,7 @@ function delete_surat_masuk(id) {
                         </p>
                     </div>
                     <div class="mb-4">
-                        <label for="input-label" class="block text-sm font-medium mb-2">Kategori</label>
+                        <label for="input-label" class="block text-sm font-medium mb-2">Kategori <span class="text-red-400">*</span></label>
                         <SearchInput v-if="!selected_category" v-model="selected_category"
                             :url="`${url}/incoming-letters/categories`" id="category" placeholder="Cari Kategori Surat ...">
                             <template v-slot="{ data }">
@@ -324,7 +338,7 @@ function delete_surat_masuk(id) {
                     </div>
                     <div class="mb-4 grid grid-cols-2 gap-x-8">
                         <div>
-                            <label for="input-label" class="block text-sm font-medium mb-2">Nomor Surat</label>
+                            <label for="input-label" class="block text-sm font-medium mb-2">Nomor Surat <span class="text-red-400">*</span></label>
                             <input type="text" v-model="form.reference_number" class="form-control" required
                                 placeholder="Nomor surat" />
                             <p v-if="errors.reference_number" class="text-xs text-red-600 mt-2" id="reference_number-error">
@@ -332,7 +346,7 @@ function delete_surat_masuk(id) {
                             </p>
                         </div>
                         <div>
-                            <label for="input-label" class="block text-sm font-medium mb-2">Perihal</label>
+                            <label for="input-label" class="block text-sm font-medium mb-2">Perihal <span class="text-red-400">*</span></label>
                             <input type="text" v-model="form.perihal" class="form-control" required placeholder="Perihal" />
                             <p v-if="errors.perihal" class="text-xs text-red-600 mt-2" id="perihal-error">
                                 {{ errors.perihal }}
@@ -341,7 +355,7 @@ function delete_surat_masuk(id) {
                     </div>
                     <div class="mb-4 grid grid-cols-2 gap-x-8">
                         <div>
-                            <label for="input-label" class="block text-sm font-medium mb-2">Pengirim</label>
+                            <label for="input-label" class="block text-sm font-medium mb-2">Pengirim <span class="text-red-400">*</span></label>
                             <input type="text" v-model="form.asal_surat" class="form-control" required
                                 placeholder="Pengirim" />
                             <p v-if="errors.asal_surat" class="text-xs text-red-600 mt-2" id="pengirim-error">
@@ -349,7 +363,7 @@ function delete_surat_masuk(id) {
                             </p>
                         </div>
                         <div>
-                            <label for="input-label" class="block text-sm font-medium mb-2">Tanggal Surat</label>
+                            <label for="input-label" class="block text-sm font-medium mb-2">Tanggal Surat <span class="text-red-400">*</span></label>
                             <input type="date" v-model="form.tanggal_surat" class="form-control" required
                                 placeholder="Tanggal surat" />
                             <p v-if="errors.tanggal_surat" class="text-xs text-red-600 mt-2" id="tanggal_surat-error">
@@ -358,14 +372,15 @@ function delete_surat_masuk(id) {
                         </div>
                     </div>
                     <div class="mb-4">
-                        <label for="input-label" class="block text-sm font-medium mb-2">Keterangan</label>
-                        <textarea v-model="form.keterangan" class="form-control" placeholder="Keterangan"></textarea>
+                        <label for="input-label" class="block text-sm font-medium mb-2">Keterangan <span class="text-red-400">*</span></label>
+                        <textarea v-model="form.keterangan" rows="8" class="form-control"
+                            placeholder="Keterangan"></textarea>
                         <p v-if="errors.keterangan" class="text-xs text-red-600 mt-2" id="keterangan-error">
                             {{ errors.keterangan }}
                         </p>
                     </div>
                     <div class="mb-4">
-                        <label for="input-label" class="block text-sm font-medium mb-2">File</label>
+                        <label for="input-label" class="block text-sm font-medium mb-2">File <span class="text-red-400">*</span></label>
                         <UploadFile :default_files="existing_files" ref="file_surat" />
                         <p v-if="errors.file_surat" class="text-xs text-red-600 mt-2" id="file_surat-error">
                             {{ errors.file_surat }}
