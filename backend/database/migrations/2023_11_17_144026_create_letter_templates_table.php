@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('letter_type');
             $table->string('file');
+            $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
 
