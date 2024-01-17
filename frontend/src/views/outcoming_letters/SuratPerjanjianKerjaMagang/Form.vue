@@ -58,7 +58,7 @@ const selected_signer = ref(null)
 const modal_add_rekening = ref(null)
 
 async function get_letter_templates() {
-    await axios.get(`${url}/outcoming-letters/templates?letter_type=${NAMA_SURAT}`)
+    await axios.get(`${url}/outcoming-letters/templates?letter_type=${NAMA_SURAT}&is_active=true`)
         .then(res => {
             letter_templates.value = res.data.data
             form_surat.letter_template_id = letter_templates.value[0].id
@@ -104,6 +104,7 @@ function reset_errors() {
 
 function reset_employee() {
     selected_employee.value = null
+    reset_rekening()
 }
 
 function reset_rekening() {

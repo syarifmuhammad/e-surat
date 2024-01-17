@@ -41,7 +41,7 @@ const selected_employee = ref(null)
 const selected_signer = ref(null)
 
 async function get_letter_templates() {
-    await axios.get(`${url}/outcoming-letters/templates?letter_type=${NAMA_SURAT}`)
+    await axios.get(`${url}/outcoming-letters/templates?letter_type=${NAMA_SURAT}&is_active=true`)
         .then(res => {
             letter_templates.value = res.data.data
             form_surat.letter_template_id = letter_templates.value[0].id
