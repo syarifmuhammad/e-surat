@@ -162,7 +162,7 @@ const router = createRouter({
       component: Position,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_unit'],
         layout: 'AuthenticatedLayout',
       },
     },
@@ -172,7 +172,7 @@ const router = createRouter({
       component: FormPosition,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_unit'],
         layout: 'AuthenticatedLayout',
         parentName: 'positions',
       },
@@ -183,7 +183,7 @@ const router = createRouter({
       component: FormPosition,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_unit'],
         layout: 'AuthenticatedLayout',
         parentName: 'positions',
       },
@@ -194,7 +194,7 @@ const router = createRouter({
       component: Prodi,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_unit'],
         layout: 'AuthenticatedLayout',
       },
     },
@@ -204,7 +204,7 @@ const router = createRouter({
       component: FormProdi,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_unit'],
         layout: 'AuthenticatedLayout',
         parentName: 'prodi',
       },
@@ -215,7 +215,7 @@ const router = createRouter({
       component: FormProdi,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_unit'],
         layout: 'AuthenticatedLayout',
         parentName: 'prodi',
       },
@@ -226,7 +226,7 @@ const router = createRouter({
       component: Unit,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_unit'],
         layout: 'AuthenticatedLayout',
       },
     },
@@ -236,7 +236,7 @@ const router = createRouter({
       component: FormUnit,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_unit'],
         layout: 'AuthenticatedLayout',
         parentName: 'unit',
       },
@@ -247,7 +247,7 @@ const router = createRouter({
       component: FormUnit,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_unit'],
         layout: 'AuthenticatedLayout',
         parentName: 'unit',
       },
@@ -258,7 +258,7 @@ const router = createRouter({
       component: Employees,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_unit'],
         layout: 'AuthenticatedLayout',
       },
     },
@@ -268,7 +268,7 @@ const router = createRouter({
       component: FormEmployees,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_unit'],
         layout: 'AuthenticatedLayout',
         parentName: 'employees',
       },
@@ -279,7 +279,7 @@ const router = createRouter({
       component: FormEmployees,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_unit'],
         layout: 'AuthenticatedLayout',
         parentName: 'employees',
       },
@@ -290,7 +290,7 @@ const router = createRouter({
       component: Categories,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'admin_sekretariat'],
+        can_accessed: ['admin_unit', 'admin_sekretariat'],
         layout: 'AuthenticatedLayout',
       },
     },
@@ -300,7 +300,7 @@ const router = createRouter({
       component: Archive,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'admin_sekretariat'],
+        can_accessed: ['admin_unit', 'admin_sekretariat'],
         layout: 'AuthenticatedLayout',
       },
     },
@@ -320,7 +320,7 @@ const router = createRouter({
       component: LetterTemplates,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_unit'],
         layout: 'AuthenticatedLayout',
       },
     },
@@ -330,7 +330,7 @@ const router = createRouter({
       component: FormLetterTemplates,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'letter_templates',
       },
@@ -341,7 +341,7 @@ const router = createRouter({
       component: FormLetterTemplates,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'letter_templates',
       },
@@ -362,7 +362,7 @@ const router = createRouter({
       component: Report,
       meta: {
         is_login_required: true,
-        can_accessed: ['superadmin', 'admin_sekretariat', 'admin_sdm'],
+        can_accessed: ['superadmin', 'admin_sekretariat', 'admin_unit'],
         layout: 'AuthenticatedLayout',
       },
     },
@@ -393,7 +393,7 @@ const router = createRouter({
       component: FormSuratKeteranganKerja,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_keterangan_kerja',
       },
@@ -404,7 +404,7 @@ const router = createRouter({
       component: FormSuratKeteranganKerja,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_keterangan_kerja',
       },
@@ -436,7 +436,7 @@ const router = createRouter({
       component: FormSuratKeputusanRotasiKepegawaian,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_keputusan_rotasi_kepegawaian',
       },
@@ -447,7 +447,7 @@ const router = createRouter({
       component: FormSuratKeputusanRotasiKepegawaian,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_keputusan_rotasi_kepegawaian',
       },
@@ -479,7 +479,7 @@ const router = createRouter({
       component: FormSuratKeputusanPemberhentian,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_keputusan_pemberhentian',
       },
@@ -490,7 +490,7 @@ const router = createRouter({
       component: FormSuratKeputusanPemberhentian,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_keputusan_pemberhentian',
       },
@@ -522,7 +522,7 @@ const router = createRouter({
       component: FormSuratKeputusanPengangkatan,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_keputusan_pengangkatan',
       },
@@ -533,7 +533,7 @@ const router = createRouter({
       component: FormSuratKeputusanPengangkatan,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_keputusan_pengangkatan',
       },
@@ -565,7 +565,7 @@ const router = createRouter({
       component: FormSuratKeputusanPemberhentianDanPengangkatan,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_keputusan_pemberhentian_dan_pengangkatan',
       },
@@ -576,7 +576,7 @@ const router = createRouter({
       component: FormSuratKeputusanPemberhentianDanPengangkatan,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_keputusan_pemberhentian_dan_pengangkatan',
       },
@@ -608,7 +608,7 @@ const router = createRouter({
       component: FormSuratPerjanjianKerjaMagang,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_perjanjian_kerja_magang',
       },
@@ -619,7 +619,7 @@ const router = createRouter({
       component: FormSuratPerjanjianKerjaMagang,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_perjanjian_kerja_magang',
       },
@@ -651,7 +651,7 @@ const router = createRouter({
       component: FormSuratPerjanjianKerjaDosenLuarBiasa,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_perjanjian_kerja_dosen_luar_biasa',
       },
@@ -662,7 +662,7 @@ const router = createRouter({
       component: FormSuratPerjanjianKerjaDosenLuarBiasa,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_perjanjian_kerja_dosen_luar_biasa',
       },
@@ -694,7 +694,7 @@ const router = createRouter({
       component: FormSuratPerjanjianKerjaDosenFullTime,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_perjanjian_kerja_dosen_full_time',
       },
@@ -705,7 +705,7 @@ const router = createRouter({
       component: FormSuratPerjanjianKerjaDosenFullTime,
       meta: {
         is_login_required: true,
-        can_accessed: ['admin_sdm', 'superadmin'],
+        can_accessed: ['admin_unit', 'superadmin'],
         layout: 'AuthenticatedLayout',
         parentName: 'surat_perjanjian_kerja_dosen_full_time',
       },
