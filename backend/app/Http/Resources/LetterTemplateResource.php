@@ -19,6 +19,7 @@ class LetterTemplateResource extends JsonResource
             'id' => $this->id,
             'letter_type' => ReferenceNumberSetting::$DEFAULT[$this->letter_type]['name'],
             'name' => $this->name,
+            'is_active' => $this->is_active(),
         ];
     }
 }
