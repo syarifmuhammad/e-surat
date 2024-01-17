@@ -14,7 +14,11 @@ class LetterTemplateController extends Controller
     public function index(Request $request)
     {
         if (!isset($request->letter_type)) {
-            $letter_templates = LetterTemplate::search($request->search)->paginate();
+            $letter_templates = LetterTemplate::search($request->search);
+            if (isset($request->is_active)) {
+                $letter_templates = $letter_templates->isActive($request->is_active);
+            }
+            $letter_templates = $letter_templates->paginate();
             return new LetterTemplateCollection($letter_templates);
         }
 
@@ -221,5 +225,47 @@ class LetterTemplateController extends Controller
                 'errors' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function set_active_or_not(Request $request, $id) {
+        $template = LetterTemplate::find($id);
+        if (!$template) {
+            return response()->json([
+                'message' => "Template surat tidak ditemukan !"
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'is_active' => 'required|boolean'
+        ]);
+
+        if ($validator->fails()) {
+            $response = [
+                'errors' => $validator->errors(),
+                'message' => "Validasi form gagal !"
+            ];
+            return response()->json($response, 422);
+        }
+
+        $count_template = LetterTemplate::where('letter_type', $template->letter_type)->isActive()->count();
+        if ($request->is_active == false && $count_template == 1) {
+            return response()->json([
+                'errors' => [
+                    'letter_type' => [
+                        "Tidak dapat menonaktifkan template surat karena hanya tersisa satu !"
+                    ]
+                ],
+                'message' => "Tidak dapat menonaktifkan template surat karena hanya tersisa satu !"
+            ], 422);
+        }
+
+        $template->is_active = $request->is_active;
+        $template->save();
+
+        $status = $request->is_active ? 'diaktifkan' : 'dinonaktifkan';
+        return response()->json([
+            'message' => "Template surat berhasil $status !",
+            'data' => $template
+        ]);
     }
 }
