@@ -24,7 +24,9 @@ class SuratKeteranganKerjaResource extends JsonResource
 
         if (!$this->have_reference_number()) {
             $status = 'waiting_for_reference_number';
-        } else if ($this->have_reference_number() && !$this->is_signed()) {
+        } else if(!$this->is_approved()) {
+            $status = 'waiting_for_approval';
+        } else if (!$this->is_signed()) {
             $status = 'waiting_for_signed';
         } else if ($this->is_signed()) {
             $status = 'signed';
@@ -40,15 +42,12 @@ class SuratKeteranganKerjaResource extends JsonResource
                 'position' => $this->position,
                 'positions' => $this->employee->positions->pluck('position'),
             ],
-            'signer' => [
-                'id' => $this->signer->id,
-                'nip' => $this->signer->nip,
-                'name' => $this->signer->name,
-                'position' => $this->signer_position,
-                'positions' => $this->signer->positions->pluck('position'),
-            ],
+            'signers' => ApprovalResource::collection($this->signers),
+            'approvals' => ApprovalResource::collection($this->approvals),
+            'current_approval' => $this->approvals->where('is_approved', false)->first(),
             'have_reference_number' => $this->have_reference_number(),
             'can_give_reference_number' => $this->can_give_reference_number(),
+            'can_approved' => $this->can_approved(),
             'can_signed' => $this->can_signed(),
             'can_edit' => $this->can_edit(),
             'can_upload_verified_file' => $this->can_upload_verified_file(),
@@ -57,6 +56,8 @@ class SuratKeteranganKerjaResource extends JsonResource
             'status' => $status,
             'tanggal_surat_raw' => $this->tanggal_surat,
             'tanggal_surat' => Carbon::parse($this->tanggal_surat)->translatedFormat('l, d F Y'),
+            'tanggal_akhir_berlaku_raw' => $this->tanggal_akhir_berlaku,
+            'tanggal_akhir_berlaku' => Carbon::parse($this->tanggal_akhir_berlaku)->translatedFormat('l, d F Y'),
         ];
     }
 }
