@@ -33,7 +33,11 @@ class LetterTemplateController extends Controller
                 'errors' => $validate->errors()
             ], 422);
         }
-        $letter_templates = LetterTemplate::where('letter_type', $request->letter_type)->get();
+        $letter_templates = LetterTemplate::where('letter_type', $request->letter_type);
+        if (isset($request->is_active)) {
+            $letter_templates = $letter_templates->isActive(filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN));
+        }
+        $letter_templates = $letter_templates->get();
 
         return response()->json([
             'data' => $letter_templates,
