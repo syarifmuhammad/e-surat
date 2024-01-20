@@ -19,6 +19,8 @@ const ReferenceNumberSettings = () => import('@/views/outcoming_letters/Referenc
 const LetterTemplates = () => import('@/views/outcoming_letters/LetterTemplates/Index.vue')
 const FormLetterTemplates = () => import('@/views/outcoming_letters/LetterTemplates/Form.vue')
 const Report = () => import('@/views/outcoming_letters/Report.vue')
+const ApproveLetter = () => import('@/views/outcoming_letters/ApproveLetter.vue')
+const SignedLetter = () => import('@/views/outcoming_letters/SignedLetter.vue')
 
 //surat keterangan kerja
 const SuratKeteranganKerja = () => import('@/views/outcoming_letters/SuratKeteranganKerja/Index.vue')
@@ -385,6 +387,32 @@ const router = createRouter({
         can_accessed: ['*'],
         layout: 'BlankLayout',
         parentName: 'surat_keterangan_kerja',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keterangan-kerja/:id/approve',
+      name: 'approve_surat_keterangan_kerja',
+      component: ApproveLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keterangan_kerja',
+        api_letter: 'surat-keterangan-kerja',
+        title: "Setujui Surat Keterangan Kerja",
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keterangan-kerja/:id/tanda-tangan',
+      name: 'tanda_tangan_surat_keterangan_kerja',
+      component: SignedLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keterangan_kerja',
+        api_letter: 'surat-keterangan-kerja',
+        title: "Tanda Tangan Surat Keterangan Kerja",
       },
     },
     {
