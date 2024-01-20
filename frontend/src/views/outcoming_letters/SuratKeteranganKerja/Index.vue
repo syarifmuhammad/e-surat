@@ -21,7 +21,7 @@ const thead = [
     "Pegawai",
     "Penandatangan",
     "Tanggal Surat",
-    "Jenis TTD",
+    // "Jenis TTD",
     "Status",
     "",
 ]
@@ -282,14 +282,24 @@ function delete_letter(id) {
                     </td>
                     <td :class="[item.defaultClass]">{{ item.employee.nip }}</td>
                     <td :class="[item.defaultClass]">{{ item.employee.name }}</td>
-                    <td :class="[item.defaultClass]">{{ item.signer.name }}</td>
+                    <td :class="[item.defaultClass]">
+                        <template v-for="(signer, key) in item.signers">
+                            {{ signer.employee.name }} {{ key != item.signers.length - 1 ? ', ' : '' }}
+                        </template>
+                    </td>
                     <td :class="[item.defaultClass]">{{ item.tanggal_surat }}</td>
-                    <td :class="[item.defaultClass]">{{ item.signature_type.toString().toUpperCase() }}</td>
+                    <!-- <td :class="[item.defaultClass]">{{ item.signature_type.toString().toUpperCase() }}</td> -->
                     <td :class="[item.defaultClass]">
                         <template v-if="item.status == 'waiting_for_reference_number'">
                             <span class="badge badge-danger text-center">Pending</span>
                             <br>
                             <small class="text-red-500 ">Catatan : Menunggu nomor surat</small>
+                        </template>
+                        <template v-if="item.status == 'waiting_for_approval'">
+                            <span class="badge badge-warning text-center">Pending</span>
+                            <br>
+                            <small class="text-yellow-500 ">Catatan : {{ item.can_approved ? "Perlu persetujuan Anda" :
+                                "Menunggu disetujui oleh " + item.current_approval.employee.name }}</small>
                         </template>
                         <template v-if="item.status == 'waiting_for_signed'">
                             <span class="badge badge-warning text-center">Pending</span>
@@ -337,18 +347,24 @@ function delete_letter(id) {
                                         <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
                                         Berikan Nomor Surat
                                     </span>
-                                    <span v-if="item.can_upload_verified_file"
+                                    <!-- <span v-if="item.can_upload_verified_file"
                                         @click="open_modal_upload_signed_file(item.id)"
                                         class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                         <Icon class="text-lg" icon="octicon:upload-16"></Icon>
                                         Upload Surat Bertanda Tangan
-                                    </span>
-                                    <span v-if="!item.can_upload_verified_file && item.can_signed"
-                                        @click="open_modal_sign(item.id, item.signature_type)"
+                                    </span> -->
+                                    <RouterLink v-if="item.can_approved"
+                                        :to="{ name: 'approve_surat_keterangan_kerja', params: { id: item.id } }"
+                                        class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+                                        <Icon class="text-lg" icon="fluent:signed-24-regular"></Icon>
+                                        Setujui Surat
+                                    </RouterLink>
+                                    <RouterLink v-if="!item.can_upload_verified_file && item.can_signed"
+                                        :to="{ name: 'tanda_tangan_surat_keterangan_kerja', params: { id: item.id } }"
                                         class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                         <Icon class="text-lg" icon="fluent:signed-24-regular"></Icon>
                                         Tanda Tangani Surat
-                                    </span>
+                                    </RouterLink>
                                     <RouterLink v-if="item.can_edit"
                                         :to="{ name: 'update_surat_keterangan_kerja', params: { id: item.id } }"
                                         class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">

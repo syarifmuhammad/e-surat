@@ -2,8 +2,6 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
-import VuePdfApp from "vue3-pdf-app";
-import "vue3-pdf-app/dist/icons/main.css";
 
 import Loading from '@/components/Loading.vue'
 
