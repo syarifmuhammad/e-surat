@@ -121,6 +121,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/{id}', [SuratKeteranganKerjaController::class, 'update']);
             Route::delete('/{id}', [SuratKeteranganKerjaController::class, 'destroy']);
             Route::put('/{id}/reference-number', [SuratKeteranganKerjaController::class, 'give_reference_number']);
+            Route::put('/{id}/approve', [SuratKeteranganKerjaController::class, 'approve']);
             Route::put('/{id}/sign', [SuratKeteranganKerjaController::class, 'sign']);
         });
         Route::prefix('surat-keputusan-rotasi-kepegawaian')->group(function () {
