@@ -17,7 +17,11 @@ class SuratKeteranganKerja extends Model
     public function scopeWhereUser($query, $user)
     {
         if ($user->roles == 'pegawai') {
-            return $query->where('employee_id', $user->id)->orWhere('signer_id', $user->id);
+            return $query->where('employee_id', $user->id)->orWhereHas('signers', function ($query) use ($user) {
+                return $query->where('employee_id', $user->id);
+            })->orWhereHas('approvals', function ($query) use ($user) {
+                return $query->where('employee_id', $user->id);
+            });
         } else {
             return $query;
         }
@@ -29,26 +33,15 @@ class SuratKeteranganKerja extends Model
             ->orWhereHas('employee', function ($query) use ($search) {
                 return $query->where('nip', 'like', '%' . $search . '%');
             })
-            ->orWhereHas('signer', function ($query) use ($search) {
-                return $query->where('nip', 'like', '%' . $search . '%');
-            })
             ->orWhereHas('employee', function ($query) use ($search) {
-                return $query->where('name', 'like', '%' . $search . '%');
-            })
-            ->orWhereHas('signer', function ($query) use ($search) {
                 return $query->where('name', 'like', '%' . $search . '%');
             });
     }
 
     public function scopeByUser($query)
     {
-        $id = auth()->id();
-        $roles = auth()->user()->roles;
-        if ($roles === 'pegawai') {
-            return $query->where('employee_id', $id)->orWhere('signer_id', $id);
-        } else {
-            return $query;
-        }
+        $user = auth()->user();
+        return $this->scopeWhereUser($query, $user);
     }
 
     public function scopeWhereNotSigned($query) {
@@ -64,9 +57,14 @@ class SuratKeteranganKerja extends Model
         return $this->belongsTo(Employee::class, 'employee_id', 'id');
     }
 
-    public function signer()
+    public function approvals()
     {
-        return $this->belongsTo(Employee::class, 'signer_id', 'id');
+        return $this->morphMany(Approval::class, 'approvable')->where('is_signer', false);
+    }
+
+    public function signers()
+    {
+        return $this->morphMany(Approval::class, 'approvable')->where('is_signer', true);
     }
 
     public function letter_template()
@@ -93,15 +91,28 @@ class SuratKeteranganKerja extends Model
         return $this->is_signed;
     }
 
+    public function is_approved()
+    {
+        return $this->is_approved;
+    }
+
     public function can_give_reference_number()
     {
         return !$this->have_reference_number() && auth()->user()->roles == 'admin_sekretariat';
     }
 
+    public function can_approved()
+    {
+        $not_approved = $this->approvals->where('is_approved', false)->first();
+        $can_approved = isset($not_approved->employee_id) && $not_approved->employee_id == auth()->id();
+        return $can_approved && $this->have_reference_number();
+    }
+
     public function can_signed()
     {
-        return !$this->is_signed() && $this->have_reference_number() && auth()->id() == $this->signer_id 
-        && $this->signature_type != 'manual';
+        $can_signed = $this->signers->where('employee_id', auth()->id())->first();
+        return $can_signed && !$can_signed->is_approved && $this->have_reference_number()
+        && $this->signature_type != 'manual' && $this->is_approved();
     }
 
     public function can_edit()
@@ -133,18 +144,19 @@ class SuratKeteranganKerja extends Model
         $templateProcessor->setValue('jabatan', $this->position);
 
         // Kebutuhan data yang terkait dengan pejabat yang menandatangan
-        $templateProcessor->setValue('nama_penandatangan', $this->signer->name);
-        $templateProcessor->setValue('jabatan_penandatangan', $this->signer_position);
-
-        if ($this->is_signed()) {
-            if ($this->signature_type == "gambar tanda tangan" || $this->signature_type == "digital") {
-                $templateProcessor->setImageValue('tanda_tangan', [
-                    'path' => storage_path('app/signed_files/' . $this->signed_file),
+        foreach ($this->signers as $key => $signer) {
+            $templateProcessor->setValue('nama_penandatangan' . $key + 1, $signer->employee->name);
+            $templateProcessor->setValue('jabatan_penandatangan' . $key + 1, $signer->position);
+            if ($this->is_signed()) {
+                $templateProcessor->setImageValue('tanda_tangan' . $key + 1, [
+                    'path' => storage_path('app/signed_files/' . $signer->signed_file),
                     'ratio' => true,
+                    'width' => 100,
+                    'height' => 100,
                 ]);
+            } else {
+                $templateProcessor->setValue('tanda_tangan' . $key + 1, '');
             }
-        } else {
-            $templateProcessor->setValue('tanda_tangan', '');
         }
 
         return $templateProcessor;
