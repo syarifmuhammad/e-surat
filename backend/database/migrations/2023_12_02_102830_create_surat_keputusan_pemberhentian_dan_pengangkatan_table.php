@@ -15,24 +15,21 @@ return new class extends Migration
             $table->id();
             $table->string('reference_number')->nullable()->unique('reference_number');
             $table->date('tanggal_surat')->default(now());
+            $table->bigInteger('masa_berlaku');
             $table->string('nomor_berita_acara');
             $table->date('tanggal_berita_acara');
             $table->unsignedBigInteger('employee_id');
             $table->string('pemberhentian_dalam_jabatan');
             $table->string('pengangkatan_dalam_jabatan');
             $table->text('keterangan_tambahan')->default("");
-            $table->date('tanggal_berlaku');
-            $table->unsignedBigInteger('signer_id');
-            $table->string('signer_position');
-            $table->enum('signature_type', ['manual', 'digital', 'gambar tanda tangan'])->default('manual');
+            $table->enum('signature_type', ['manual', 'digital', 'gambar tanda tangan'])->default('digital');
             $table->unsignedBigInteger('letter_template_id');
+            $table->boolean('is_approved')->default(false);
             $table->boolean('is_signed')->default(false);
-            $table->string('signed_file')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
 
             $table->foreign('employee_id', 'pemberhentian_dan_pengangkatan_employee_id')->references('id')->on('employees')->noActionOnDelete();
-            $table->foreign('signer_id', 'pemberhentian_dan_pengangkatan_signer_id')->references('id')->on('employees')->noActionOnUpdate();
             $table->foreign('letter_template_id', 'pemberhentian_dan_pengangkatan_letter_template_id')->references('id')->on('letter_templates')->restrictOnDelete();
             $table->foreign('created_by', 'pemberhentian_dan_pengangkatan_created_by')->references('id')->on('users')->noActionOnDelete();
         });

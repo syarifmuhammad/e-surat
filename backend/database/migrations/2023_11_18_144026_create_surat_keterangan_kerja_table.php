@@ -15,19 +15,17 @@ return new class extends Migration
             $table->id();
             $table->string('reference_number')->nullable()->unique();
             $table->date('tanggal_surat')->default(now());
-            $table->date('tanggal_akhir_berlaku')->nullable();
+            $table->bigInteger('masa_berlaku');
             $table->unsignedBigInteger('employee_id');
             $table->string('position');
-            $table->enum('signature_type', ['manual', 'digital', 'gambar tanda tangan'])->default('manual');
+            $table->enum('signature_type', ['manual', 'digital', 'gambar tanda tangan'])->default('digital');
             $table->unsignedBigInteger('letter_template_id');
             $table->boolean('is_approved')->default(false);
             $table->boolean('is_signed')->default(false);
-            // $table->string('signed_file')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
 
             $table->foreign('employee_id')->references('id')->on('employees')->noActionOnDelete();
-            // $table->foreign('signer_id')->references('id')->on('employees')->noActionOnUpdate();
             $table->foreign('letter_template_id')->references('id')->on('letter_templates')->restrictOnDelete();
             $table->foreign('created_by')->references('id')->on('users')->noActionOnDelete();
         });
