@@ -14,6 +14,7 @@ class SuratKeteranganKerja extends Model
     protected $perPage = 10;
     public const NAME = 'SURAT_KETERANGAN_KERJA';
     protected $table = 'surat_keterangan_kerja';
+    
     public function scopeWhereUser($query, $user)
     {
         if ($user->roles == 'pegawai') {
@@ -22,6 +23,8 @@ class SuratKeteranganKerja extends Model
             })->orWhereHas('approvals', function ($query) use ($user) {
                 return $query->where('employee_id', $user->id);
             });
+        } else if($user->roles == 'admin_unit') {
+            return $query->where('created_by', auth()->id());
         } else {
             return $query;
         }
@@ -44,12 +47,19 @@ class SuratKeteranganKerja extends Model
         return $this->scopeWhereUser($query, $user);
     }
 
-    public function scopeWhereNotSigned($query) {
+    public function scopeWhereNotSigned($query)
+    {
         return $query->where('is_signed', false);
     }
 
-    public function scopeWhereSigned($query) {
+    public function scopeWhereSigned($query)
+    {
         return $query->where('is_signed', true);
+    }
+
+    public function masa_berlaku_parse()
+    {
+        return interval_to_array($this->masa_berlaku);
     }
 
     public function employee()
@@ -112,7 +122,7 @@ class SuratKeteranganKerja extends Model
     {
         $can_signed = $this->signers->where('employee_id', auth()->id())->first();
         return $can_signed && !$can_signed->is_approved && $this->have_reference_number()
-        && $this->signature_type != 'manual' && $this->is_approved();
+            && $this->signature_type != 'manual' && $this->is_approved();
     }
 
     public function can_edit()
@@ -148,12 +158,16 @@ class SuratKeteranganKerja extends Model
             $templateProcessor->setValue('nama_penandatangan' . $key + 1, $signer->employee->name);
             $templateProcessor->setValue('jabatan_penandatangan' . $key + 1, $signer->position);
             if ($this->is_signed()) {
-                $templateProcessor->setImageValue('tanda_tangan' . $key + 1, [
-                    'path' => storage_path('app/signed_files/' . $signer->signed_file),
-                    'ratio' => true,
-                    'width' => 100,
-                    'height' => 100,
-                ]);
+                if ($signer->signed_file && file_exists(storage_path('app/signed_files/' . $signer->signed_file))) {
+                    $templateProcessor->setImageValue('tanda_tangan' . $key + 1, [
+                        'path' => storage_path('app/signed_files/' . $signer->signed_file),
+                        'ratio' => true,
+                        'width' => 100,
+                        'height' => 100,
+                    ]);
+                } else {
+                    $templateProcessor->setValue('tanda_tangan' . $key + 1, "Telah ditandatangani oleh: " . $signer->employee->name . " pada tanggal " . Carbon::parse($signer->updated_at)->translatedFormat('d F Y') . "");
+                }
             } else {
                 $templateProcessor->setValue('tanda_tangan' . $key + 1, '');
             }
