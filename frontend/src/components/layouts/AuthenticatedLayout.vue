@@ -48,7 +48,7 @@ const sidebarMenu = ref([
         ],
     },
     {
-        title: 'Surat Masuk',
+        title: 'Surat Masuk (Eksternal)',
         name: 'incoming_letter',
         icon: 'iconoir:mail-in',
         child: [
@@ -169,11 +169,6 @@ const sidebarMenu = ref([
                         </span>
                     </div>
                 </div>
-                <!-- <div class="flex items-center gap-x-4">
-                    <small>Selamat datang, M. SYARIF HIDAYATULLAH</small>
-                    <img class="inline-block h-[2.875rem] w-[2.875rem] rounded-full" src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Image Description">
-                    
-                </div> -->
             </div>
         </header>
         <aside id="sidebar" :class="{ active: sidebar_menu_is_active }"
@@ -259,3 +254,67 @@ const sidebarMenu = ref([
     }
 }
 </style>
+
+
+<!-- {
+    title: 'Surat Masuk (Internal)',
+    name: 'outcoming_letter',
+    icon: 'iconoir:mail-in',
+    child: [
+        {
+            title: 'Template Surat',
+            name: 'letter_templates',
+            icon: 'eos-icons:templates-outlined',
+        },
+        {
+            title: 'Nomor Surat',
+            name: 'reference_outcoming_letter',
+            icon: 'fluent:document-page-number-24-regular',
+        },
+        {
+            title: 'Report',
+            name: 'report_outcoming_letter',
+            icon: 'carbon:report',
+        },
+        {
+            title: 'Surat Keterangan Kerja',
+            name: 'surat_keterangan_kerja',
+            icon: 'gg:file-document',
+        },
+        {
+            title: 'SK Rotasi Kepegawaian',
+            name: 'surat_keputusan_rotasi_kepegawaian',
+            icon: 'ph:user-switch-light',
+        },
+        {
+            title: 'SK Pemberhentian Dalam Jabatan',
+            name: 'surat_keputusan_pemberhentian',
+            icon: 'gg:file-document',
+        },
+        {
+            title: 'SK Pengangkatan Dalam Jabatan',
+            name: 'surat_keputusan_pengangkatan',
+            icon: 'gg:file-document',
+        },
+        {
+            title: 'SK Pemberhentian Dan Pengangkatan Dalam Jabatan',
+            name: 'surat_keputusan_pemberhentian_dan_pengangkatan',
+            icon: 'gg:file-document',
+        },
+        {
+            title: 'Surat Perjanjian Kerja Magang',
+            name: 'surat_perjanjian_kerja_magang',
+            icon: 'gg:file-document',
+        },
+        {
+            title: 'Surat Perjanjian Kerja Dosen Luar Biasa',
+            name: 'surat_perjanjian_kerja_dosen_luar_biasa',
+            icon: 'gg:file-document',
+        },
+        {
+            title: 'Surat Perjanjian Kerja Dosen Full Time',
+            name: 'surat_perjanjian_kerja_dosen_full_time',
+            icon: 'gg:file-document',
+        },
+    ]
+}, -->

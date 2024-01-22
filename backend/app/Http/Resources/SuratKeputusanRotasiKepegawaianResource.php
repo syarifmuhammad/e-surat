@@ -24,13 +24,16 @@ class SuratKeputusanRotasiKepegawaianResource extends JsonResource
 
         if (!$this->have_reference_number()) {
             $status = 'waiting_for_reference_number';
-        } else if ($this->have_reference_number() && !$this->is_signed()) {
+        } else if (!$this->is_approved()) {
+            $status = 'waiting_for_approval';
+        } else if (!$this->is_signed()) {
             $status = 'waiting_for_signed';
         } else if ($this->is_signed()) {
             $status = 'signed';
         }
         return [
             'id' => $this->id,
+            'letter_template_id' => $this->letter_template_id,
             'reference_number' => $reference_number,
             'employee' => [
                 'id' => $this->employee->id,
@@ -42,19 +45,15 @@ class SuratKeputusanRotasiKepegawaianResource extends JsonResource
                 'jabatan_akhir' => $this->jabatan_akhir,
                 'positions' => $this->employee->positions->pluck('position'),
             ],
-            'signer' => [
-                'id' => $this->signer->id,
-                'nip' => $this->signer->nip,
-                'name' => $this->signer->name,
-                'position' => $this->signer_position,
-                'positions' => $this->signer->positions->pluck('position'),
-            ],
+            'signers' => ApprovalResource::collection($this->signers),
+            'approvals' => ApprovalResource::collection($this->approvals),
+            'current_approval' => $this->approvals->where('is_approved', false)->first(),
             'nomor_berita_acara' => $this->nomor_berita_acara,
             'tanggal_berita_acara' => $this->tanggal_berita_acara,
-            'tanggal_berlaku' => $this->tanggal_berlaku,
-            'tanggal_berlaku' => $this->tanggal_berlaku,
+            'masa_berlaku' => $this->masa_berlaku_parse(),
             'have_reference_number' => $this->have_reference_number(),
             'can_give_reference_number' => $this->can_give_reference_number(),
+            'can_approved' => $this->can_approved(),
             'can_signed' => $this->can_signed(),
             'can_edit' => $this->can_edit(),
             'can_upload_verified_file' => $this->can_upload_verified_file(),

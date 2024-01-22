@@ -6,6 +6,7 @@ import SubHeader from '@/components/SubHeader.vue'
 import SearchInput from '@/components/SearchInput.vue';
 import CustomSelect from '@/components/CustomSelect.vue';
 import AddRekening from '@/components/AddRekening.vue';
+import ChooseEmployee from '@/components/ChooseEmployee.vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute()
@@ -14,11 +15,20 @@ const NAMA_SURAT = "SURAT_PERJANJIAN_KERJA_DOSEN_LUAR_BIASA"
 
 const loading = ref(null)
 const search_input_rekening = ref(null)
+const modal_choose_signer = ref(null)
+const modal_choose_approval = ref(null)
+
+const masa_berlaku_exist = ref(false)
 
 const form_surat = reactive({
     id: "",
     letter_template_id: "",
     tanggal_surat: new Date().toISOString().slice(0, 10),
+    masa_berlaku: {
+        year: 0,
+        month: 0,
+        day: 0,
+    },
     employee: {},
     jabatan_fungsional: "",
     nidn: "",
@@ -28,15 +38,15 @@ const form_surat = reactive({
     rekening: {},
     upah: 0,
     transportasi: 0,
-    signer: {
-        position: "",
-    },
-    signature_type: "manual",
+    signers: [],
+    approvals: [],
+    signature_type: "digital",
 })
 
 const errors = reactive({
     letter_template_id: "",
     tanggal_surat: "",
+    masa_berlaku: "",
     "employee.id": "",
     jabatan_fungsional: "",
     nidn: "",
@@ -46,8 +56,8 @@ const errors = reactive({
     rekening: "",
     upah: "",
     transportasi: "",
-    "signer.id": "",
-    "signer.position": "",
+    signers: "",
+    approvals: "",
     signature_type: ""
 })
 
@@ -55,7 +65,6 @@ const letter_templates = ref([])
 const jabatan_fungsional = ref([])
 const selected_employee = ref(null)
 const selected_rekening = ref(null)
-const selected_signer = ref(null)
 const modal_add_rekening = ref(null)
 
 async function get_letter_templates() {
@@ -88,6 +97,10 @@ async function get_letter(id) {
             form_surat.id = data.id
             form_surat.letter_template_id = data.letter_template_id
             form_surat.tanggal_surat = data.tanggal_surat_raw
+            form_surat.masa_berlaku = res.data.data.masa_berlaku
+            if (form_surat.masa_berlaku.year != 0 || form_surat.masa_berlaku.month != 0 || form_surat.masa_berlaku.day != 0) {
+                masa_berlaku_exist.value = true
+            }
             form_surat.jabatan_fungsional = data.jabatan_fungsional
             form_surat.nidn = data.nidn
             form_surat.mata_kuliah = data.mata_kuliah
@@ -96,10 +109,10 @@ async function get_letter(id) {
             form_surat.upah = data.upah
             form_surat.transportasi = data.transportasi
             form_surat.signature_type = data.signature_type
+            form_surat.signers = res.data.data.signers
+            form_surat.approvals = res.data.data.approvals
             selected_employee.value = data.employee
             selected_rekening.value = data.rekening
-            selected_signer.value = data.signer
-            form_surat.signer.position = data.signer.position
         })
         .catch(err => {
             console.log(err)
@@ -122,17 +135,15 @@ function reset_rekening() {
     selected_rekening.value = null
 }
 
-function reset_signer() {
-    selected_signer.value = null
-    form_surat.signer = {
-        position: "",
-    }
-}
-
 function reset_form() {
     form_surat.id = ""
     form_surat.letter_template_id = ""
     form_surat.tanggal_surat = new Date().toISOString().slice(0, 10)
+    form_surat.masa_berlaku = {
+        year: 0,
+        month: 0,
+        day: 0,
+    }
     form_surat.jabatan_fungsional = ""
     form_surat.nidn = ""
     form_surat.mata_kuliah = ""
@@ -140,13 +151,28 @@ function reset_form() {
     form_surat.semester = ""
     form_surat.upah = 0
     form_surat.transportasi = 0
-    form_surat.signature_type = "manual"
+    form_surat.signers = []
+    form_surat.approvals = []
+    form_surat.signature_type = "digital"
     reset_employee()
     reset_rekening()
-    reset_signer()
     reset_errors()
 }
 
+function open_modal_choose_signer() {
+    modal_choose_signer.value.open()
+}
+
+function open_modal_choose_approval() {
+    modal_choose_approval.value.open()
+}
+
+function add_signer(signer) {
+    form_surat.signers.push(signer)
+}
+function add_approval(approval) {
+    form_surat.approvals.push(approval)
+}
 
 function save_surat() {
     //check if form is valid
@@ -166,7 +192,7 @@ function save_surat() {
         });
         return
     }
-    if (!selected_signer.value) {
+    if (form_surat.signers.length == 0) {
         Swal.fire({
             icon: "error",
             title: "Gagal",
@@ -178,29 +204,32 @@ function save_surat() {
     reset_errors()
 
     loading.value.open()
+
+    let payload = {
+        letter_template_id: form_surat.letter_template_id,
+        tanggal_surat: form_surat.tanggal_surat,
+        employee: {
+            id: selected_employee.value.id,
+        },
+        jabatan_fungsional: form_surat.jabatan_fungsional,
+        nidn: form_surat.nidn,
+        mata_kuliah: form_surat.mata_kuliah,
+        tahun_ajaran: form_surat.tahun_ajaran,
+        semester: form_surat.semester,
+        rekening: selected_rekening.value.id,
+        upah: form_surat.upah,
+        transportasi: form_surat.transportasi,
+        signers: form_surat.signers,
+        approvals: form_surat.approvals,
+        signature_type: form_surat.signature_type,
+    }
+
+    if (masa_berlaku_exist.value) {
+        payload.masa_berlaku = form_surat.masa_berlaku
+    }
+
     if (form_surat.id != "") {
         // update
-        let payload = {
-            letter_template_id: form_surat.letter_template_id,
-            tanggal_surat: form_surat.tanggal_surat,
-            employee: {
-                id: selected_employee.value.id,
-            },
-            jabatan_fungsional: form_surat.jabatan_fungsional,
-            nidn: form_surat.nidn,
-            mata_kuliah: form_surat.mata_kuliah,
-            tahun_ajaran: form_surat.tahun_ajaran,
-            semester: form_surat.semester,
-            rekening: selected_rekening.value.id,
-            upah: form_surat.upah,
-            transportasi: form_surat.transportasi,
-            signer: {
-                id: selected_signer.value.id,
-                position: form_surat.signer.position
-            },
-            signature_type: form_surat.signature_type,
-        }
-
         axios.put(`${url}/outcoming-letters/surat-perjanjian-kerja-dosen-luar-biasa/${form_surat.id}`, payload)
             .then(res => {
                 Swal.fire({
@@ -233,27 +262,6 @@ function save_surat() {
             })
     } else {
         // create
-        let payload = {
-            letter_template_id: form_surat.letter_template_id,
-            tanggal_surat: form_surat.tanggal_surat,
-            employee: {
-                id: selected_employee.value.id,
-            },
-            jabatan_fungsional: form_surat.jabatan_fungsional,
-            nidn: form_surat.nidn,
-            mata_kuliah: form_surat.mata_kuliah,
-            tahun_ajaran: form_surat.tahun_ajaran,
-            semester: form_surat.semester,
-            rekening: selected_rekening.value.id,
-            upah: form_surat.upah,
-            transportasi: form_surat.transportasi,
-            signer: {
-                id: selected_signer.value.id,
-                position: form_surat.signer.position
-            },
-            signature_type: form_surat.signature_type,
-        }
-
         axios.post(`${url}/outcoming-letters/surat-perjanjian-kerja-dosen-luar-biasa`, payload)
             .then(res => {
                 Swal.fire({
@@ -329,6 +337,33 @@ onMounted(async () => {
                     <input type="date" class="form-control" required v-model="form_surat.tanggal_surat">
                     <p v-if="errors['tanggal_surat']" class="text-xs text-red-600 mt-2">
                         {{ errors['tanggal_surat'] }}
+                    </p>
+                </div>
+                <div class="mb-4 flex gap-x-4 items-center">
+                    <input type="checkbox" v-model="masa_berlaku_exist">
+                    <label class="block text-sm font-medium">Memiliki Masa Berlaku ?</label>
+                </div>
+                <div class="mb-4" v-if="masa_berlaku_exist">
+                    <label class="block text-sm font-medium mb-2">Masa Berlaku</label>
+                    <div class="grid grid-cols-3 gap-x-4">
+                        <div>
+                            <label class="block text-xs font-medium mb-2">Tahun</label>
+                            <input type="number" class="form-control" v-model="form_surat.masa_berlaku.year"
+                                placeholder="Tahun">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-2">Bulan</label>
+                            <input type="number" class="form-control" v-model="form_surat.masa_berlaku.month"
+                                placeholder="Bulan">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-2">Hari</label>
+                            <input type="number" class="form-control" v-model="form_surat.masa_berlaku.day"
+                                placeholder="Hari">
+                        </div>
+                    </div>
+                    <p v-if="errors['masa_berlaku']" class="text-xs text-red-600 mt-2">
+                        {{ errors['masa_berlaku'] }}
                     </p>
                 </div>
                 <div class="mb-4">
@@ -461,54 +496,47 @@ onMounted(async () => {
                 <hr class="my-4" />
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Penandatangan</label>
-                    <search-input v-if="!selected_signer" v-model="selected_signer" :url="`${url}/employees`" id="signer"
-                        placeholder="Cari Penandatangan ...">
-                        <template v-slot="{ data }">
-                            <small>{{ data.nip }}</small>
-                            <p class="mb-0">{{ data.name }}</p>
-                            <hr class="m-0" />
-                            <small class="mb-0">
-                                <template v-for="(position, i) in data.positions">
-                                    {{ position }}
-                                    <template v-if="i != data.positions.length - 1"> | </template>
-                                </template>
-                            </small>
-                        </template>
-                    </search-input>
-                    <p v-if="errors['signer.id']" class="text-xs text-red-600 mt-2" id="signer-id-error">
-                        {{ errors['signer.id'] }}
+                    <p class="text-center text-primary cursor-pointer w-full form-control hover:bg-primary-500/25"
+                        @click="open_modal_choose_signer">
+                        Pilih Penandatangan
                     </p>
-                    <div v-if="selected_signer"
-                        class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">
-                        <div class="w-full">
-                            <small>{{ selected_signer.nip }}</small>
-                            <p class="mb-0">{{ selected_signer.name }}</p>
+                    <p v-if="errors.signers" class="text-xs text-red-600 mt-2" id="signers-error">{{
+                        errors.signers }}</p>
+                    <template v-if="form_surat.signers.length > 0">
+                        <div v-for="(signer, index) in form_surat.signers" :key="index"
+                            class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">
+                            <div class="w-full">
+                                <p>{{ signer.employee.name }}</p>
+                                <small>{{ signer.position }}</small>
+                            </div>
+                            <span @click="form_surat.signers.splice(index, 1)"
+                                class="p-3 hover:bg-red-200 rounded-full cursor-pointer transition ease-in-out duration-500">
+                                <Icon icon="jam:trash" class="text-red-600 text-2xl" />
+                            </span>
                         </div>
-                        <span @click="reset_signer"
-                            class="p-3 hover:bg-red-200 rounded-full cursor-pointer transition ease-in-out duration-500">
-                            <Icon icon="jam:trash" class="text-red-600 text-2xl" />
-                        </span>
-                    </div>
-                </div>
-                <div class="mb-4" v-if="selected_signer">
-                    <label class="block text-sm font-medium mb-2">Pilih Jabatan Penandatangan</label>
-                    <custom-select :required="true" v-model="form_surat.signer.position" :data="selected_signer.positions"
-                        placeholder="Jabatan penandatangan"></custom-select>
-                    <p v-if="errors['signer.position']" class="text-xs text-red-600 mt-2" id="signer-position-error">
-                        {{ errors['signer.position'] }}
-                    </p>
+                    </template>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">Jenis Tanda Tangan</label>
-                    <select class="form-control" required v-model="form_surat.signature_type"
-                        placeholder="Jenis Tanda Tangan">
-                        <option value="manual">Tanda Tangan Manual</option>
-                        <option value="digital">Tanda Tangan Digital</option>
-                        <option value="gambar tanda tangan">Tanda Tangan Berupa Gambar</option>
-                    </select>
-                    <p v-if="errors.signature_type" class="text-xs text-red-600 mt-2" id="signatur-type-error">
-                        {{ errors.signature_type }}
+                    <label class="block text-sm font-medium mb-2">Pegawai Yang Approval</label>
+                    <p class="text-center text-primary cursor-pointer w-full form-control hover:bg-primary-500/25"
+                        @click="open_modal_choose_approval">
+                        Pilih Pegawai Yang Approval
                     </p>
+                    <p v-if="errors.approvals" class="text-xs text-red-600 mt-2" id="approvals-error">{{
+                        errors.approvals }}</p>
+                    <template v-if="form_surat.approvals.length > 0">
+                        <div v-for="(approval, index) in form_surat.approvals" :key="index"
+                            class="form-control bg-primary-200/20  mt-2 flex justify-between items-center gap-x-4">
+                            <div class="w-full">
+                                <p>{{ approval.employee.name }}</p>
+                                <small>{{ approval.position }}</small>
+                            </div>
+                            <span @click="form_surat.approvals.splice(index, 1)"
+                                class="p-3 hover:bg-red-200 rounded-full cursor-pointer transition ease-in-out duration-500">
+                                <Icon icon="jam:trash" class="text-red-600 text-2xl" />
+                            </span>
+                        </div>
+                    </template>
                 </div>
                 <div class="flex justify-end gap-x-6">
                     <router-link :to="{ name: 'surat_perjanjian_kerja_dosen_luar_biasa' }"
@@ -522,4 +550,7 @@ onMounted(async () => {
     <template v-if="selected_employee">
         <AddRekening ref="modal_add_rekening" :employee="selected_employee" @inserted="search_input_rekening.fetchData()" />
     </template>
+
+    <ChooseEmployee ref="modal_choose_signer" :title="'Pilih Penandatangan'" @choosed="add_signer" />
+    <ChooseEmployee ref="modal_choose_approval" :title="'Pilih Pegawai Yang Approval'" @choosed="add_approval" />
 </template>

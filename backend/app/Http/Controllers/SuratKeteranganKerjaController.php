@@ -23,6 +23,7 @@ class SuratKeteranganKerjaController extends Controller
     /**
      * Display a listing of the resource.
      */
+
     public function index(Request $request)
     {
         $letters = Letter::with(['signers', 'signers.employee', 'approvals', 'approvals.employee'])->search($request->search)->whereUser(auth()->user())->orderBy('is_signed')->orderBy('reference_number')->orderBy('id')->paginate();
@@ -56,14 +57,14 @@ class SuratKeteranganKerjaController extends Controller
         $validate = Validator::make($request->all(), [
             'letter_template_id' => 'required|exists:letter_templates,id',
             'tanggal_surat' => 'required|date',
-            'tanggal_akhir_berlaku' => 'sometimes|nullable|date|after:now',
+            'masa_berlaku.year' => 'sometimes|integer',
+            'masa_berlaku.month' => 'sometimes|integer',
+            'masa_berlaku.day' => 'sometimes|integer',
             'employee.id' => 'required|exists:employees,id',
             'employee.position' => 'required|string',
             'signers' => 'required|array|min:1',
             'approvals' => 'sometimes|array',
             'signature_type' => 'required|in:manual,digital,gambar tanda tangan',
-        ], [
-            'tanggal_akhir_berlaku.after' => 'Tanggal akhir berlaku harus setelah tanggal hari ini !'
         ]);
 
         if ($validate->fails()) {
@@ -79,38 +80,17 @@ class SuratKeteranganKerjaController extends Controller
             $letter = new Letter;
             $letter->letter_template_id = $request->letter_template_id;
             $letter->tanggal_surat = $request->tanggal_surat;
-            $letter->tanggal_akhir_berlaku = $request->tanggal_akhir_berlaku ?? null;
+            $letter->masa_berlaku = to_interval($request->masa_berlaku['year'] ?? 0, $request->masa_berlaku['month'] ?? 0, $request->masa_berlaku['day'] ?? 0);
             $letter->employee_id = $request->employee['id'];
             $letter->position = $request->employee['position'];
-            // $letter->signer_id = $request->signer['id'];
-            // $letter->signer_position = $request->signer['position'];
 
             $letter->signature_type = $request->signature_type;
             $letter->created_by = auth()->user()->id;
             $letter->save();
 
-            $signers = [];
-            foreach ($request->signers as $signer) {
-                $tmp = new Approval();
-                $tmp->employee_id = $signer['employee']['id'];
-                $tmp->position = $signer['position'];
-                $tmp->is_signer = true;
-                $signers[] = $tmp->toArray();
-            }
+            Approval::create_approvals_and_signers_to_letter($letter, $request->signers, $request->approvals);
 
-            $letter->approvals->createMany($signers);
-
-            $approvals = [];
-            foreach ($request->approvals as $approval) {
-                $tmp = new Approval();
-                $tmp->employee_id = $approval['employee']['id'];
-                $tmp->position = $approval['position'];
-                $approvals[] = $tmp->toArray();
-            }
-
-            $letter->approvals->createMany($approvals);
-
-            if (count($approvals) == 0) {
+            if (count($request->approvals) == 0) {
                 $letter->is_approved = true;
                 $letter->save();
             }
@@ -135,7 +115,7 @@ class SuratKeteranganKerjaController extends Controller
      */
     public function show(string $id)
     {
-        $letter = Letter::with(['signers', 'signers.employee', 'approvals', 'approvals.employee'])->find($id);
+        $letter = Letter::find($id);
         if (!$letter) {
             return response()->json([
                 'message' => "Surat keterangan kerja tidak ditemukan !"
@@ -159,7 +139,6 @@ class SuratKeteranganKerjaController extends Controller
         $filename = $letter->id . '.docx';
         $fileNameServerDocx = "app/tmp/surat_keterangan_kerja/" . $filename;
         $templateProcessor = $letter->generate_docx();
-        $templateProcessor->setValue('tanda_tangan', '');
         $templateProcessor->saveAs(storage_path($fileNameServerDocx));
         return response()->download(storage_path($fileNameServerDocx), $filename)->deleteFileAfterSend();
     }
@@ -217,7 +196,9 @@ class SuratKeteranganKerjaController extends Controller
         $validate = Validator::make($request->all(), [
             'letter_template_id' => 'required|exists:letter_templates,id',
             'tanggal_surat' => 'required|date',
-            'tanggal_akhir_berlaku' => 'sometimes|nullable|date|after:now',
+            'masa_berlaku.year' => 'sometimes|integer',
+            'masa_berlaku.month' => 'sometimes|integer',
+            'masa_berlaku.day' => 'sometimes|integer',
             'employee.id' => 'required|exists:employees,id',
             'employee.position' => 'required|string',
             'signers' => 'required|array|min:1',
@@ -236,38 +217,20 @@ class SuratKeteranganKerjaController extends Controller
         try {
             $letter->letter_template_id = $request->letter_template_id;
             $letter->tanggal_surat = $request->tanggal_surat;
+            $letter->masa_berlaku = to_interval($request->masa_berlaku['year'] ?? 0, $request->masa_berlaku['month'] ?? 0, $request->masa_berlaku['day'] ?? 0);
             $letter->employee_id = $request->employee['id'];
             $letter->position = $request->employee['position'];
             $letter->signature_type = $request->signature_type;
             $letter->save();
 
-            $letter->signers()->delete();
-            $signers = [];
-            foreach ($request->signers as $signer) {
-                $tmp = new Approval();
-                $tmp->employee_id = $signer['employee']['id'];
-                $tmp->position = $signer['position'];
-                $tmp->is_signer = true;
-                $signers[] = $tmp->toArray();
-            }
+            Approval::update_approvals_and_signers_to_letter($letter, $request->signers, $request->approvals);
 
-            $letter->approvals->createMany($signers);
-
-            $letter->approvals->delete();
-            $approvals = [];
-            foreach ($request->approvals as $approval) {
-                $tmp = new Approval();
-                $tmp->employee_id = $approval['employee']['id'];
-                $tmp->position = $approval['position'];
-                $approvals[] = $tmp->toArray();
-            }
-
-            $letter->approvals->createMany($approvals);
-
-            if (count($approvals) == 0) {
+            if (count($request->approvals) == 0) {
                 $letter->is_approved = true;
-                $letter->save();
+            } else {
+                $letter->is_approved = false;
             }
+            $letter->save();
 
             DB::commit();
             $response = [
@@ -342,18 +305,33 @@ class SuratKeteranganKerjaController extends Controller
                 'message' => "Surat keterangan kerja tidak dapat dihapus !"
             ], 403);
         }
-        $old_file = $letter->id . '.pdf';
-        $letter->delete();
 
-        $tmpFileNameServerPdf = 'app/tmp/surat_keterangan_kerja/' . $old_file;
-        if (file_exists(storage_path($tmpFileNameServerPdf))) {
-            unlink(storage_path($tmpFileNameServerPdf));
+        DB::beginTransaction();
+        try {
+            $old_file = $letter->id . '.pdf';
+            $letter->approvals()->delete();
+            $letter->signers()->delete();
+            $letter->delete();
+    
+            $tmpFileNameServerPdf = 'app/tmp/surat_keterangan_kerja/' . $old_file;
+            if (file_exists(storage_path($tmpFileNameServerPdf))) {
+                unlink(storage_path($tmpFileNameServerPdf));
+            }
+  
+            DB::commit();
+            
+            $response = [
+                'message' => "Berhasil menghapus surat keterangan kerja !"
+            ];
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $response = [
+                'errors' => $e->getMessage(),
+                'message' => "Gagal menghapus surat keterangan kerja !"
+            ];
+            return response()->json($response, 500);
         }
-
-        $response = [
-            'message' => "Berhasil menghapus surat keterangan kerja !"
-        ];
-        return response()->json($response, 200);
     }
 
     public function give_reference_number(Request $request)
@@ -450,9 +428,9 @@ class SuratKeteranganKerjaController extends Controller
                     'letter_type' => 'surat_keterangan_kerja',
                 ];
                 $encrypt_payload = Crypt::encrypt($payload);
-                $url_confirmation = env('APP_FRONTEND_URL') . "/confirm-signature?data=$encrypt_payload";
+                $url_confirmation = env('APP_FRONTEND_URL') . "/verify/$encrypt_payload";
                 $fileName = "surat_keterangan_kerja_" . Str::replace("/", "-", $letter->get_reference_number()) . '.png';
-                QrCode::format('png')->size(300)->generate($url_confirmation, storage_path('app/signed_files/' . $fileName));
+                QrCode::style('round')->format('png')->size(200)->generate($url_confirmation, storage_path('app/signed_files/' . $fileName));
             } else if ($letter->signature_type == 'gambar tanda tangan') {
                 $signature = Employee::find(auth()->id())->signature;
 
@@ -468,7 +446,7 @@ class SuratKeteranganKerjaController extends Controller
                 }
             }
 
-            
+
             $signer = $letter->signers->where('employee_id', auth()->id())->first();
             $signer->signed_file = $fileName;
             $signer->is_approved = true;

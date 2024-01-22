@@ -56,8 +56,7 @@ class SuratKeteranganKerjaResource extends JsonResource
             'status' => $status,
             'tanggal_surat_raw' => $this->tanggal_surat,
             'tanggal_surat' => Carbon::parse($this->tanggal_surat)->translatedFormat('l, d F Y'),
-            'tanggal_akhir_berlaku_raw' => $this->tanggal_akhir_berlaku,
-            'tanggal_akhir_berlaku' => Carbon::parse($this->tanggal_akhir_berlaku)->translatedFormat('l, d F Y'),
+            'masa_berlaku' => $this->masa_berlaku_parse(),
         ];
     }
 }

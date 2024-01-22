@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+const Verify = () => import('@/views/Verify.vue')
 const Register = () => import('@/views/Register.vue')
-const AskVerification = () => import('@/views/AskVerification.vue')
 const Login = () => import('@/views/Login.vue')
 const Profile = () => import('@/views/Profile.vue')
 const Dashboard = () => import('@/views/Dashboard.vue')
@@ -26,65 +26,41 @@ const SignedLetter = () => import('@/views/outcoming_letters/SignedLetter.vue')
 const SuratKeteranganKerja = () => import('@/views/outcoming_letters/SuratKeteranganKerja/Index.vue')
 const PreviewSuratKeteranganKerja = () => import('@/views/outcoming_letters/SuratKeteranganKerja/Preview.vue')
 const FormSuratKeteranganKerja = () => import('@/views/outcoming_letters/SuratKeteranganKerja/Form.vue')
-// import SuratKeteranganKerja from '@/views/outcoming_letters/SuratKeteranganKerja/Index.vue'
-// import PreviewSuratKeteranganKerja from '@/views/outcoming_letters/SuratKeteranganKerja/Preview.vue'
-// import FormSuratKeteranganKerja from '@/views/outcoming_letters/SuratKeteranganKerja/Form.vue'
 
 //surat keputusan rotasi kepegawaian
 const SuratKeputusanRotasiKepegawaian = () => import('@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Index.vue')
 const PreviewSuratKeputusanRotasiKepegawaian = () => import('@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Preview.vue')
 const FormSuratKeputusanRotasiKepegawaian = () => import('@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Form.vue')
-// import SuratKeputusanRotasiKepegawaian from '@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Index.vue'
-// import PreviewSuratKeputusanRotasiKepegawaian from '@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Preview.vue'
-// import FormSuratKeputusanRotasiKepegawaian from '@/views/outcoming_letters/SuratKeputusanRotasiKepegawaian/Form.vue'
 
 //surat keputusan pemberhentian
 const SuratKeputusanPemberhentian = () => import('@/views/outcoming_letters/SuratKeputusanPemberhentian/Index.vue')
 const PreviewSuratKeputusanPemberhentian = () => import('@/views/outcoming_letters/SuratKeputusanPemberhentian/Preview.vue')
 const FormSuratKeputusanPemberhentian = () => import('@/views/outcoming_letters/SuratKeputusanPemberhentian/Form.vue')
-// import SuratKeputusanPemberhentian from '@/views/outcoming_letters/SuratKeputusanPemberhentian/Index.vue'
-// import PreviewSuratKeputusanPemberhentian from '@/views/outcoming_letters/SuratKeputusanPemberhentian/Preview.vue'
-// import FormSuratKeputusanPemberhentian from '@/views/outcoming_letters/SuratKeputusanPemberhentian/Form.vue'
 
 //surat keputusan pengangkatan
 const SuratKeputusanPengangkatan = () => import('@/views/outcoming_letters/SuratKeputusanPengangkatan/Index.vue')
 const PreviewSuratKeputusanPengangkatan = () => import('@/views/outcoming_letters/SuratKeputusanPengangkatan/Preview.vue')
 const FormSuratKeputusanPengangkatan = () => import('@/views/outcoming_letters/SuratKeputusanPengangkatan/Form.vue')
-// import SuratKeputusanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPengangkatan/Index.vue'
-// import PreviewSuratKeputusanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPengangkatan/Preview.vue'
-// import FormSuratKeputusanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPengangkatan/Form.vue'
 
 //surat keputusan pemberhenetian dan pengangkatan
 const SuratKeputusanPemberhentianDanPengangkatan = () => import('@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Index.vue')
 const PreviewSuratKeputusanPemberhentianDanPengangkatan = () => import('@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Preview.vue')
 const FormSuratKeputusanPemberhentianDanPengangkatan = () => import('@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Form.vue')
-// import SuratKeputusanPemberhentianDanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Index.vue'
-// import PreviewSuratKeputusanPemberhentianDanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Preview.vue'
-// import FormSuratKeputusanPemberhentianDanPengangkatan from '@/views/outcoming_letters/SuratKeputusanPemberhentianDanPengangkatan/Form.vue'
 
 //surat perjanjian kerja magang
 const SuratPerjanjianKerjaMagang = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Index.vue')
 const PreviewSuratPerjanjianKerjaMagang = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Preview.vue')
 const FormSuratPerjanjianKerjaMagang = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Form.vue')
-// import SuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Index.vue'
-// import PreviewSuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Preview.vue'
-// import FormSuratPerjanjianKerjaMagang from '@/views/outcoming_letters/SuratPerjanjianKerjaMagang/Form.vue'
 
 //surat perjanjian kerja dosen luar biasa
 const SuratPerjanjianKerjaDosenLuarBiasa = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Index.vue')
 const PreviewSuratPerjanjianKerjaDosenLuarBiasa = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Preview.vue')
 const FormSuratPerjanjianKerjaDosenLuarBiasa = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Form.vue')
-// import SuratPerjanjianKerjaDosenLuarBiasa from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Index.vue'
-// import PreviewSuratPerjanjianKerjaDosenLuarBiasa from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Preview.vue'
-// import FormSuratPerjanjianKerjaDosenLuarBiasa from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenLuarBiasa/Form.vue'
 
 //surat perjanjian kerja dosen full time
 const SuratPerjanjianKerjaDosenFullTime = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Index.vue')
 const PreviewSuratPerjanjianKerjaDosenFullTime = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Preview.vue')
 const FormSuratPerjanjianKerjaDosenFullTime = () => import('@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Form.vue')
-// import SuratPerjanjianKerjaDosenFullTime from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Index.vue'
-// import PreviewSuratPerjanjianKerjaDosenFullTime from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Preview.vue'
-// import FormSuratPerjanjianKerjaDosenFullTime from '@/views/outcoming_letters/SuratPerjanjianKerjaDosenFullTime/Form.vue'
 
 //errors page
 import Forbidden from '@/views/errors/Forbidden.vue'
@@ -114,6 +90,16 @@ const router = createRouter({
       component: Maintenance,
       meta: {
         is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'GuestLayout',
+      }
+    },
+    {
+      path: '/verify/:token',
+      name: 'Verify',
+      component: Verify,
+      meta: {
+        is_login_required: false,
         can_accessed: ['*'],
         layout: 'GuestLayout',
       }
@@ -459,6 +445,32 @@ const router = createRouter({
       },
     },
     {
+      path: '/surat-keluar/surat-keputusan-rotasi-kepegawaian/:id/approve',
+      name: 'approve_surat_keputusan_rotasi_kepegawaian',
+      component: ApproveLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_rotasi_kepegawaian',
+        api_letter: 'surat-keputusan-rotasi-kepegawaian',
+        title: "Setujui Surat Keputusan Rotasi Kepegawaian",
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-rotasi-kepegawaian/:id/tanda-tangan',
+      name: 'tanda_tangan_surat_keputusan_rotasi_kepegawaian',
+      component: SignedLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_rotasi_kepegawaian',
+        api_letter: 'surat-keputusan-rotasi-kepegawaian',
+        title: "Tanda Tangan Surat Keputusan Rotasi Kepegawaian",
+      },
+    },
+    {
       path: '/surat-keluar/surat-keputusan-rotasi-kepegawaian/create',
       name: 'create_surat_keputusan_rotasi_kepegawaian',
       component: FormSuratKeputusanRotasiKepegawaian,
@@ -499,6 +511,32 @@ const router = createRouter({
         can_accessed: ['*'],
         layout: 'BlankLayout',
         parentName: 'surat_keputusan_pemberhentian',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pemberhentian/:id/approve',
+      name: 'approve_surat_keputusan_pemberhentian',
+      component: ApproveLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_pemberhentian',
+        api_letter: 'surat-keputusan-pemberhentian',
+        title: "Setujui Surat Keputusan Pemberhentian",
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pemberhentian/:id/tanda-tangan',
+      name: 'tanda_tangan_surat_keputusan_pemberhentian',
+      component: SignedLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_pemberhentian',
+        api_letter: 'surat-keputusan-pemberhentian',
+        title: "Tanda Tangan Surat Keputusan Pemberhentian",
       },
     },
     {
@@ -545,6 +583,32 @@ const router = createRouter({
       },
     },
     {
+      path: '/surat-keluar/surat-keputusan-pengangkatan/:id/approve',
+      name: 'approve_surat_keputusan_pengangkatan',
+      component: ApproveLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_pengangkatan',
+        api_letter: 'surat-keputusan-pengangkatan',
+        title: "Setujui Surat Keputusan Pengangkatan",
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pengangkatan/:id/tanda-tangan',
+      name: 'tanda_tangan_surat_keputusan_pengangkatan',
+      component: SignedLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_pengangkatan',
+        api_letter: 'surat-keputusan-pengangkatan',
+        title: "Tanda Tangan Surat Keputusan Pengangkatan",
+      },
+    },
+    {
       path: '/surat-keluar/surat-keputusan-pengangkatan/create',
       name: 'create_surat_keputusan_pengangkatan',
       component: FormSuratKeputusanPengangkatan,
@@ -585,6 +649,32 @@ const router = createRouter({
         can_accessed: ['*'],
         layout: 'BlankLayout',
         parentName: 'surat_keputusan_pemberhentian_dan_pengangkatan',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pemberhentian-dan-pengangkatan/:id/approve',
+      name: 'approve_surat_keputusan_pemberhentian_dan_pengangkatan',
+      component: ApproveLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_pemberhentian_dan_pengangkatan',
+        api_letter: 'surat-keputusan-pemberhentian-dan-pengangkatan',
+        title: "Setujui Surat Keputusan Pemberhentian Dan Pengangkatan",
+      },
+    },
+    {
+      path: '/surat-keluar/surat-keputusan-pemberhentian-dan-pengangkatan/:id/tanda-tangan',
+      name: 'tanda_tangan_surat_keputusan_pemberhentian_dan_pengangkatan',
+      component: SignedLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_keputusan_pemberhentian_dan_pengangkatan',
+        api_letter: 'surat-keputusan-pemberhentian-dan-pengangkatan',
+        title: "Tanda Tangan Surat Keputusan Pemberhentian Dan Pengangkatan",
       },
     },
     {
@@ -631,6 +721,32 @@ const router = createRouter({
       },
     },
     {
+      path: '/surat-keluar/surat-perjanjian-kerja-magang/:id/approve',
+      name: 'approve_surat_perjanjian_kerja_magang',
+      component: ApproveLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_perjanjian_kerja_magang',
+        api_letter: 'surat-perjanjian-kerja-magang',
+        title: "Setujui Surat Perjanjian Kerja Magang",
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-magang/:id/tanda-tangan',
+      name: 'tanda_tangan_surat_perjanjian_kerja_magang',
+      component: SignedLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_perjanjian_kerja_magang',
+        api_letter: 'surat-perjanjian-kerja-magang',
+        title: "Tanda Tangan Surat Perjanjian Kerja Magang",
+      },
+    },
+    {
       path: '/surat-keluar/surat-perjanjian-kerja-magang/create',
       name: 'create_surat_perjanjian_kerja_magang',
       component: FormSuratPerjanjianKerjaMagang,
@@ -674,6 +790,32 @@ const router = createRouter({
       },
     },
     {
+      path: '/surat-keluar/surat-perjanjian-kerja-dosen-luar-biasa/:id/approve',
+      name: 'approve_surat_perjanjian_kerja_dosen_luar_biasa',
+      component: ApproveLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_perjanjian_kerja_dosen_luar_biasa',
+        api_letter: 'surat-perjanjian-kerja-dosen-luar-biasa',
+        title: "Setujui Surat Perjanjian Kerja Dosen Luar Biasa",
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-dosen-luar-biasa/:id/tanda-tangan',
+      name: 'tanda_tangan_surat_perjanjian_kerja_dosen_luar_biasa',
+      component: SignedLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_perjanjian_kerja_dosen_luar_biasa',
+        api_letter: 'surat-perjanjian-kerja-dosen-luar-biasa',
+        title: "Tanda Tangan Surat Perjanjian Kerja Dosen Luar Biasa",
+      },
+    },
+    {
       path: '/surat-keluar/surat-perjanjian-kerja-dosen-luar-biasa/create',
       name: 'create_surat_perjanjian_kerja_dosen_luar_biasa',
       component: FormSuratPerjanjianKerjaDosenLuarBiasa,
@@ -714,6 +856,32 @@ const router = createRouter({
         can_accessed: ['*'],
         layout: 'BlankLayout',
         parentName: 'surat_perjanjian_kerja_dosen_full_time',
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-dosen-full-time/:id/approve',
+      name: 'approve_surat_perjanjian_kerja_dosen_full_time',
+      component: ApproveLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_perjanjian_kerja_dosen_full_time',
+        api_letter: 'surat-perjanjian-kerja-dosen-full-time',
+        title: "Setujui Surat Perjanjian Kerja Dosen Full Time",
+      },
+    },
+    {
+      path: '/surat-keluar/surat-perjanjian-kerja-dosen-full-time/:id/tanda-tangan',
+      name: 'tanda_tangan_surat_perjanjian_kerja_dosen_full_time',
+      component: SignedLetter,
+      meta: {
+        is_login_required: true,
+        can_accessed: ['*'],
+        layout: 'AuthenticatedLayout',
+        parentName: 'surat_perjanjian_kerja_dosen_full_time',
+        api_letter: 'surat-perjanjian-kerja-dosen-full-time',
+        title: "Tanda Tangan Surat Perjanjian Kerja Dosen Full Time",
       },
     },
     {

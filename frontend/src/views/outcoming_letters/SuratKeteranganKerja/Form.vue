@@ -16,13 +16,17 @@ const loading = ref(null)
 const modal_choose_signer = ref(null)
 const modal_choose_approval = ref(null)
 
-const tanggal_akhir_berlaku_exist = ref(false)
+const masa_berlaku_exist = ref(false)
 
 const form_surat = reactive({
     id: "",
     letter_template_id: "",
     tanggal_surat: new Date().toISOString().slice(0, 10),
-    tanggal_akhir_berlaku: null,
+    masa_berlaku: {
+        year: 0,
+        month: 0,
+        day: 0
+    },
     employee: {
         position: "",
     },
@@ -34,6 +38,7 @@ const form_surat = reactive({
 const errors = reactive({
     letter_template_id: "",
     tanggal_surat: "",
+    masa_berlaku: "",
     "employee.id": "",
     "employee.position": "",
     signers: "",
@@ -43,7 +48,6 @@ const errors = reactive({
 
 const letter_templates = ref([])
 const selected_employee = ref(null)
-const selected_signer = ref(null)
 
 async function get_letter_templates() {
     await axios.get(`${url}/outcoming-letters/templates?letter_type=${NAMA_SURAT}&is_active=true`)
@@ -62,14 +66,16 @@ async function get_letter(id) {
             form_surat.id = res.data.data.id
             form_surat.letter_template_id = res.data.data.letter_template_id
             form_surat.tanggal_surat = res.data.data.tanggal_surat_raw
-            form_surat.tanggal_akhir_berlaku = res.data.data.tanggal_akhir_berlaku
+            form_surat.masa_berlaku = res.data.data.masa_berlaku
+            if (res.data.data.masa_berlaku.year != 0 || res.data.data.masa_berlaku.month != 0 || res.data.data.masa_berlaku.day != 0) {
+                masa_berlaku_exist.value = true
+            }
             form_surat.employee.id = res.data.data.employee.id
             form_surat.employee.position = res.data.data.employee.position
             form_surat.signers = res.data.data.signers
             form_surat.approvals = res.data.data.approvals
             form_surat.signature_type = res.data.data.signature_type
             selected_employee.value = res.data.data.employee
-            selected_signer.value = res.data.data.signer
         })
         .catch(err => {
             console.log(err)
@@ -91,19 +97,15 @@ function reset_employee() {
     }
 }
 
-// function reset_signer() {
-//     selected_signer.value = null
-//     form_surat.signer = {
-//         id: "",
-//         position: "",
-//     }
-// }
-
 function reset_form() {
     form_surat.id = ""
     form_surat.letter_template_id = ""
     form_surat.tanggal_surat = new Date().toISOString().slice(0, 10)
-    form_surat.tanggal_akhir_berlaku = null
+    form_surat.masa_berlaku = {
+        year: 0,
+        month: 0,
+        day: 0
+    }
     form_surat.employee = {
         id: "",
         position: "",
@@ -112,7 +114,6 @@ function reset_form() {
     form_surat.approvals = []
     form_surat.signature_type = "digital"
     reset_employee()
-    reset_signer()
     reset_errors()
 }
 
@@ -168,8 +169,8 @@ function save_surat() {
             signature_type: form_surat.signature_type,
         }
 
-        if (tanggal_akhir_berlaku_exist.value) {
-            payload.tanggal_akhir_berlaku = form_surat.tanggal_akhir_berlaku
+        if (masa_berlaku_exist.value) {
+            payload.masa_berlaku = form_surat.masa_berlaku
         }
 
         axios.put(`${url}/outcoming-letters/surat-keterangan-kerja/${form_surat.id}`, payload)
@@ -216,8 +217,8 @@ function save_surat() {
             signature_type: form_surat.signature_type,
         }
 
-        if (tanggal_akhir_berlaku_exist.value) {
-            payload.tanggal_akhir_berlaku = form_surat.tanggal_akhir_berlaku
+        if (masa_berlaku_exist.value) {
+            payload.masa_berlaku = form_surat.masa_berlaku
         }
 
         axios.post(`${url}/outcoming-letters/surat-keterangan-kerja`, payload)
@@ -292,15 +293,31 @@ onMounted(async () => {
                         {{ errors['tanggal_surat'] }}
                     </p>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">Tanggal Akhir Berlaku ?</label>
-                    <div class="flex items-center gap-x-4">
-                        <input type="checkbox" v-model="tanggal_akhir_berlaku_exist">
-                        <input :disabled="!tanggal_akhir_berlaku_exist" :required="tanggal_akhir_berlaku_exist" type="date"
-                            class="form-control w-full" v-model="form_surat.tanggal_akhir_berlaku">
+                <div class="mb-4 flex gap-x-4 items-center">
+                    <input type="checkbox" v-model="masa_berlaku_exist">
+                    <label class="block text-sm font-medium">Memiliki Masa Berlaku ?</label>
+                </div>
+                <div class="mb-4" v-if="masa_berlaku_exist">
+                    <label class="block text-sm font-medium mb-2">Masa Berlaku</label>
+                    <div class="grid grid-cols-3 gap-x-4">
+                        <div>
+                            <label class="block text-xs font-medium mb-2">Tahun</label>
+                            <input type="number" class="form-control" v-model="form_surat.masa_berlaku.year"
+                                placeholder="Tahun">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-2">Bulan</label>
+                            <input type="number" class="form-control" v-model="form_surat.masa_berlaku.month"
+                                placeholder="Bulan">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-2">Hari</label>
+                            <input type="number" class="form-control" v-model="form_surat.masa_berlaku.day"
+                                placeholder="Hari">
+                        </div>
                     </div>
-                    <p v-if="errors['tanggal_akhir_berlaku']" class="text-xs text-red-600 mt-2">
-                        {{ errors['tanggal_akhir_berlaku'] }}
+                    <p v-if="errors['masa_berlaku']" class="text-xs text-red-600 mt-2">
+                        {{ errors['masa_berlaku'] }}
                     </p>
                 </div>
                 <div class="mb-4">

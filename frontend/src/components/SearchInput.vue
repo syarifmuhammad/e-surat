@@ -93,6 +93,10 @@ function fetchData() {
         return;
     }
 
+    if (focus.value == false) {
+        return;
+    }
+
     axios.get(url).then((response) => {
         before.value = next.value;
         if (response.data.links && response.data.links.next) {
