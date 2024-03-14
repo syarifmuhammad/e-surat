@@ -24,6 +24,7 @@ const fasilitas_lainnya = ref("")
 
 const form_surat = reactive({
     id: "",
+    is_private: false,
     nomor_surat_sebelumnya: "",
     tanggal_surat_sebelumnya: "",
     letter_template_id: "",
@@ -62,6 +63,7 @@ const form_surat = reactive({
 })
 
 const errors = reactive({
+    is_private: "",
     letter_template_id: "",
     tanggal_surat: "",
     masa_berlaku: "",
@@ -127,6 +129,7 @@ async function get_letter(id) {
         .then(res => {
             let data = res.data.data
             form_surat.id = data.id
+            form_surat.is_private = data.is_private
             form_surat.nomor_surat_sebelumnya = data.nomor_surat_sebelumnya
             form_surat.tanggal_surat_sebelumnya = data.tanggal_surat_sebelumnya
             form_surat.letter_template_id = data.letter_template_id
@@ -172,6 +175,7 @@ function reset_prodi() {
 
 function reset_form() {
     form_surat.id = ""
+    form_surat.is_private = false
     form_surat.nomor_surat_sebelumnya = ""
     form_surat.tanggal_surat_sebelumnya = ""
     form_surat.letter_template_id = ""
@@ -266,6 +270,7 @@ function save_surat() {
     loading.value.open()
 
     let payload = {
+        is_private: form_surat.is_private,
         letter_template_id: form_surat.letter_template_id,
         tanggal_surat: form_surat.tanggal_surat,
         mulai_berlaku: form_surat.mulai_berlaku,
@@ -378,6 +383,16 @@ onMounted(async () => {
                     </select>
                     <p v-if="errors.letter_template_id" class="text-xs text-red-600 mt-2" id="letter-template-error">
                         {{ errors.letter_template_id }}
+                    </p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Sifat Surat : Rahasia atau tidak ?</label>
+                    <input type="radio" name="is_private" value="false" @click="form_surat.is_private = false"
+                        :checked="!form_surat.is_private"> Tidak Rahasia
+                    <input class="ml-4" type="radio" name="is_private" value="true" @click="form_surat.is_private = true"
+                        :checked="form_surat.is_private"> Rahasia
+                    <p v-if="errors.is_private" class="text-xs text-red-600 mt-2" id="is-private-error">
+                        {{ errors.is_private }}
                     </p>
                 </div>
                 <div class="mb-4">

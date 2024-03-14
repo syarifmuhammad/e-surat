@@ -14,16 +14,25 @@ class SuratKeputusanPengangkatan extends Model
     protected $perPage = 10;
     public const NAME = 'SURAT_KEPUTUSAN_PENGANGKATAN';
     protected $table = 'surat_keputusan_pengangkatan';
+    public function scopeWhereAssigned($query, $user)
+    {
+        if ($user->roles == 'admin_sekretariat') {
+            return $query;
+        }
+        
+        return $query->where('employee_id', $user->id)->orWhereHas('signers', function ($query) use ($user) {
+            return $query->where('employee_id', $user->id);
+        })->orWhereHas('approvals', function ($query) use ($user) {
+            return $query->where('employee_id', $user->id);
+        });
+    }
+
     public function scopeWhereUser($query, $user)
     {
         if ($user->roles == 'pegawai') {
-            return $query->where('employee_id', $user->id)->orWhereHas('signers', function ($query) use ($user) {
-                return $query->where('employee_id', $user->id);
-            })->orWhereHas('approvals', function ($query) use ($user) {
-                return $query->where('employee_id', $user->id);
-            });
-        } else if($user->roles == 'admin_unit') {
-            return $query->where('created_by', auth()->id());
+            return $this->scopeWhereAssigned($query, $user);
+        } else if ($user->roles == 'admin_unit') {
+            return $query->orWhere('created_by', $user->id);
         } else {
             return $query;
         }

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('pertelaan_perjanjian_kerja', function (Blueprint $table) {
             $table->id();
+            $table->boolean('is_private')->default(false);
             $table->string('pendidikan');
             $table->string('tahun_satu');
             $table->integer('tunjangan_dasar_satu');

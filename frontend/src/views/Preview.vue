@@ -13,7 +13,7 @@ const pdf = ref(null)
 
 function get_pdf(id) {
     loading.value.open()
-    axios.get(`${url}/outcoming-letters/surat-keterangan-kerja/${id}/download/pdf`, {
+    axios.get(`${url}/outcoming-letters/${route.meta.api_letter}/${id}/download/pdf`, {
         responseType: 'blob',
     }).then(res => {
         const url_pdf = window.URL.createObjectURL(res.data);

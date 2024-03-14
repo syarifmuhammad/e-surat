@@ -4,10 +4,7 @@ import { RouterLink } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import axios from 'axios'
 import CustomTable from '@/components/CustomTable.vue';
-import Modal from '@/components/Modal.vue';
-import UploadFile from '@/components/UploadFile.vue'
 import Loading from '@/components/Loading.vue'
-import UploadSignature from '@/components/UploadSignature.vue';
 import { useUserStore } from '@/stores/user'
 
 const userStore = useUserStore()
@@ -26,14 +23,6 @@ const thead = [
 ]
 
 const table = ref(null)
-const modal_upload_signed_file = ref(null)
-const modal_sign = ref(null)
-const modal_update_signature = ref(null)
-
-const verified_file = ref(null)
-const letter_id = ref(null)
-const letter_signature_type = ref("")
-const signature = ref(null)
 
 function download_docx(id, nama) {
     loading.value.open()
@@ -90,120 +79,6 @@ function give_reference_number(id) {
             icon: 'error',
         })
     })
-}
-
-function open_modal_upload_signed_file(id) {
-    modal_upload_signed_file.value.open()
-    letter_id.value = id
-}
-
-function close_modal_upload_signed_file() {
-    modal_upload_signed_file.value.close()
-    letter_id.value = null
-}
-
-function upload_signed_file() {
-    if (!letter_id.value) {
-        Swal.fire({
-            title: 'Gagal!',
-            text: 'Terjadi kesalahan!',
-            icon: 'error',
-        })
-        return
-    }
-    if (!verified_file.value.files) {
-        Swal.fire({
-            title: 'Gagal!',
-            text: 'File tidak boleh kosong!',
-            icon: 'error',
-        })
-        return
-    }
-    loading.value.open()
-    let request = new FormData()
-    request.append('signed_file', verified_file.value.files)
-    request.append('_method', 'PUT')
-    axios.post(`${url}/outcoming-letters/surat-perjanjian-kerja-magang/${letter_id.value}/upload-signed-file`, request).then(res => {
-        loading.value.close()
-        Swal.fire({
-            title: 'Berhasil!',
-            text: 'File berhasil diupload!',
-            icon: 'success',
-        })
-        table.value.getData()
-        close_modal_upload_signed_file()
-    }).catch(err => {
-        loading.value.close()
-        Swal.fire({
-            title: 'Gagal!',
-            text: 'File gagal diupload!',
-            icon: 'error',
-        })
-        close_modal_upload_signed_file()
-    })
-}
-
-function open_modal_sign(id, signature_type) {
-    if (signature_type == 'digital') {
-        modal_sign.value.open()
-        letter_id.value = id
-        letter_signature_type.value = signature_type
-    } else {
-        loading.value.open()
-        axios.get(`${url}/signature`, {
-            responseType: 'blob',
-        }).then(res => {
-            if (res.data.type != 'application/json') {
-                signature.value = window.URL.createObjectURL(new Blob([res.data]));
-            } else {
-                signature.value = null
-            }
-            modal_sign.value.open()
-            letter_id.value = id
-            letter_signature_type.value = signature_type
-        }).catch(err => {
-            loading.value.close()
-            Swal.fire({
-                title: 'Gagal!',
-                text: 'File tanda tangan gagal didapatkan!',
-                icon: 'error',
-            })
-        }).finally(() => {
-            loading.value.close()
-        })
-    }
-}
-
-function sign() {
-    if (!letter_id.value) {
-        Swal.fire({
-            title: 'Gagal!',
-            text: 'Terjadi kesalahan!',
-            icon: 'error',
-        })
-        return
-    }
-    loading.value.open()
-    let payload = {
-        _method: 'PUT',
-    }
-    axios.put(`${url}/outcoming-letters/surat-perjanjian-kerja-magang/${letter_id.value}/sign`, payload).then(res => {
-        loading.value.close()
-        Swal.fire({
-            title: 'Berhasil!',
-            text: 'Surat berhasil ditandatangani!',
-            icon: 'success',
-        })
-        table.value.getData()
-    }).catch(err => {
-        loading.value.close()
-        Swal.fire({
-            title: 'Gagal!',
-            text: 'Surat gagal ditandatangani!',
-            icon: 'error',
-        })
-    })
-
 }
 
 function delete_letter(id) {
@@ -324,24 +199,7 @@ function delete_letter(id) {
                                     <Icon class="text-lg" icon="gg:file-document"></Icon>
                                     Lihat Surat (.DOCX)
                                 </span>
-                                <span v-if="item.can_give_reference_number"
-                                    @click="open_sweetalert_confirm_give_reference_number(item.id)"
-                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
-                                    Berikan Nomor Surat
-                                </span>
-                                <RouterLink v-if="item.can_approved"
-                                    :to="{ name: 'approve_surat_perjanjian_kerja_magang', params: { id: item.id } }"
-                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="fluent:signed-24-regular"></Icon>
-                                    Setujui Surat
-                                </RouterLink>
-                                <RouterLink v-if="!item.can_upload_verified_file && item.can_signed"
-                                    :to="{ name: 'tanda_tangan_surat_perjanjian_kerja_magang', params: { id: item.id } }"
-                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="fluent:signed-24-regular"></Icon>
-                                    Tanda Tangani Surat
-                                </RouterLink>
+                                
                                 <RouterLink v-if="item.can_edit"
                                     :to="{ name: 'update_surat_perjanjian_kerja_magang', params: { id: item.id } }"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">

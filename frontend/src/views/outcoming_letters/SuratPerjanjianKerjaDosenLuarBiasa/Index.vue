@@ -329,12 +329,7 @@ function delete_letter(id) {
                                     <Icon class="text-lg" icon="gg:file-document"></Icon>
                                     Lihat Surat (.DOCX)
                                 </span>
-                                <span v-if="item.can_give_reference_number"
-                                    @click="open_sweetalert_confirm_give_reference_number(item.id)"
-                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="fluent:document-page-number-24-regular"></Icon>
-                                    Berikan Nomor Surat
-                                </span>
+                                
                                 <RouterLink v-if="item.can_approved"
                                     :to="{ name: 'approve_surat_perjanjian_kerja_dosen_luar_biasa', params: { id: item.id } }"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">

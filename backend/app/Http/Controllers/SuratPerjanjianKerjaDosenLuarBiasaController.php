@@ -26,7 +26,13 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
      */
     public function index(Request $request)
     {
-        $letters = Letter::search($request->search)->whereUser(auth()->user())->orderBy('is_signed')->orderBy('reference_number')->orderBy('id')->paginate();
+        $letters = Letter::with(['signers', 'signers.employee', 'approvals', 'approvals.employee'])->search($request->search)->where('created_by', auth()->id())->orderBy('is_signed')->orderBy('reference_number')->orderBy('id')->paginate();
+        return new ThisCollection($letters);
+    }
+
+    public function incoming(Request $request)
+    {
+        $letters = Letter::with(['signers', 'signers.employee', 'approvals', 'approvals.employee'])->search($request->search)->whereAssigned(auth()->user())->orderBy('is_signed')->orderBy('reference_number')->orderBy('id')->paginate();
         return new ThisCollection($letters);
     }
 
@@ -55,6 +61,7 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
     public function store(Request $request)
     {
         $validate = Validator::make($request->all(), [
+            'is_private' => 'required|boolean',
             'letter_template_id' => 'required|exists:letter_templates,id',
             'tanggal_surat' => 'required|date',
             'masa_berlaku.year' => 'required|integer',
@@ -98,6 +105,7 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
 
         try {
             $letter = new Letter;
+            $letter->is_private = $request->is_private;
             $letter->letter_template_id = $request->letter_template_id;
             $letter->tanggal_surat = $request->tanggal_surat;
             $letter->masa_berlaku = to_interval($request->masa_berlaku['year'], $request->masa_berlaku['month'], $request->masa_berlaku['day']);
@@ -227,6 +235,7 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
         }
 
         $validate = Validator::make($request->all(), [
+            'is_private' => 'required|boolean',
             'letter_template_id' => 'required|exists:letter_templates,id',
             'tanggal_surat' => 'required|date',
             'masa_berlaku.year' => 'required|integer',
@@ -269,6 +278,7 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
         DB::beginTransaction();
 
         try {
+            $letter->is_private = $request->is_private;
             $letter->letter_template_id = $request->letter_template_id;
             $letter->tanggal_surat = $request->tanggal_surat;
             $letter->masa_berlaku = to_interval($request->masa_berlaku['year'], $request->masa_berlaku['month'], $request->masa_berlaku['day']);
@@ -388,14 +398,14 @@ class SuratPerjanjianKerjaDosenLuarBiasaController extends Controller
             $letter->approvals()->delete();
             $letter->signers()->delete();
             $letter->delete();
-    
+
             $tmpFileNameServerPdf = 'app/tmp/surat_perjanjian_kerja_dosen_luar_biasa/' . $old_file;
             if (file_exists(storage_path($tmpFileNameServerPdf))) {
                 unlink(storage_path($tmpFileNameServerPdf));
             }
-  
+
             DB::commit();
-            
+
             $response = [
                 'message' => "Berhasil menghapus surat perjanjian kerja dosen luar biasa !"
             ];

@@ -125,7 +125,7 @@ onMounted(async () => {
       <div v-for="n in 6" class="w-full min-h-[272px] bg-slate-200 animate-pulse"></div>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" v-else>
-      <RouterLink :to="{ name: 'surat_keterangan_kerja' }" class="rounded-lg bg-white p-6">
+      <RouterLink :to="{ name: 'surat_keterangan_kerja' + (user.roles == 'admin_unit' ? '' : '_internal') }" class="rounded-lg bg-white p-6">
         <div class="flex justify-between items-center mb-2">
           <Icon class="text-4xl text-gray-500" icon="gg:file-document" />
           <span v-if="is_need_to_check('surat_keterangan_kerja')" class="text-red-500">Perlu di proses</span>
@@ -151,7 +151,7 @@ onMounted(async () => {
           </button>
         </div>
       </RouterLink>
-      <RouterLink :to="{ name: 'surat_keputusan_rotasi_kepegawaian' }" class="rounded-lg bg-white p-6">
+      <RouterLink :to="{ name: 'surat_keputusan_rotasi_kepegawaian' + (user.roles == 'admin_unit' ? '' : '_internal') }" class="rounded-lg bg-white p-6">
         <div class="flex justify-between items-center mb-2">
           <Icon class="text-4xl text-gray-500" icon="gg:file-document" />
           <span v-if="is_need_to_check('sk_rotasi_kepegawaian')" class="text-red-500">Perlu di proses</span>
@@ -178,7 +178,7 @@ onMounted(async () => {
           </button>
         </div>
       </RouterLink>
-      <RouterLink :to="{ name: 'surat_keputusan_pemberhentian' }" class="rounded-lg bg-white p-6">
+      <RouterLink :to="{ name: 'surat_keputusan_pemberhentian' + (user.roles == 'admin_unit' ? '' : '_internal') }" class="rounded-lg bg-white p-6">
         <div class="flex justify-between items-center mb-2">
           <Icon class="text-4xl text-gray-500" icon="gg:file-document" />
           <span v-if="is_need_to_check('sk_pemberhentian')" class="text-red-500">Perlu di proses</span>
@@ -205,7 +205,7 @@ onMounted(async () => {
           </button>
         </div>
       </RouterLink>
-      <RouterLink :to="{ name: 'surat_keputusan_pengangkatan' }" class="rounded-lg bg-white p-6">
+      <RouterLink :to="{ name: 'surat_keputusan_pengangkatan' + (user.roles == 'admin_unit' ? '' : '_internal') }" class="rounded-lg bg-white p-6">
         <div class="flex justify-between items-center mb-2">
           <Icon class="text-4xl text-gray-500" icon="gg:file-document" />
           <span v-if="is_need_to_check('sk_pengangkatan')" class="text-red-500">Perlu di proses</span>
@@ -232,7 +232,7 @@ onMounted(async () => {
           </button>
         </div>
       </RouterLink>
-      <RouterLink :to="{ name: 'surat_keputusan_pemberhentian_dan_pengangkatan' }" class="rounded-lg bg-white p-6">
+      <RouterLink :to="{ name: 'surat_keputusan_pemberhentian_dan_pengangkatan' + (user.roles == 'admin_unit' ? '' : '_internal') }" class="rounded-lg bg-white p-6">
         <div class="flex justify-between items-center mb-2">
           <Icon class="text-4xl text-gray-500" icon="gg:file-document" />
           <span v-if="is_need_to_check('sk_pemberhentian_dan_pengangkatan')" class="text-red-500">Perlu di proses</span>
@@ -259,7 +259,7 @@ onMounted(async () => {
           </button>
         </div>
       </RouterLink>
-      <RouterLink :to="{ name: 'surat_perjanjian_kerja_magang' }" class="rounded-lg bg-white p-6">
+      <RouterLink :to="{ name: 'surat_perjanjian_kerja_magang' + (user.roles == 'admin_unit' ? '' : '_internal') }" class="rounded-lg bg-white p-6">
         <div class="flex justify-between items-center mb-2">
           <Icon class="text-4xl text-gray-500" icon="gg:file-document" />
           <span v-if="is_need_to_check('spk_magang')" class="text-red-500">Perlu di proses</span>
@@ -286,7 +286,7 @@ onMounted(async () => {
           </button>
         </div>
       </RouterLink>
-      <RouterLink :to="{ name: 'surat_perjanjian_kerja_dosen_luar_biasa' }" class="rounded-lg bg-white p-6">
+      <RouterLink :to="{ name: 'surat_perjanjian_kerja_dosen_luar_biasa' + (user.roles == 'admin_unit' ? '' : '_internal') }" class="rounded-lg bg-white p-6">
         <div class="flex justify-between items-center mb-2">
           <Icon class="text-4xl text-gray-500" icon="gg:file-document" />
           <span v-if="is_need_to_check('spk_dosen_luar_biasa')" class="text-red-500">Perlu di proses</span>
@@ -313,7 +313,7 @@ onMounted(async () => {
           </button>
         </div>
       </RouterLink>
-      <RouterLink :to="{ name: 'surat_perjanjian_kerja_dosen_full_time' }" class="rounded-lg bg-white p-6">
+      <RouterLink :to="{ name: 'surat_perjanjian_kerja_dosen_full_time' + (user.roles == 'admin_unit' ? '' : '_internal') }" class="rounded-lg bg-white p-6">
         <div class="flex justify-between items-center mb-2">
           <Icon class="text-4xl text-gray-500" icon="gg:file-document" />
           <span v-if="is_need_to_check('spk_dosen_full_time')" class="text-red-500">Perlu di proses</span>

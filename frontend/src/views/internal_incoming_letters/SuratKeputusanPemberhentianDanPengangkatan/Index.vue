@@ -39,7 +39,7 @@ const signature = ref(null)
 
 function download_docx(id, nama) {
     loading.value.open()
-    axios.get(`${url}/outcoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${id}/download/docx`, {
+    axios.get(`${url}/incoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${id}/download/docx`, {
         responseType: 'blob',
     }).then(res => {
         const url = window.URL.createObjectURL(new Blob([res.data]))
@@ -74,7 +74,7 @@ function open_sweetalert_confirm_give_reference_number(id) {
 
 function give_reference_number(id) {
     loading.value.open()
-    axios.post(`${url}/outcoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${id}/reference-number`, {
+    axios.post(`${url}/incoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${id}/reference-number`, {
         _method: 'PUT',
     }).then(res => {
         loading.value.close()
@@ -120,7 +120,7 @@ function upload_signed_file() {
     let request = new FormData()
     request.append('signed_file', verified_file.value.files)
     request.append('_method', 'PUT')
-    axios.post(`${url}/outcoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${letter_id.value}/upload-signed-file`, request).then(res => {
+    axios.post(`${url}/incoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${letter_id.value}/upload-signed-file`, request).then(res => {
         loading.value.close()
         Swal.fire({
             title: 'Berhasil!',
@@ -182,7 +182,7 @@ function sign() {
     let payload = {
         _method: 'PUT',
     }
-    axios.put(`${url}/outcoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${letter_id.value}/sign`, payload).then(res => {
+    axios.put(`${url}/incoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${letter_id.value}/sign`, payload).then(res => {
         loading.value.close()
         Swal.fire({
             title: 'Berhasil!',
@@ -200,50 +200,6 @@ function sign() {
     })
 
 }
-
-function delete_letter(id) {
-    Swal.fire({
-        title: 'Apakah anda yakin?',
-        text: "Surat akan dihapus secara permanen!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, hapus!',
-        cancelButtonText: 'Batal',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            loading.value.open()
-            axios.delete(`${url}/outcoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan/${id}`)
-                .then(res => {
-                    loading.value.close()
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil',
-                        text: 'Surat berhasil dihapus!',
-                    })
-                    table.value.getData()
-                })
-                .catch(err => {
-                    loading.value.close()
-                    if (err.response.status == 422) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: err.response.data.message,
-                        })
-                    } else {
-                        console.log(err.response)
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Terjadi kesalahan, silahkan coba lagi!',
-                        })
-                    }
-                })
-        }
-    })
-}
 </script>
 
 <template>
@@ -252,13 +208,9 @@ function delete_letter(id) {
         <div class="px-8 py-5 min-w-full inline-block align-middle">
             <div class="flex justify-between mb-6">
                 <h3 class="text-primary-400">List Surat Keputusan Pemberhentian Dan Pengangkatan Dalam Jabatan</h3>
-                <RouterLink v-if="userStore.user.roles === 'superadmin' || userStore.user.roles === 'admin_unit'"
-                    :to="{ name: 'create_surat_keputusan_pemberhentian_dan_pengangkatan' }" class="btn btn-primary">
-                    <Icon class="text-lg" icon="fluent:add-12-filled" /> Tambah Surat
-                </RouterLink>
             </div>
             <CustomTable ref="table" :thead="thead"
-                :url="`${url}/outcoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan`" v-slot="item">
+                :url="`${url}/incoming-letters/surat-keputusan-pemberhentian-dan-pengangkatan`" v-slot="item">
                 <td :class="[item.defaultClass]">{{ item.key }}</td>
                 <td :class="[item.defaultClass]">
                     {{ item.reference_number }}
@@ -311,7 +263,7 @@ function delete_letter(id) {
                             aria-labelledby="hs-dropdown-with-icons">
                             <div class="py-2 first:pt-0 last:pb-0">
                                 <RouterLink target="_blank"
-                                    :to="{ name: 'preview_surat_keputusan_pemberhentian_dan_pengangkatan', params: { id: item.id } }"
+                                    :to="{ name: 'preview_surat_keputusan_pemberhentian_dan_pengangkatan_internal', params: { id: item.id } }"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="gg:file-document"></Icon>
                                     Lihat Surat (.PDF)
@@ -328,28 +280,17 @@ function delete_letter(id) {
                                     Berikan Nomor Surat
                                 </span>
                                 <RouterLink v-if="item.can_approved"
-                                    :to="{ name: 'approve_surat_keputusan_pemberhentian_dan_pengangkatan', params: { id: item.id } }"
+                                    :to="{ name: 'approve_surat_keputusan_pemberhentian_dan_pengangkatan_internal', params: { id: item.id } }"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="fluent:signed-24-regular"></Icon>
                                     Setujui Surat
                                 </RouterLink>
                                 <RouterLink v-if="!item.can_upload_verified_file && item.can_signed"
-                                    :to="{ name: 'tanda_tangan_surat_keputusan_pemberhentian_dan_pengangkatan', params: { id: item.id } }"
+                                    :to="{ name: 'tanda_tangan_surat_keputusan_pemberhentian_dan_pengangkatan_internal', params: { id: item.id } }"
                                     class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <Icon class="text-lg" icon="fluent:signed-24-regular"></Icon>
                                     Tanda Tangani Surat
                                 </RouterLink>
-                                <RouterLink v-if="item.can_edit"
-                                    :to="{ name: 'update_surat_keputusan_pemberhentian_dan_pengangkatan', params: { id: item.id } }"
-                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="cil:pencil"></Icon>
-                                    Edit Surat
-                                </RouterLink>
-                                <span v-if="item.can_edit" @click="delete_letter(item.id)"
-                                    class="text-primary-500 cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
-                                    <Icon class="text-lg" icon="cil:trash"></Icon>
-                                    Hapus Surat
-                                </span>
                             </div>
                         </div>
                     </div>

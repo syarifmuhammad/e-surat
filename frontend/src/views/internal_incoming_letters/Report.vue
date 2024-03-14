@@ -23,12 +23,12 @@ const errors = reactive({
 
 function get_report() {
     let url = new URL(import.meta.env.VITE_URL_API.replace('/api', ''))
-    url.pathname = '/outcoming-letters/report'
+    url.pathname = '/incoming-letters/report'
     url.searchParams.append('jenis_surat', form.jenis_surat)
     url.searchParams.append('start_date', form.start_date)
     url.searchParams.append('end_date', form.end_date)
     window.open(url.href, '_blank')
-    // axios.get(`${url}/outcoming-letters/reports`, {
+    // axios.get(`${url}/incoming-letters/reports`, {
     //     params: {
     //         jenis_surat: form.jenis_surat,
     //         start_date: form.start_date,

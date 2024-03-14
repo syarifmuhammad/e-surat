@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('surat_perjanjian_kerja_dosen_luar_biasa', function (Blueprint $table) {
             $table->id();
+            $table->boolean('is_private')->default(false);
             $table->string('reference_number')->nullable()->unique();
             $table->date('tanggal_surat')->default(now());
             $table->bigInteger('masa_berlaku');

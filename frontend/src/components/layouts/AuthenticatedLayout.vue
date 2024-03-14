@@ -45,24 +45,12 @@ const sidebarMenu = ref([
                 name: 'employees',
                 icon: 'solar:user-outline',
             },
+            {
+                title: 'Nomor Surat Keluar',
+                name: 'reference_outcoming_letter',
+                icon: 'fluent:document-page-number-24-regular',
+            },
         ],
-    },
-    {
-        title: 'Surat Masuk (Eksternal)',
-        name: 'incoming_letter',
-        icon: 'iconoir:mail-in',
-        child: [
-            {
-                title: 'Kategori Surat',
-                name: 'category_incoming_letter',
-                icon: 'ion:folder-outline',
-            },
-            {
-                title: 'Arsip Surat Masuk',
-                name: 'archive_incoming_letter',
-                icon: 'iconoir:archive',
-            },
-        ]
     },
     {
         title: 'Surat Keluar',
@@ -73,11 +61,6 @@ const sidebarMenu = ref([
                 title: 'Template Surat',
                 name: 'letter_templates',
                 icon: 'eos-icons:templates-outlined',
-            },
-            {
-                title: 'Nomor Surat',
-                name: 'reference_outcoming_letter',
-                icon: 'fluent:document-page-number-24-regular',
             },
             {
                 title: 'Report',
@@ -126,7 +109,70 @@ const sidebarMenu = ref([
             },
         ]
     },
-
+    {
+        title: 'Surat Masuk (Internal)',
+        name: 'incoming_letter_internal',
+        icon: 'iconoir:mail-in',
+        child: [
+            {
+                title: 'Surat Keterangan Kerja',
+                name: 'surat_keterangan_kerja_internal',
+                icon: 'gg:file-document',
+            },
+            {
+                title: 'SK Rotasi Kepegawaian',
+                name: 'surat_keputusan_rotasi_kepegawaian_internal',
+                icon: 'ph:user-switch-light',
+            },
+            {
+                title: 'SK Pemberhentian Dalam Jabatan',
+                name: 'surat_keputusan_pemberhentian_internal',
+                icon: 'gg:file-document',
+            },
+            {
+                title: 'SK Pengangkatan Dalam Jabatan',
+                name: 'surat_keputusan_pengangkatan_internal',
+                icon: 'gg:file-document',
+            },
+            {
+                title: 'SK Pemberhentian Dan Pengangkatan Dalam Jabatan',
+                name: 'surat_keputusan_pemberhentian_dan_pengangkatan_internal',
+                icon: 'gg:file-document',
+            },
+            {
+                title: 'Surat Perjanjian Kerja Magang',
+                name: 'surat_perjanjian_kerja_magang_internal',
+                icon: 'gg:file-document',
+            },
+            {
+                title: 'Surat Perjanjian Kerja Dosen Luar Biasa',
+                name: 'surat_perjanjian_kerja_dosen_luar_biasa_internal',
+                icon: 'gg:file-document',
+            },
+            {
+                title: 'Surat Perjanjian Kerja Dosen Full Time',
+                name: 'surat_perjanjian_kerja_dosen_full_time_internal',
+                icon: 'gg:file-document',
+            },
+        ]
+    },
+    {
+        title: 'Surat Masuk (Eksternal)',
+        name: 'incoming_letter',
+        icon: 'iconoir:mail-in',
+        child: [
+            {
+                title: 'Kategori Surat',
+                name: 'category_incoming_letter',
+                icon: 'ion:folder-outline',
+            },
+            {
+                title: 'Arsip Surat Masuk',
+                name: 'archive_incoming_letter',
+                icon: 'iconoir:archive',
+            },
+        ]
+    },
 ])
 
 </script>
@@ -157,11 +203,12 @@ const sidebarMenu = ref([
                             <p class="text-sm text-gray-500">Signed in as</p>
                             <p class="text-sm font-medium text-gray-800">{{ user.email }}</p>
                         </div>
-                        <RouterLink class="mt-4 flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+                        <RouterLink
+                            class="mt-4 flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
                             :to="{ name: 'profile' }">
                             <Icon class="flex-shrink-0 w-4 h-4" icon="solar:user-outline" />
                             Profil
-                    </RouterLink>
+                        </RouterLink>
                         <span @click="useAuthStore().logout()"
                             class="text-red-500 flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 focus:outline-none focus:bg-gray-100 cursor-pointer">
                             <Icon class="flex-shrink-0 w-4 h-4" icon="solar:logout-3-line-duotone" />
@@ -254,67 +301,3 @@ const sidebarMenu = ref([
     }
 }
 </style>
-
-
-<!-- {
-    title: 'Surat Masuk (Internal)',
-    name: 'outcoming_letter',
-    icon: 'iconoir:mail-in',
-    child: [
-        {
-            title: 'Template Surat',
-            name: 'letter_templates',
-            icon: 'eos-icons:templates-outlined',
-        },
-        {
-            title: 'Nomor Surat',
-            name: 'reference_outcoming_letter',
-            icon: 'fluent:document-page-number-24-regular',
-        },
-        {
-            title: 'Report',
-            name: 'report_outcoming_letter',
-            icon: 'carbon:report',
-        },
-        {
-            title: 'Surat Keterangan Kerja',
-            name: 'surat_keterangan_kerja',
-            icon: 'gg:file-document',
-        },
-        {
-            title: 'SK Rotasi Kepegawaian',
-            name: 'surat_keputusan_rotasi_kepegawaian',
-            icon: 'ph:user-switch-light',
-        },
-        {
-            title: 'SK Pemberhentian Dalam Jabatan',
-            name: 'surat_keputusan_pemberhentian',
-            icon: 'gg:file-document',
-        },
-        {
-            title: 'SK Pengangkatan Dalam Jabatan',
-            name: 'surat_keputusan_pengangkatan',
-            icon: 'gg:file-document',
-        },
-        {
-            title: 'SK Pemberhentian Dan Pengangkatan Dalam Jabatan',
-            name: 'surat_keputusan_pemberhentian_dan_pengangkatan',
-            icon: 'gg:file-document',
-        },
-        {
-            title: 'Surat Perjanjian Kerja Magang',
-            name: 'surat_perjanjian_kerja_magang',
-            icon: 'gg:file-document',
-        },
-        {
-            title: 'Surat Perjanjian Kerja Dosen Luar Biasa',
-            name: 'surat_perjanjian_kerja_dosen_luar_biasa',
-            icon: 'gg:file-document',
-        },
-        {
-            title: 'Surat Perjanjian Kerja Dosen Full Time',
-            name: 'surat_perjanjian_kerja_dosen_full_time',
-            icon: 'gg:file-document',
-        },
-    ]
-}, -->

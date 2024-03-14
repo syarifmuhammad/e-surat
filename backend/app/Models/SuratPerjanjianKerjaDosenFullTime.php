@@ -13,16 +13,25 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
     protected $perPage = 10;
     public const NAME = 'SURAT_PERJANJIAN_KERJA_DOSEN_FULL_TIME';
     protected $table = 'surat_perjanjian_kerja_dosen_full_time';
+    public function scopeWhereAssigned($query, $user)
+    {
+        if ($user->roles == 'admin_sekretariat') {
+            return $query;
+        }
+        
+        return $query->where('employee_id', $user->id)->orWhereHas('signers', function ($query) use ($user) {
+            return $query->where('employee_id', $user->id);
+        })->orWhereHas('approvals', function ($query) use ($user) {
+            return $query->where('employee_id', $user->id);
+        });
+    }
+
     public function scopeWhereUser($query, $user)
     {
         if ($user->roles == 'pegawai') {
-            return $query->where('employee_id', $user->id)->orWhereHas('signers', function ($query) use ($user) {
-                return $query->where('employee_id', $user->id);
-            })->orWhereHas('approvals', function ($query) use ($user) {
-                return $query->where('employee_id', $user->id);
-            });
-        } else if($user->roles == 'admin_unit') {
-            return $query->where('created_by', auth()->id());
+            return $this->scopeWhereAssigned($query, $user);
+        } else if ($user->roles == 'admin_unit') {
+            return $query->orWhere('created_by', $user->id);
         } else {
             return $query;
         }
@@ -165,7 +174,7 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         $templateProcessor->setValue('nama_prodi', $prodi->nama_prodi);
         $templateProcessor->setValue('nama_fakultas', $prodi->nama_fakultas);
         $templateProcessor->setValue('singkatan_fakultas', $prodi->singkatan_fakultas);
-        
+
         $masa_berlaku = interval_to_array($this->masa_berlaku);
         $templateProcessor->setValue('mulai_berlaku', Carbon::parse($this->mulai_berlaku)->translatedFormat('d F Y'));
         $templateProcessor->setValue('akhir_berlaku', Carbon::parse($this->mulai_berlaku)->addYears($masa_berlaku['year'])->addMonths($masa_berlaku['month'])->addDays($masa_berlaku['day'])->translatedFormat('d F Y'));
@@ -203,7 +212,7 @@ class SuratPerjanjianKerjaDosenFullTime extends Model
         $templateProcessor->setValue('tunjangan_struktural_satu', $pertelaan_perjanjian_kerja->tunjangan_struktural_satu ? "Rp " . number_format($pertelaan_perjanjian_kerja->tunjangan_struktural_satu, 0, ',', '.') : "");
         $templateProcessor->setValue('tunjangan_kemahalan_satu', $pertelaan_perjanjian_kerja->tunjangan_kemahalan_satu ? "Rp " . number_format($pertelaan_perjanjian_kerja->tunjangan_kemahalan_satu, 0, ',', '.') : "");
         $templateProcessor->setValue('pendapatan_bulanan_satu', $pertelaan_perjanjian_kerja->pendapatan_bulanan_satu ? "Rp " . number_format($pertelaan_perjanjian_kerja->pendapatan_bulanan_satu, 0, ',', '.') : "");
-        $templateProcessor->setValue('tahun_dua', $pertelaan_perjanjian_kerja->tahun_dua ?? "" );
+        $templateProcessor->setValue('tahun_dua', $pertelaan_perjanjian_kerja->tahun_dua ?? "");
         $templateProcessor->setValue('tunjangan_dasar_dua', $pertelaan_perjanjian_kerja->tunjangan_dasar_dua ? "Rp " . number_format($pertelaan_perjanjian_kerja->tunjangan_dasar_dua, 0, ',', '.') : "");
         $templateProcessor->setValue('tunjangan_fungsional_dua', $pertelaan_perjanjian_kerja->tunjangan_fungsional_dua ? "Rp " . number_format($pertelaan_perjanjian_kerja->tunjangan_fungsional_dua, 0, ',', '.') : "");
         $templateProcessor->setValue('tunjangan_struktural_dua', $pertelaan_perjanjian_kerja->tunjangan_struktural_dua ? "Rp " . number_format($pertelaan_perjanjian_kerja->tunjangan_struktural_dua, 0, ',', '.') : "");

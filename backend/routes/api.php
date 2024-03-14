@@ -52,7 +52,8 @@ Route::get('/unique', function (Request $request) {
 
 Route::post('/login', [AuthenticationController::class, 'login']);
 Route::post('/register', [AuthenticationController::class, 'store']);
-Route::get('/confirm-signature', [SignatureConfirmationController::class, 'confirm_signature']);
+Route::get('/verify/{token}', [SignatureConfirmationController::class, 'verify']);
+Route::get('/file/{token}', [SignatureConfirmationController::class, 'file']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthenticationController::class, 'me']);
@@ -83,10 +84,90 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('analytics', [AnalyticsController::class, 'index']);
-    
+
     Route::prefix('incoming-letters')->group(function () {
+
+        Route::prefix('surat-keterangan-kerja')->group(function () {
+            Route::get('', [SuratKeteranganKerjaController::class, 'incoming']);
+            Route::get('/{id}/download/docx', [SuratKeteranganKerjaController::class, 'download_docx']);
+            Route::get('/{id}/download/pdf', [SuratKeteranganKerjaController::class, 'download_pdf']);
+            Route::put('/{id}/upload-signed-file', [SuratKeteranganKerjaController::class, 'upload_signed_file']);
+            Route::put('/{id}/reference-number', [SuratKeteranganKerjaController::class, 'give_reference_number']);
+            Route::put('/{id}/approve', [SuratKeteranganKerjaController::class, 'approve']);
+            Route::put('/{id}/sign', [SuratKeteranganKerjaController::class, 'sign']);
+        });
+        Route::prefix('surat-keputusan-rotasi-kepegawaian')->group(function () {
+            Route::get('', [SuratKeputusanRotasiKepegawaianController::class, 'incoming']);
+            Route::get('/{id}/download/docx', [SuratKeputusanRotasiKepegawaianController::class, 'download_docx']);
+            Route::get('/{id}/download/pdf', [SuratKeputusanRotasiKepegawaianController::class, 'download_pdf']);
+            Route::put('/{id}/upload-signed-file', [SuratKeputusanRotasiKepegawaianController::class, 'upload_signed_file']);
+            Route::put('/{id}/reference-number', [SuratKeputusanRotasiKepegawaianController::class, 'give_reference_number']);
+            Route::put('/{id}/approve', [SuratKeputusanRotasiKepegawaianController::class, 'approve']);
+            Route::put('/{id}/sign', [SuratKeputusanRotasiKepegawaianController::class, 'sign']);
+        });
+
+        Route::prefix('surat-keputusan-pemberhentian')->group(function () {
+            Route::get('', [SuratKeputusanPemberhentianController::class, 'incoming']);
+            Route::get('/{id}/download/docx', [SuratKeputusanPemberhentianController::class, 'download_docx']);
+            Route::get('/{id}/download/pdf', [SuratKeputusanPemberhentianController::class, 'download_pdf']);
+            Route::put('/{id}/upload-signed-file', [SuratKeputusanPemberhentianController::class, 'upload_signed_file']);
+            Route::put('/{id}/reference-number', [SuratKeputusanPemberhentianController::class, 'give_reference_number']);
+            Route::put('/{id}/approve', [SuratKeputusanPemberhentianController::class, 'approve']);
+            Route::put('/{id}/sign', [SuratKeputusanPemberhentianController::class, 'sign']);
+        });
+
+        Route::prefix('surat-keputusan-pengangkatan')->group(function () {
+            Route::get('', [SuratKeputusanPengangkatanController::class, 'incoming']);
+            Route::get('/{id}/download/docx', [SuratKeputusanPengangkatanController::class, 'download_docx']);
+            Route::get('/{id}/download/pdf', [SuratKeputusanPengangkatanController::class, 'download_pdf']);
+            Route::put('/{id}/upload-signed-file', [SuratKeputusanPengangkatanController::class, 'upload_signed_file']);
+            Route::put('/{id}/reference-number', [SuratKeputusanPengangkatanController::class, 'give_reference_number']);
+            Route::put('/{id}/approve', [SuratKeputusanPengangkatanController::class, 'approve']);
+            Route::put('/{id}/sign', [SuratKeputusanPengangkatanController::class, 'sign']);
+        });
+
+        Route::prefix('surat-keputusan-pemberhentian-dan-pengangkatan')->group(function () {
+            Route::get('', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'incoming']);
+            Route::get('/{id}/download/docx', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'download_docx']);
+            Route::get('/{id}/download/pdf', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'download_pdf']);
+            Route::put('/{id}/upload-signed-file', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'upload_signed_file']);
+            Route::put('/{id}/reference-number', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'give_reference_number']);
+            Route::put('/{id}/approve', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'approve']);
+            Route::put('/{id}/sign', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'sign']);
+        });
+
+        Route::prefix('surat-perjanjian-kerja-magang')->group(function () {
+            Route::get('', [SuratPerjanjianKerjaMagangController::class, 'incoming']);
+            Route::get('/{id}/download/docx', [SuratPerjanjianKerjaMagangController::class, 'download_docx']);
+            Route::get('/{id}/download/pdf', [SuratPerjanjianKerjaMagangController::class, 'download_pdf']);
+            Route::put('/{id}/upload-signed-file', [SuratPerjanjianKerjaMagangController::class, 'upload_signed_file']);
+            Route::put('/{id}/reference-number', [SuratPerjanjianKerjaMagangController::class, 'give_reference_number']);
+            Route::put('/{id}/approve', [SuratPerjanjianKerjaMagangController::class, 'approve']);
+            Route::put('/{id}/sign', [SuratPerjanjianKerjaMagangController::class, 'sign']);
+        });
+
+        Route::prefix('surat-perjanjian-kerja-dosen-luar-biasa')->group(function () {
+            Route::get('', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'incoming']);
+            Route::get('/{id}/download/docx', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'download_docx']);
+            Route::get('/{id}/download/pdf', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'download_pdf']);
+            Route::put('/{id}/upload-signed-file', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'upload_signed_file']);
+            Route::put('/{id}/reference-number', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'give_reference_number']);
+            Route::put('/{id}/approve', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'approve']);
+            Route::put('/{id}/sign', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'sign']);
+        });
+
+        Route::prefix('surat-perjanjian-kerja-dosen-full-time')->group(function () {
+            Route::get('', [SuratPerjanjianKerjaDosenFullTimeController::class, 'incoming']);
+            Route::get('/{id}/download/docx', [SuratPerjanjianKerjaDosenFullTimeController::class, 'download_docx']);
+            Route::get('/{id}/download/pdf', [SuratPerjanjianKerjaDosenFullTimeController::class, 'download_pdf']);
+            Route::put('/{id}/upload-signed-file', [SuratPerjanjianKerjaDosenFullTimeController::class, 'upload_signed_file']);
+            Route::put('/{id}/reference-number', [SuratPerjanjianKerjaDosenFullTimeController::class, 'give_reference_number']);
+            Route::put('/{id}/approve', [SuratPerjanjianKerjaDosenFullTimeController::class, 'approve']);
+            Route::put('/{id}/sign', [SuratPerjanjianKerjaDosenFullTimeController::class, 'sign']);
+        });
+
         Route::prefix('categories')->group(function () {
-            Route::get('', [CategoryIncomingLetterController::class, 'index']);
+            Route::get('', [CategoryIncomingLetterController::class, 'incoming']);
             Route::post('', [CategoryIncomingLetterController::class, 'store']);
             Route::put('{id}', [CategoryIncomingLetterController::class, 'update']);
             Route::delete('{id}', [CategoryIncomingLetterController::class, 'destroy']);
@@ -117,12 +198,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}/download/docx', [SuratKeteranganKerjaController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratKeteranganKerjaController::class, 'download_pdf']);
             Route::get('/{id}', [SuratKeteranganKerjaController::class, 'show']);
-            Route::put('/{id}/upload-signed-file', [SuratKeteranganKerjaController::class, 'upload_signed_file']);
             Route::put('/{id}', [SuratKeteranganKerjaController::class, 'update']);
             Route::delete('/{id}', [SuratKeteranganKerjaController::class, 'destroy']);
-            Route::put('/{id}/reference-number', [SuratKeteranganKerjaController::class, 'give_reference_number']);
-            Route::put('/{id}/approve', [SuratKeteranganKerjaController::class, 'approve']);
-            Route::put('/{id}/sign', [SuratKeteranganKerjaController::class, 'sign']);
         });
         Route::prefix('surat-keputusan-rotasi-kepegawaian')->group(function () {
             Route::get('', [SuratKeputusanRotasiKepegawaianController::class, 'index']);
@@ -131,12 +208,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}/download/docx', [SuratKeputusanRotasiKepegawaianController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratKeputusanRotasiKepegawaianController::class, 'download_pdf']);
             Route::get('/{id}', [SuratKeputusanRotasiKepegawaianController::class, 'show']);
-            Route::put('/{id}/upload-signed-file', [SuratKeputusanRotasiKepegawaianController::class, 'upload_signed_file']);
             Route::put('/{id}', [SuratKeputusanRotasiKepegawaianController::class, 'update']);
             Route::delete('/{id}', [SuratKeputusanRotasiKepegawaianController::class, 'destroy']);
-            Route::put('/{id}/reference-number', [SuratKeputusanRotasiKepegawaianController::class, 'give_reference_number']);
-            Route::put('/{id}/approve', [SuratKeputusanRotasiKepegawaianController::class, 'approve']);
-            Route::put('/{id}/sign', [SuratKeputusanRotasiKepegawaianController::class, 'sign']);
         });
 
         Route::prefix('surat-keputusan-pemberhentian')->group(function () {
@@ -146,12 +219,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}/download/docx', [SuratKeputusanPemberhentianController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratKeputusanPemberhentianController::class, 'download_pdf']);
             Route::get('/{id}', [SuratKeputusanPemberhentianController::class, 'show']);
-            Route::put('/{id}/upload-signed-file', [SuratKeputusanPemberhentianController::class, 'upload_signed_file']);
             Route::put('/{id}', [SuratKeputusanPemberhentianController::class, 'update']);
             Route::delete('/{id}', [SuratKeputusanPemberhentianController::class, 'destroy']);
-            Route::put('/{id}/reference-number', [SuratKeputusanPemberhentianController::class, 'give_reference_number']);
-            Route::put('/{id}/approve', [SuratKeputusanPemberhentianController::class, 'approve']);
-            Route::put('/{id}/sign', [SuratKeputusanPemberhentianController::class, 'sign']);
         });
 
         Route::prefix('surat-keputusan-pengangkatan')->group(function () {
@@ -161,12 +230,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}/download/docx', [SuratKeputusanPengangkatanController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratKeputusanPengangkatanController::class, 'download_pdf']);
             Route::get('/{id}', [SuratKeputusanPengangkatanController::class, 'show']);
-            Route::put('/{id}/upload-signed-file', [SuratKeputusanPengangkatanController::class, 'upload_signed_file']);
             Route::put('/{id}', [SuratKeputusanPengangkatanController::class, 'update']);
             Route::delete('/{id}', [SuratKeputusanPengangkatanController::class, 'destroy']);
-            Route::put('/{id}/reference-number', [SuratKeputusanPengangkatanController::class, 'give_reference_number']);
-            Route::put('/{id}/approve', [SuratKeputusanPengangkatanController::class, 'approve']);
-            Route::put('/{id}/sign', [SuratKeputusanPengangkatanController::class, 'sign']);
         });
 
         Route::prefix('surat-keputusan-pemberhentian-dan-pengangkatan')->group(function () {
@@ -176,12 +241,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}/download/docx', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'download_pdf']);
             Route::get('/{id}', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'show']);
-            Route::put('/{id}/upload-signed-file', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'upload_signed_file']);
             Route::put('/{id}', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'update']);
             Route::delete('/{id}', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'destroy']);
-            Route::put('/{id}/reference-number', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'give_reference_number']);
-            Route::put('/{id}/approve', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'approve']);
-            Route::put('/{id}/sign', [SuratKeputusanPemberhentianDanPengangkatanController::class, 'sign']);
         });
 
         Route::prefix('surat-perjanjian-kerja-magang')->group(function () {
@@ -191,12 +252,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}/download/docx', [SuratPerjanjianKerjaMagangController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratPerjanjianKerjaMagangController::class, 'download_pdf']);
             Route::get('/{id}', [SuratPerjanjianKerjaMagangController::class, 'show']);
-            Route::put('/{id}/upload-signed-file', [SuratPerjanjianKerjaMagangController::class, 'upload_signed_file']);
             Route::put('/{id}', [SuratPerjanjianKerjaMagangController::class, 'update']);
             Route::delete('/{id}', [SuratPerjanjianKerjaMagangController::class, 'destroy']);
-            Route::put('/{id}/reference-number', [SuratPerjanjianKerjaMagangController::class, 'give_reference_number']);
-            Route::put('/{id}/approve', [SuratPerjanjianKerjaMagangController::class, 'approve']);
-            Route::put('/{id}/sign', [SuratPerjanjianKerjaMagangController::class, 'sign']);
         });
 
         Route::prefix('surat-perjanjian-kerja-dosen-luar-biasa')->group(function () {
@@ -206,12 +263,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}/download/docx', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'download_pdf']);
             Route::get('/{id}', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'show']);
-            Route::put('/{id}/upload-signed-file', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'upload_signed_file']);
             Route::put('/{id}', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'update']);
             Route::delete('/{id}', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'destroy']);
-            Route::put('/{id}/reference-number', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'give_reference_number']);
-            Route::put('/{id}/approve', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'approve']);
-            Route::put('/{id}/sign', [SuratPerjanjianKerjaDosenLuarBiasaController::class, 'sign']);
         });
 
         Route::prefix('surat-perjanjian-kerja-dosen-full-time')->group(function () {
@@ -221,12 +274,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}/download/docx', [SuratPerjanjianKerjaDosenFullTimeController::class, 'download_docx']);
             Route::get('/{id}/download/pdf', [SuratPerjanjianKerjaDosenFullTimeController::class, 'download_pdf']);
             Route::get('/{id}', [SuratPerjanjianKerjaDosenFullTimeController::class, 'show']);
-            Route::put('/{id}/upload-signed-file', [SuratPerjanjianKerjaDosenFullTimeController::class, 'upload_signed_file']);
             Route::put('/{id}', [SuratPerjanjianKerjaDosenFullTimeController::class, 'update']);
             Route::delete('/{id}', [SuratPerjanjianKerjaDosenFullTimeController::class, 'destroy']);
-            Route::put('/{id}/reference-number', [SuratPerjanjianKerjaDosenFullTimeController::class, 'give_reference_number']);
-            Route::put('/{id}/approve', [SuratPerjanjianKerjaDosenFullTimeController::class, 'approve']);
-            Route::put('/{id}/sign', [SuratPerjanjianKerjaDosenFullTimeController::class, 'sign']);
         });
     });
 });

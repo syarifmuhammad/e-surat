@@ -33,6 +33,7 @@ class SuratPerjanjianKerjaDosenFullTimeResource extends JsonResource
         }
         return [
             'id' => $this->id,
+            'is_private' => $this->is_private,
             'letter_template_id' => $this->letter_template_id,
             'nomor_surat_sebelumnya' => $this->nomor_surat_sebelumnya,
             'tanggal_surat_sebelumnya' => $this->tanggal_surat_sebelumnya,

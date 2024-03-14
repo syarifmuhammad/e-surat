@@ -20,6 +20,7 @@ const masa_berlaku_exist = ref(false)
 
 const form_surat = reactive({
     id: "",
+    is_private: false,
     letter_template_id: "",
     tanggal_surat: new Date().toISOString().slice(0, 10),
     masa_berlaku: {
@@ -36,6 +37,7 @@ const form_surat = reactive({
 })
 
 const errors = reactive({
+    is_private: "",
     letter_template_id: "",
     tanggal_surat: "",
     masa_berlaku: "",
@@ -64,6 +66,7 @@ async function get_letter(id) {
     await axios.get(`${url}/outcoming-letters/surat-keterangan-kerja/${id}`)
         .then(res => {
             form_surat.id = res.data.data.id
+            form_surat.is_private = res.data.data.is_private
             form_surat.letter_template_id = res.data.data.letter_template_id
             form_surat.tanggal_surat = res.data.data.tanggal_surat_raw
             form_surat.masa_berlaku = res.data.data.masa_berlaku
@@ -99,6 +102,7 @@ function reset_employee() {
 
 function reset_form() {
     form_surat.id = ""
+    form_surat.is_private = false
     form_surat.letter_template_id = ""
     form_surat.tanggal_surat = new Date().toISOString().slice(0, 10)
     form_surat.masa_berlaku = {
@@ -155,24 +159,26 @@ function save_surat() {
     reset_errors()
 
     loading.value.open()
+
+    let payload = {
+        is_private: form_surat.is_private,
+        letter_template_id: form_surat.letter_template_id,
+        tanggal_surat: form_surat.tanggal_surat,
+        employee: {
+            id: selected_employee.value.id,
+            position: form_surat.employee.position
+        },
+        signers: form_surat.signers,
+        approvals: form_surat.approvals,
+        signature_type: form_surat.signature_type,
+    }
+
+    if (masa_berlaku_exist.value) {
+        payload.masa_berlaku = form_surat.masa_berlaku
+    }
+
     if (form_surat.id != '') {
         // update
-        let payload = {
-            letter_template_id: form_surat.letter_template_id,
-            tanggal_surat: form_surat.tanggal_surat,
-            employee: {
-                id: selected_employee.value.id,
-                position: form_surat.employee.position
-            },
-            signers: form_surat.signers,
-            approvals: form_surat.approvals,
-            signature_type: form_surat.signature_type,
-        }
-
-        if (masa_berlaku_exist.value) {
-            payload.masa_berlaku = form_surat.masa_berlaku
-        }
-
         axios.put(`${url}/outcoming-letters/surat-keterangan-kerja/${form_surat.id}`, payload)
             .then(res => {
                 Swal.fire({
@@ -205,22 +211,6 @@ function save_surat() {
             })
     } else {
         // create
-        let payload = {
-            letter_template_id: form_surat.letter_template_id,
-            tanggal_surat: form_surat.tanggal_surat,
-            employee: {
-                id: selected_employee.value.id,
-                position: form_surat.employee.position
-            },
-            signers: form_surat.signers,
-            approvals: form_surat.approvals,
-            signature_type: form_surat.signature_type,
-        }
-
-        if (masa_berlaku_exist.value) {
-            payload.masa_berlaku = form_surat.masa_berlaku
-        }
-
         axios.post(`${url}/outcoming-letters/surat-keterangan-kerja`, payload)
             .then(res => {
                 Swal.fire({
@@ -284,6 +274,16 @@ onMounted(async () => {
                     </select>
                     <p v-if="errors.letter_template_id" class="text-xs text-red-600 mt-2" id="letter-template-error">
                         {{ errors.letter_template_id }}
+                    </p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Sifat Surat : Rahasia atau tidak ?</label>
+                    <input type="radio" name="is_private" value="false" @click="form_surat.is_private = false"
+                        :checked="!form_surat.is_private"> Tidak Rahasia
+                    <input class="ml-4" type="radio" name="is_private" value="true" @click="form_surat.is_private = true"
+                        :checked="form_surat.is_private"> Rahasia
+                    <p v-if="errors.is_private" class="text-xs text-red-600 mt-2" id="is-private-error">
+                        {{ errors.is_private }}
                     </p>
                 </div>
                 <div class="mb-4">

@@ -28,7 +28,13 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
      */
     public function index(Request $request)
     {
-        $letters = Letter::with(['signers', 'signers.employee', 'approvals', 'approvals.employee'])->search($request->search)->whereUser(auth()->user())->orderBy('is_signed')->orderBy('reference_number')->orderBy('id')->paginate();
+        $letters = Letter::with(['signers', 'signers.employee', 'approvals', 'approvals.employee'])->search($request->search)->where('created_by', auth()->id())->orderBy('is_signed')->orderBy('reference_number')->orderBy('id')->paginate();
+        return new ThisCollection($letters);
+    }
+
+    public function incoming(Request $request)
+    {
+        $letters = Letter::with(['signers', 'signers.employee', 'approvals', 'approvals.employee'])->search($request->search)->whereAssigned(auth()->user())->orderBy('is_signed')->orderBy('reference_number')->orderBy('id')->paginate();
         return new ThisCollection($letters);
     }
 
@@ -57,6 +63,7 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
     public function store(Request $request)
     {
         $validate = Validator::make($request->all(), [
+            'is_private' => 'required|boolean',
             'letter_template_id' => 'required|exists:letter_templates,id',
             'tanggal_surat' => 'required|date',
             'masa_berlaku.year' => 'required|integer',
@@ -98,6 +105,7 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
 
         try {
             $letter = new Letter;
+            $letter->is_private = $request->is_private;
             $letter->letter_template_id = $request->letter_template_id;
             $letter->tanggal_surat = $request->tanggal_surat;
             $letter->mulai_berlaku = $request->mulai_berlaku;
@@ -252,6 +260,7 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
         }
 
         $validate = Validator::make($request->all(), [
+            'is_private' => 'required|boolean',
             'letter_template_id' => 'required|exists:letter_templates,id',
             'tanggal_surat' => 'required|date',
             'masa_berlaku.year' => 'required|integer',
@@ -292,6 +301,7 @@ class SuratPerjanjianKerjaDosenFullTimeController extends Controller
         DB::beginTransaction();
 
         try {
+            $letter->is_private = $request->is_private;
             $letter->letter_template_id = $request->letter_template_id;
             $letter->tanggal_surat = $request->tanggal_surat;
             $letter->mulai_berlaku = $request->mulai_berlaku;

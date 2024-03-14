@@ -17,7 +17,7 @@ const modal_sign = ref(null)
 
 function get_pdf(id) {
     loading_pdf.value = true
-    axios.get(`${url}/outcoming-letters/${route.meta.api_letter}/${id}/download/pdf`, {
+    axios.get(`${url}/incoming-letters/${route.meta.api_letter}/${id}/download/pdf`, {
         responseType: 'blob',
     }).then(res => {
         const url_pdf = window.URL.createObjectURL(res.data);
@@ -43,7 +43,7 @@ function sign() {
     let payload = {
         _method: 'PUT',
     }
-    axios.put(`${url}/outcoming-letters/${route.meta.api_letter}/${route.params.id}/sign`, payload).then(res => {
+    axios.put(`${url}/incoming-letters/${route.meta.api_letter}/${route.params.id}/sign`, payload).then(res => {
         loading.value.close()
         Swal.fire({
             title: 'Berhasil!',

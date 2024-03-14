@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('surat_perjanjian_kerja_dosen_full_time', function (Blueprint $table) {
             $table->id();
+            $table->boolean('is_private')->default(false);
             $table->string('reference_number')->nullable()->unique();
             $table->date('tanggal_surat')->default(now());
             $table->date('mulai_berlaku')->nullable()->default(null);
             $table->bigInteger('masa_berlaku');
             $table->string('nomor_surat_sebelumnya')->nullable();
-            $table->string('tanggal_surat_sebelumnya')->nullable();
+            $table->date('tanggal_surat_sebelumnya');
             $table->unsignedBigInteger('employee_id');
             $table->string('jabatan_fungsional');
             $table->json('prodi');
