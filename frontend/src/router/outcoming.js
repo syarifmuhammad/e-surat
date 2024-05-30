@@ -1,8 +1,6 @@
 const LetterTemplates = () => import('@/views/outcoming_letters/LetterTemplates/Index.vue')
 const FormLetterTemplates = () => import('@/views/outcoming_letters/LetterTemplates/Form.vue')
 const Report = () => import('@/views/outcoming_letters/Report.vue')
-const ApproveLetter = () => import('@/views/outcoming_letters/ApproveLetter.vue')
-const SignedLetter = () => import('@/views/outcoming_letters/SignedLetter.vue')
 
 const Preview = () => import('@/views/Preview.vue')
 
